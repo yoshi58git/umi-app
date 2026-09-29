@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>umi — 海のごみを記録する</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -674,6 +674,13 @@ function backToMap(){ document.getElementById('done-view').classList.remove('act
 function showLoading(text){ document.getElementById('loading-text').textContent=text; document.getElementById('loading-overlay').classList.add('active') }
 function hideLoading(){ document.getElementById('loading-overlay').classList.remove('active') }
 
+// Leafletが確実に読み込まれるまで待つ
+function waitForLeaflet(cb, tries=0){
+  if(typeof L !== 'undefined') cb();
+  else if(tries < 20) setTimeout(()=>waitForLeaflet(cb, tries+1), 200);
+  else console.error('Leaflet load timeout');
+}
+
 // ══ ONBOARDING ══
 function startApp(){
   localStorage.setItem('umi_started', '1');
@@ -685,7 +692,9 @@ function startApp(){
 // map-area click handled by Leaflet
 
 async function init(){
-  await loadRecords();
+  waitForLeaflet(async ()=>{
+    await loadRecords();
+  });
   // 起動時は現在地マーカーなし（EXIFのみ使用）
 }
 
