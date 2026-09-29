@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>umi — 海のごみを記録する</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exifr/7.1.3/full.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -212,7 +213,7 @@ html,body{height:100%;background:var(--sea-deep);color:var(--white);font-family:
 <input type="file" id="file-input" accept="image/*" onchange="handleFile(this)">
 
 <script>
-// ══ 設定（ここにキーを入れる） ══
+// ══ 設定 ══
 const SUPABASE_URL = 'https://imqgpzgpytwvfkgscezn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcWdwemdweXR3dmZrZ3NjZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODM3MDksImV4cCI6MjEwNjI1OTcwOX0.Wso1DnlSPDJfjH-4AWKOCGke-6vPau5V6cBeFZ_npZ4';
 const EDGE_FUNCTION_URL = SUPABASE_URL + '/functions/v1/analyze-image';
@@ -380,75 +381,19 @@ function handleFile(input){
 }
 
 async function extractGPSFromEXIF(file){
-  return new Promise(resolve=>{
-    const reader = new FileReader();
-    reader.onload = e => {
-      try{
-        const arr = new Uint8Array(e.target.result);
-        // JPEGのEXIFを検索
-        let offset = 2;
-        while(offset < arr.length){
-          if(arr[offset]===0xFF && arr[offset+1]===0xE1){
-            const exifLen = (arr[offset+2]<<8) | arr[offset+3];
-            const exifData = arr.slice(offset+4, offset+4+exifLen);
-            const gps = parseGPS(exifData);
-            resolve(gps);
-            return;
-          }
-          offset++;
-        }
-        resolve(null);
-      }catch(e){ resolve(null); }
-    };
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-function parseGPS(data){
   try{
-    // 'Exif\0\0' を検索
-    let tiffOffset = -1;
-    for(let i=0;i<data.length-6;i++){
-      if(data[i]===0x45&&data[i+1]===0x78&&data[i+2]===0x69&&data[i+3]===0x66){
-        tiffOffset = i+6; break;
+    // exifrライブラリで確実にEXIF GPS取得
+    if(typeof exifr !== 'undefined'){
+      const gps = await exifr.gps(file);
+      if(gps && gps.latitude && gps.longitude){
+        return { lat: gps.latitude, lng: gps.longitude };
       }
     }
-    if(tiffOffset<0) return null;
-    const td = data.slice(tiffOffset);
-    const le = td[0]===0x49; // little endian
-    const readU16=(o)=>le?(td[o]|td[o+1]<<8):(td[o]<<8|td[o+1]);
-    const readU32=(o)=>le?(td[o]|td[o+1]<<8|td[o+2]<<16|td[o+3]<<24)>>>0:((td[o]<<24|td[o+1]<<16|td[o+2]<<8|td[o+3])>>>0);
-    const ifdOffset = readU32(4);
-    const entries = readU16(ifdOffset);
-    let gpsIFDOffset = -1;
-    for(let i=0;i<entries;i++){
-      const tag = readU16(ifdOffset+2+i*12);
-      if(tag===0x8825){ gpsIFDOffset=readU32(ifdOffset+2+i*12+8); break; }
-    }
-    if(gpsIFDOffset<0) return null;
-    const gpsEntries = readU16(gpsIFDOffset);
-    let latRef='N',lngRef='E',lat=null,lng=null;
-    for(let i=0;i<gpsEntries;i++){
-      const tag = readU16(gpsIFDOffset+2+i*12);
-      const valOffset = gpsIFDOffset+2+i*12+8;
-      if(tag===0x01) latRef=String.fromCharCode(td[readU32(valOffset)]);
-      if(tag===0x03) lngRef=String.fromCharCode(td[readU32(valOffset)]);
-      if(tag===0x02||tag===0x04){
-        const off=readU32(valOffset);
-        const d=readU32(off)/readU32(off+4);
-        const m=readU32(off+8)/readU32(off+12);
-        const s=readU32(off+16)/readU32(off+20);
-        const deg=d+m/60+s/3600;
-        if(tag===0x02) lat=deg;
-        else lng=deg;
-      }
-    }
-    if(lat===null||lng===null) return null;
-    return {
-      lat: latRef==='S'?-lat:lat,
-      lng: lngRef==='W'?-lng:lng
-    };
-  }catch(e){ return null; }
+    return null;
+  }catch(e){
+    console.log('EXIF GPS取得失敗:', e);
+    return null;
+  }
 }
 
 async function runAnalysis(){
