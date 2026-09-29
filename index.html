@@ -275,8 +275,8 @@ function renderDot(record){
   const area = document.getElementById('map-area');
   const dot = document.createElement('div');
   dot.className = 'dot ' + (record.category||'sea').toLowerCase();
-  const x = ((record.lng - 130) / 20) * 100;
-  const y = ((46 - record.lat) / 16) * 100;
+  const x = ((record.lng + 180) / 360) * 100;
+  const y = ((90 - record.lat) / 180) * 100;
   dot.style.left = Math.max(5,Math.min(95,x)) + '%';
   dot.style.top = Math.max(5,Math.min(95,y)) + '%';
   dot.onclick = () => showPanel(record);
@@ -364,10 +364,91 @@ function takePhoto(){
 
 function handleFile(input){
   if(!input.files[0]) return;
-  capturedBlob=input.files[0];
-  const reader=new FileReader();
-  reader.onload=e=>{ capturedDataUrl=e.target.result; closeCamera(); runAnalysis(); };
-  reader.readAsDataURL(input.files[0]);
+  const file = input.files[0];
+  capturedBlob = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    capturedDataUrl = e.target.result;
+    // EXIFからGPS取得を試みる
+    extractGPSFromEXIF(file).then(loc => {
+      if(loc){ userLat=loc.lat; userLng=loc.lng; }
+      closeCamera();
+      runAnalysis();
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+async function extractGPSFromEXIF(file){
+  return new Promise(resolve=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const arr = new Uint8Array(e.target.result);
+        // JPEGのEXIFを検索
+        let offset = 2;
+        while(offset < arr.length){
+          if(arr[offset]===0xFF && arr[offset+1]===0xE1){
+            const exifLen = (arr[offset+2]<<8) | arr[offset+3];
+            const exifData = arr.slice(offset+4, offset+4+exifLen);
+            const gps = parseGPS(exifData);
+            resolve(gps);
+            return;
+          }
+          offset++;
+        }
+        resolve(null);
+      }catch(e){ resolve(null); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function parseGPS(data){
+  try{
+    // 'Exif\0\0' を検索
+    let tiffOffset = -1;
+    for(let i=0;i<data.length-6;i++){
+      if(data[i]===0x45&&data[i+1]===0x78&&data[i+2]===0x69&&data[i+3]===0x66){
+        tiffOffset = i+6; break;
+      }
+    }
+    if(tiffOffset<0) return null;
+    const td = data.slice(tiffOffset);
+    const le = td[0]===0x49; // little endian
+    const readU16=(o)=>le?(td[o]|td[o+1]<<8):(td[o]<<8|td[o+1]);
+    const readU32=(o)=>le?(td[o]|td[o+1]<<8|td[o+2]<<16|td[o+3]<<24)>>>0:((td[o]<<24|td[o+1]<<16|td[o+2]<<8|td[o+3])>>>0);
+    const ifdOffset = readU32(4);
+    const entries = readU16(ifdOffset);
+    let gpsIFDOffset = -1;
+    for(let i=0;i<entries;i++){
+      const tag = readU16(ifdOffset+2+i*12);
+      if(tag===0x8825){ gpsIFDOffset=readU32(ifdOffset+2+i*12+8); break; }
+    }
+    if(gpsIFDOffset<0) return null;
+    const gpsEntries = readU16(gpsIFDOffset);
+    let latRef='N',lngRef='E',lat=null,lng=null;
+    for(let i=0;i<gpsEntries;i++){
+      const tag = readU16(gpsIFDOffset+2+i*12);
+      const valOffset = gpsIFDOffset+2+i*12+8;
+      if(tag===0x01) latRef=String.fromCharCode(td[readU32(valOffset)]);
+      if(tag===0x03) lngRef=String.fromCharCode(td[readU32(valOffset)]);
+      if(tag===0x02||tag===0x04){
+        const off=readU32(valOffset);
+        const d=readU32(off)/readU32(off+4);
+        const m=readU32(off+8)/readU32(off+12);
+        const s=readU32(off+16)/readU32(off+20);
+        const deg=d+m/60+s/3600;
+        if(tag===0x02) lat=deg;
+        else lng=deg;
+      }
+    }
+    if(lat===null||lng===null) return null;
+    return {
+      lat: latRef==='S'?-lat:lat,
+      lng: lngRef==='W'?-lng:lng
+    };
+  }catch(e){ return null; }
 }
 
 async function runAnalysis(){
@@ -442,7 +523,45 @@ function hideLoading(){ document.getElementById('loading-overlay').classList.rem
 
 // ══ INIT ══
 document.getElementById('map-area').addEventListener('click', closePanel);
-loadRecords();
+
+async function init(){
+  await loadRecords();
+  // 起動時にGPSを取得して中心を設定
+  const loc = await getLocation();
+  if(loc){
+    userLat = loc.lat;
+    userLng = loc.lng;
+    centerMap(loc.lat, loc.lng);
+  }
+}
+
+function centerMap(lat, lng){
+  // 現在地を示す青い点を表示
+  const area = document.getElementById('map-area');
+  const existing = document.getElementById('my-location');
+  if(existing) existing.remove();
+
+  const x = ((lng + 180) / 360) * 100;
+  const y = ((90 - lat) / 180) * 100;
+
+  const me = document.createElement('div');
+  me.id = 'my-location';
+  me.style.cssText = `
+    position:absolute;
+    width:12px;height:12px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.9);
+    border:2px solid #1A7A9A;
+    transform:translate(-50%,-50%);
+    left:${Math.max(5,Math.min(95,x))}%;
+    top:${Math.max(5,Math.min(95,y))}%;
+    z-index:10;
+    box-shadow:0 0 0 4px rgba(26,122,154,0.3);
+  `;
+  area.appendChild(me);
+}
+
+init();
 </script>
 </body>
 </html>
