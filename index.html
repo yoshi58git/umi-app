@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>umi — 海のごみを記録する</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -147,11 +149,32 @@ html,body{height:100%;background:var(--sea-deep);color:var(--white);font-family:
   letter-spacing:0.04em;
 }
 </style>
+<style>
+#leaflet-map{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.leaflet-popup-content-wrapper{
+  background:rgba(6,20,32,0.97)!important;
+  border:1px solid rgba(26,122,154,0.4)!important;
+  border-radius:12px!important;
+  box-shadow:0 4px 24px rgba(0,0,0,0.5)!important;
+  color:var(--white)!important;
+  padding:0!important;
+}
+.leaflet-popup-content{margin:0!important;width:220px!important}
+.leaflet-popup-tip{background:rgba(6,20,32,0.97)!important}
+.leaflet-popup-close-button{color:rgba(170,221,238,0.6)!important;font-size:18px!important;top:8px!important;right:10px!important}
+.umi-popup img{width:100%;height:130px;object-fit:cover;border-radius:12px 12px 0 0;display:block}
+.umi-popup-body{padding:10px 12px 12px}
+.umi-popup-cat{font-size:10px;letter-spacing:0.08em;color:var(--foam);opacity:0.6;margin-bottom:4px}
+.umi-popup-items{font-size:12px;color:var(--white);line-height:1.55;margin-bottom:6px}
+.umi-popup-risk{font-size:11px;font-weight:500}
+.leaflet-tile{filter:brightness(0.85) saturate(0.7)}
+</style>
 </head>
 <body>
 
 <div id="map-view">
   <div id="map-bg"></div>
+  <!-- Google Maps は map-area 内に描画 -->
   <div id="header">
     <div id="logo">umi</div>
     <div>
@@ -291,43 +314,114 @@ async function analyzeImage(dataUrl){
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
     },
-    body: JSON.stringify({ imageBase64: base64 })
+    body: JSON.stringify({ imageBase64: base64, lat: userLat, lng: userLng })
   });
   if(!res.ok) throw new Error('AI解析失敗');
   return res.json();
 }
 
-// ══ MAP ══
-function renderDot(record){
-  const area = document.getElementById('map-area');
-  const dot = document.createElement('div');
-  dot.className = 'dot ' + (record.category||'sea').toLowerCase();
-  const x = ((record.lng + 180) / 360) * 100;
-  const y = ((90 - record.lat) / 180) * 100;
-  dot.style.left = Math.max(5,Math.min(95,x)) + '%';
-  dot.style.top = Math.max(5,Math.min(95,y)) + '%';
-  dot.onclick = () => showPanel(record);
-  area.appendChild(dot);
+// ══ MAP (Leaflet + OpenStreetMap) ══
+let leafmap = null;
+const catColors = {
+  SEA:'#22CCEE', RIVER:'#44BB88', CITY:'#FFAA44', LIFE:'#FF7766'
+};
+
+function initLeafletMap(centerLat, centerLng, zoom){
+  const mapArea = document.getElementById('map-area');
+  const mapDiv = document.createElement('div');
+  mapDiv.id = 'leaflet-map';
+  mapArea.appendChild(mapDiv);
+
+  leafmap = L.map('leaflet-map', {
+    center: [centerLat, centerLng],
+    zoom: zoom || 13,
+    zoomControl: true,
+    attributionControl: true,
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
+  }).addTo(leafmap);
+}
+
+function addMarker(record){
+  if(!leafmap || !record.lat || !record.lng) return;
+  const cat = (record.category||'SEA').toUpperCase();
+  const color = catColors[cat] || '#22CCEE';
+
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:12px;height:12px;border-radius:50%;
+      background:${color};
+      border:2px solid rgba(255,255,255,0.6);
+      box-shadow:0 0 0 3px ${color}44;
+    "></div>`,
+    iconSize: [12,12],
+    iconAnchor: [6,6],
+    popupAnchor: [0,-8],
+  });
+
+  const riskColor = record.mp_risk==='高'?'#FF7766':record.mp_risk==='中'?'#FFAA44':'#44BB88';
+  const imgHtml = record.image_url
+    ? `<img src="${record.image_url}" alt="" onerror="this.style.display='none'">`
+    : '';
+  const itemsShort = (record.items||'').split('\n').slice(0,3).join('<br>');
+  const dateStr = record.created_at ? record.created_at.slice(0,10) : '';
+  const locName = record.location_name && record.location_name !== '不明'
+    ? record.location_name + ' — ' : '';
+
+  const popup = L.popup({
+    maxWidth: 240,
+    className: 'umi-leaflet-popup',
+    closeButton: true,
+  }).setContent(`
+    <div class="umi-popup">
+      ${imgHtml}
+      <div class="umi-popup-body">
+        <div class="umi-popup-cat">${cat} ${locName}${dateStr}</div>
+        <div class="umi-popup-items">${itemsShort}</div>
+        ${record.mp_risk ? `<div class="umi-popup-risk" style="color:${riskColor}">MPリスク：${record.mp_risk}</div>` : ''}
+      </div>
+    </div>
+  `);
+
+  L.marker([record.lat, record.lng], {icon}).addTo(leafmap).bindPopup(popup);
 }
 
 async function loadRecords(){
   try{
-    const data = await sb('records?select=*&order=created_at.desc&limit=200');
-    let sea=0, city=0;
+    const data = await sb('records?select=*&order=created_at.desc&limit=500');
+    let sea=0, city=0, sumLat=0, sumLng=0, count=0;
+
     if(Array.isArray(data)){
       data.forEach(r=>{
-        if(r.lat && r.lng) renderDot(r);
         const cat=(r.category||'').toUpperCase();
         if(cat==='SEA'||cat==='RIVER') sea++;
         if(cat==='CITY'||cat==='LIFE') city++;
+        if(r.lat && r.lng){ sumLat+=r.lat; sumLng+=r.lng; count++; }
       });
+
       totalCount = data.length;
       document.getElementById('counter-num').textContent = totalCount;
       document.getElementById('stat-total').textContent = totalCount;
       document.getElementById('stat-sea').textContent = sea;
       document.getElementById('stat-city').textContent = city;
+
+      // レコードの重心で地図を初期化
+      const centerLat = count > 0 ? sumLat/count : 35.316;
+      const centerLng = count > 0 ? sumLng/count : 139.473;
+      initLeafletMap(centerLat, centerLng, count > 0 ? 14 : 10);
+
+      data.forEach(r=>{ if(r.lat && r.lng) addMarker(r); });
+    } else {
+      initLeafletMap(35.316, 139.473, 13);
     }
-  }catch(e){ console.error('読み込みエラー:', e) }
+  }catch(e){
+    console.error('読み込みエラー:', e);
+    initLeafletMap(35.316, 139.473, 13);
+  }
 }
 
 function showPanel(r){
@@ -564,7 +658,7 @@ async function sendPhoto(){
     totalCount++;
     document.getElementById('done-num').textContent = totalCount;
     document.getElementById('impact-text').textContent = r.summary||'記録されました';
-    if(userLat&&userLng) renderDot({...record});
+    if(userLat&&userLng) addMarker({...record, created_at: new Date().toISOString()});
     document.getElementById('counter-num').textContent = totalCount;
     document.getElementById('stat-total').textContent = totalCount;
     document.getElementById('done-view').classList.add('active');
@@ -588,7 +682,7 @@ function startApp(){
 }
 
 // ══ INIT ══
-document.getElementById('map-area').addEventListener('click', closePanel);
+// map-area click handled by Leaflet
 
 async function init(){
   await loadRecords();
@@ -596,29 +690,9 @@ async function init(){
 }
 
 function centerMap(lat, lng){
-  // 現在地を示す青い点を表示
-  const area = document.getElementById('map-area');
-  const existing = document.getElementById('my-location');
-  if(existing) existing.remove();
-
-  const x = ((lng + 180) / 360) * 100;
-  const y = ((90 - lat) / 180) * 100;
-
-  const me = document.createElement('div');
-  me.id = 'my-location';
-  me.style.cssText = `
-    position:absolute;
-    width:12px;height:12px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.9);
-    border:2px solid #1A7A9A;
-    transform:translate(-50%,-50%);
-    left:${Math.max(5,Math.min(95,x))}%;
-    top:${Math.max(5,Math.min(95,y))}%;
-    z-index:10;
-    box-shadow:0 0 0 4px rgba(26,122,154,0.3);
-  `;
-  area.appendChild(me);
+  if(leafmap){
+    leafmap.setView([lat, lng], 14);
+  }
 }
 
 if(localStorage.getItem('umi_started')){
@@ -626,5 +700,6 @@ if(localStorage.getItem('umi_started')){
   init();
 }
 </script>
+
 </body>
 </html>
