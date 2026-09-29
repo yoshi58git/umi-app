@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>umi — 海のごみを記録する</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -120,6 +119,33 @@ html,body{height:100%;background:var(--sea-deep);color:var(--white);font-family:
 
 #cam-canvas{display:none}
 #file-input{display:none}
+
+#onboarding{
+  position:fixed;inset:0;background:var(--sea-deep);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:1000;padding:40px 32px;
+}
+#onboarding.hidden{display:none}
+#ob-logo{font-size:32px;font-weight:300;letter-spacing:0.2em;color:var(--foam);margin-bottom:40px}
+.ob-item{
+  display:flex;align-items:flex-start;gap:16px;
+  width:100%;max-width:320px;margin-bottom:28px;
+}
+.ob-icon{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(26,122,154,0.2);border:1px solid rgba(26,122,154,0.4);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;
+}
+.ob-text{font-size:13px;color:var(--foam);line-height:1.6;opacity:0.9}
+.ob-text strong{color:var(--white);font-weight:500}
+#ob-btn{
+  width:100%;max-width:320px;padding:14px;
+  background:var(--wave);border:none;border-radius:var(--radius);
+  color:var(--white);font-size:15px;font-weight:500;
+  cursor:pointer;margin-top:16px;font-family:'Inter',sans-serif;
+  letter-spacing:0.04em;
+}
 </style>
 </head>
 <body>
@@ -320,16 +346,7 @@ function showPanel(r){
 }
 function closePanel(){ document.getElementById('dot-panel').classList.remove('open') }
 
-// ══ GPS ══
-function getLocation(){
-  return new Promise(resolve=>{
-    if(!navigator.geolocation){ resolve(null); return; }
-    navigator.geolocation.getCurrentPosition(
-      p=>resolve({lat:p.coords.latitude, lng:p.coords.longitude}),
-      ()=>resolve(null), {timeout:5000}
-    );
-  });
-}
+// ══ GPS ══ (EXIFのみ使用)
 
 // ══ CAMERA ══
 async function openCamera(){
@@ -338,8 +355,7 @@ async function openCamera(){
     videoStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
     document.getElementById('cam-video').srcObject = videoStream;
   }catch(e){ console.log('カメラアクセス不可') }
-  const loc = await getLocation();
-  if(loc){ userLat=loc.lat; userLng=loc.lng; }
+  // GPS はEXIFから取得
 }
 
 function closeCamera(){
@@ -381,22 +397,94 @@ function handleFile(input){
 }
 
 async function extractGPSFromEXIF(file){
+  return new Promise(resolve=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const view = new DataView(e.target.result);
+        // JPEG SOI check
+        if(view.getUint16(0) !== 0xFFD8){ resolve(null); return; }
+        let offset = 2;
+        while(offset < view.byteLength - 4){
+          const marker = view.getUint16(offset);
+          const size = view.getUint16(offset + 2);
+          if(marker === 0xFFE1){
+            // APP1 - EXIF
+            const exif = view.buffer.slice(offset + 4, offset + 2 + size);
+            const result = parseExifGPS(exif);
+            resolve(result);
+            return;
+          }
+          offset += 2 + size;
+        }
+        resolve(null);
+      }catch(e){ console.log('EXIF parse error:', e); resolve(null); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function parseExifGPS(buffer){
   try{
-    // exifrライブラリで確実にEXIF GPS取得
-    if(typeof exifr !== 'undefined'){
-      const gps = await exifr.gps(file);
-      if(gps && gps.latitude && gps.longitude){
-        return { lat: gps.latitude, lng: gps.longitude };
+    const view = new DataView(buffer);
+    const header = String.fromCharCode(
+      view.getUint8(0),view.getUint8(1),view.getUint8(2),view.getUint8(3)
+    );
+    if(header !== 'Exif') return null;
+
+    const tiff = 6;
+    const byteOrder = view.getUint16(tiff);
+    const le = byteOrder === 0x4949; // 0x4D4D = big endian, 0x4949 = little endian
+
+    const r16 = o => view.getUint16(tiff+o, le);
+    const r32 = o => view.getUint32(tiff+o, le);
+
+    const ifd0 = r32(4);
+    const n0 = r16(ifd0);
+
+    let gpsOff = -1;
+    for(let i=0; i<n0; i++){
+      if(r16(ifd0+2+i*12) === 0x8825){
+        gpsOff = r32(ifd0+2+i*12+8); break;
       }
     }
-    return null;
-  }catch(e){
-    console.log('EXIF GPS取得失敗:', e);
-    return null;
-  }
+    if(gpsOff < 0) return null;
+
+    const gpsCount = r16(gpsOff);
+    let latRef='N', lngRef='E', lat=null, lng=null;
+
+    const rat = o => {
+      const n = r32(o), d = r32(o+4);
+      return d === 0 ? 0 : n/d;
+    };
+
+    for(let i=0; i<gpsCount; i++){
+      const b = gpsOff+2+i*12;
+      const tag = r16(b);
+      const vo = r32(b+8);
+      if(tag===0x01) latRef = String.fromCharCode(view.getUint8(tiff+vo));
+      else if(tag===0x03) lngRef = String.fromCharCode(view.getUint8(tiff+vo));
+      else if(tag===0x02||tag===0x04){
+        const deg = rat(tiff+vo) + rat(tiff+vo+8)/60 + rat(tiff+vo+16)/3600;
+        if(tag===0x02) lat=deg; else lng=deg;
+      }
+    }
+
+    if(lat===null||lng===null) return null;
+    console.log('EXIF GPS:', latRef, lat, lngRef, lng);
+    return {
+      lat: latRef==='S' ? -lat : lat,
+      lng: lngRef==='W' ? -lng : lng
+    };
+  }catch(e){ console.log('GPS parse error:', e); return null; }
 }
 
 async function runAnalysis(){
+  // GPS確認
+  if(!userLat || !userLng){
+    alert('この写真にはGPS情報が含まれていません。\nカメラアプリで位置情報をオンにして撮影した写真を使ってください。');
+    return;
+  }
   showLoading('AI解析中...');
   try{
     analysisResult = await analyzeImage(capturedDataUrl);
@@ -466,18 +554,19 @@ function backToMap(){ document.getElementById('done-view').classList.remove('act
 function showLoading(text){ document.getElementById('loading-text').textContent=text; document.getElementById('loading-overlay').classList.add('active') }
 function hideLoading(){ document.getElementById('loading-overlay').classList.remove('active') }
 
+// ══ ONBOARDING ══
+function startApp(){
+  localStorage.setItem('umi_started', '1');
+  document.getElementById('onboarding').classList.add('hidden');
+  init();
+}
+
 // ══ INIT ══
 document.getElementById('map-area').addEventListener('click', closePanel);
 
 async function init(){
   await loadRecords();
-  // 起動時にGPSを取得して中心を設定
-  const loc = await getLocation();
-  if(loc){
-    userLat = loc.lat;
-    userLng = loc.lng;
-    centerMap(loc.lat, loc.lng);
-  }
+  // 起動時は現在地マーカーなし（EXIFのみ使用）
 }
 
 function centerMap(lat, lng){
@@ -506,7 +595,10 @@ function centerMap(lat, lng){
   area.appendChild(me);
 }
 
-init();
+if(localStorage.getItem('umi_started')){
+  document.getElementById('onboarding').classList.add('hidden');
+  init();
+}
 </script>
 </body>
 </html>
