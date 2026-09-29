@@ -402,21 +402,29 @@ async function extractGPSFromEXIF(file){
     reader.onload = e => {
       try{
         const view = new DataView(e.target.result);
+        console.log('File size:', e.target.result.byteLength);
         // JPEG SOI check
-        if(view.getUint16(0) !== 0xFFD8){ resolve(null); return; }
+        const soi = view.getUint16(0);
+        console.log('SOI marker:', '0x'+soi.toString(16));
+        if(soi !== 0xFFD8){ console.log('Not JPEG'); resolve(null); return; }
         let offset = 2;
+        let found = false;
         while(offset < view.byteLength - 4){
           const marker = view.getUint16(offset);
           const size = view.getUint16(offset + 2);
+          console.log('Marker:', '0x'+marker.toString(16), 'size:', size, 'offset:', offset);
           if(marker === 0xFFE1){
-            // APP1 - EXIF
+            found = true;
             const exif = view.buffer.slice(offset + 4, offset + 2 + size);
             const result = parseExifGPS(exif);
+            console.log('parseExifGPS result:', result);
             resolve(result);
             return;
           }
+          if(size < 2){ console.log('Invalid size'); break; }
           offset += 2 + size;
         }
+        if(!found) console.log('APP1 not found');
         resolve(null);
       }catch(e){ console.log('EXIF parse error:', e); resolve(null); }
     };
@@ -427,51 +435,69 @@ async function extractGPSFromEXIF(file){
 function parseExifGPS(buffer){
   try{
     const view = new DataView(buffer);
+    const len = buffer.byteLength;
+
+    // Exif header check
+    if(len < 6) return null;
     const header = String.fromCharCode(
       view.getUint8(0),view.getUint8(1),view.getUint8(2),view.getUint8(3)
     );
     if(header !== 'Exif') return null;
 
     const tiff = 6;
+    if(tiff+8 > len) return null;
+
     const byteOrder = view.getUint16(tiff);
-    const le = byteOrder === 0x4949; // 0x4D4D = big endian, 0x4949 = little endian
+    const le = byteOrder === 0x4949;
 
-    const r16 = o => view.getUint16(tiff+o, le);
-    const r32 = o => view.getUint32(tiff+o, le);
+    const safe16 = o => (tiff+o+2 <= len) ? view.getUint16(tiff+o, le) : 0;
+    const safe32 = o => (tiff+o+4 <= len) ? view.getUint32(tiff+o, le) : 0;
+    const safeU8 = o => (o < len) ? view.getUint8(o) : 0;
 
-    const ifd0 = r32(4);
-    const n0 = r16(ifd0);
+    const ifd0 = safe32(4);
+    if(ifd0 === 0 || tiff+ifd0+2 > len) return null;
+    const n0 = safe16(ifd0);
 
     let gpsOff = -1;
     for(let i=0; i<n0; i++){
-      if(r16(ifd0+2+i*12) === 0x8825){
-        gpsOff = r32(ifd0+2+i*12+8); break;
+      const base = ifd0+2+i*12;
+      if(tiff+base+12 > len) break;
+      if(safe16(base) === 0x8825){
+        gpsOff = safe32(base+8); break;
       }
     }
     if(gpsOff < 0) return null;
+    if(tiff+gpsOff+2 > len) return null;
 
-    const gpsCount = r16(gpsOff);
+    const gpsCount = safe16(gpsOff);
     let latRef='N', lngRef='E', lat=null, lng=null;
 
     const rat = o => {
-      const n = r32(o), d = r32(o+4);
+      if(o+8 > len) return 0;
+      const n = view.getUint32(o, le);
+      const d = view.getUint32(o+4, le);
       return d === 0 ? 0 : n/d;
     };
 
     for(let i=0; i<gpsCount; i++){
       const b = gpsOff+2+i*12;
-      const tag = r16(b);
-      const vo = r32(b+8);
-      if(tag===0x01) latRef = String.fromCharCode(view.getUint8(tiff+vo));
-      else if(tag===0x03) lngRef = String.fromCharCode(view.getUint8(tiff+vo));
-      else if(tag===0x02||tag===0x04){
-        const deg = rat(tiff+vo) + rat(tiff+vo+8)/60 + rat(tiff+vo+16)/3600;
+      if(tiff+b+12 > len) break;
+      const tag = safe16(b);
+      const vo = safe32(b+8);
+      const absOff = tiff+vo;
+
+      if(tag===0x01 && absOff < len){
+        latRef = String.fromCharCode(safeU8(absOff));
+      } else if(tag===0x03 && absOff < len){
+        lngRef = String.fromCharCode(safeU8(absOff));
+      } else if((tag===0x02||tag===0x04) && absOff+24 <= len){
+        const deg = rat(absOff) + rat(absOff+8)/60 + rat(absOff+16)/3600;
         if(tag===0x02) lat=deg; else lng=deg;
       }
     }
 
     if(lat===null||lng===null) return null;
-    console.log('EXIF GPS:', latRef, lat, lngRef, lng);
+    console.log('EXIF GPS OK:', latRef, lat.toFixed(6), lngRef, lng.toFixed(6));
     return {
       lat: latRef==='S' ? -lat : lat,
       lng: lngRef==='W' ? -lng : lng
