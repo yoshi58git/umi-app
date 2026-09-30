@@ -121,14 +121,13 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   width:12px;height:12px;border-radius:50%;
   background:var(--c);
   border:2px solid rgba(255,255,255,.7);
-  box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent);
-  transition:width .15s,height .15s,margin .15s,box-shadow .15s;
+  box-shadow:0 0 0 3px rgba(255,255,255,.2);
+  transition:transform .15s ease,box-shadow .15s ease;
   cursor:pointer;
 }
 .leaflet-marker-icon:hover .umi-pin{
-  width:18px;height:18px;
-  margin:-3px 0 0 -3px;
-  box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 40%,transparent);
+  transform:scale(1.6);
+  box-shadow:0 0 0 5px rgba(255,255,255,.3);
 }
 </style>
 </head>
@@ -266,9 +265,11 @@ async function upload(blob){
 
 // ── MAP ──
 function initMap(clat, clng, zoom){
-  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,zoomControl:true,attributionControl:true});
+  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,minZoom:2,maxZoom:19,zoomControl:true,attributionControl:true});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom:19,
+    maxNativeZoom:19
   }).addTo(lmap);
 }
 
