@@ -200,6 +200,24 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 <input type="file" id="filein" accept="image/*" onchange="onFile(this)">
 
 <script>
+// ページ読み込み後すぐにバックグラウンド処理開始
+window.addEventListener('load', ()=>{
+  // Leafletが読み込まれたらすぐに地図とデータを準備
+  const waitL = setInterval(()=>{
+    if(typeof L !== 'undefined'){
+      clearInterval(waitL);
+      // 非表示のままLoadRecordsを実行（地図だけ先に作る）
+      document.getElementById('app').style.visibility='hidden';
+      document.getElementById('app').classList.add('show');
+      loadRecords().then(()=>{
+        document.getElementById('app').classList.remove('show');
+        document.getElementById('app').style.visibility='';
+        preloaded = true;
+      });
+    }
+  }, 50);
+});
+
 const SB_URL = 'https://imqgpzgpytwvfkgscezn.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcWdwemdweXR3dmZrZ3NjZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODM3MDksImV4cCI6MjEwNjI1OTcwOX0.Wso1DnlSPDJfjH-4AWKOCGke-6vPau5V6cBeFZ_npZ4';
 const EDGE_URL = SB_URL + '/functions/v1/analyze-image';
@@ -263,6 +281,7 @@ function addPin(r){
 async function loadRecords(){
   try{
     const data = await sb('records?select=*&order=created_at.desc&limit=500');
+    preloaded = true;
     let sea=0,city=0,slat=0,slng=0,cnt=0;
     if(Array.isArray(data)){
       data.forEach(r=>{
@@ -290,11 +309,17 @@ async function loadRecords(){
 }
 
 // ── ONBOARDING ──
+let preloaded = false;
+
 function startApp(){
   document.getElementById('ob').style.display='none';
   document.getElementById('app').classList.add('show');
-  // #appがdisplay:flexになった後にLeafletを初期化するため少し待つ
-  setTimeout(loadRecords, 100);
+  if(preloaded){
+    // すでに読み込み済みなら地図を表示するだけ
+    if(lmap) lmap.invalidateSize();
+  } else {
+    setTimeout(loadRecords, 50);
+  }
 }
 
 // ── CAMERA ──
