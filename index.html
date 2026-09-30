@@ -293,7 +293,8 @@ async function loadRecords(){
 function startApp(){
   document.getElementById('ob').style.display='none';
   document.getElementById('app').classList.add('show');
-  loadRecords();
+  // #appがdisplay:flexになった後にLeafletを初期化するため少し待つ
+  setTimeout(loadRecords, 100);
 }
 
 // ── CAMERA ──
