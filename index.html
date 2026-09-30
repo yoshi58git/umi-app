@@ -11,7 +11,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --deep:#04111C;--wave:#1A7A9A;--foam:#AADDEE;--white:#FFFFFF;
-  --sea:#22CCEE;--river:#44BB88;--city:#FFAA44;--life:#FF7766;
+  --sea:#22CCEE;--river:#44BB88;--city:#FFAA44;--ground:#FF7766;
   --r:16px;
 }
 html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Inter',sans-serif;overflow:hidden}
@@ -152,7 +152,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div class="li"><div class="ld" style="background:var(--sea)"></div>sea</div>
     <div class="li"><div class="ld" style="background:var(--river)"></div>river</div>
     <div class="li"><div class="ld" style="background:var(--city)"></div>city</div>
-    <div class="li"><div class="ld" style="background:var(--life)"></div>life</div>
+    <div class="li"><div class="ld" style="background:var(--life)"></div>ground</div>
   </div>
   <div id="map"><div id="leafmap"></div></div>
   <div id="btm">
@@ -241,7 +241,7 @@ let userLat = null, userLng = null;
 let videoStream = null;
 let total = 0;
 
-const catCol = {SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',LIFE:'#FF7766'};
+const catCol = {SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',GROUND:'#FF7766'};
 
 // ── SUPABASE ──
 async function sb(path, method='GET', body=null){
@@ -303,7 +303,7 @@ async function loadRecords(){
       data.forEach(r=>{
         const c=(r.category||'').toUpperCase();
         if(c==='SEA'||c==='RIVER') sea++;
-        if(c==='CITY'||c==='LIFE') city++;
+        if(c==='CITY'||c==='GROUND') city++;
         if(r.lat&&r.lng){slat+=r.lat;slng+=r.lng;cnt++;}
       });
       total=data.length;
