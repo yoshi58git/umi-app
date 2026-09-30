@@ -692,10 +692,14 @@ function startApp(){
 // map-area click handled by Leaflet
 
 async function init(){
-  waitForLeaflet(async ()=>{
-    await loadRecords();
+  return new Promise((resolve, reject)=>{
+    waitForLeaflet(async ()=>{
+      try{
+        await loadRecords();
+        resolve();
+      }catch(e){ reject(e); }
+    });
   });
-  // 起動時は現在地マーカーなし（EXIFのみ使用）
 }
 
 function centerMap(lat, lng){
@@ -704,10 +708,27 @@ function centerMap(lat, lng){
   }
 }
 
-if(localStorage.getItem('umi_started')){
-  document.getElementById('onboarding').classList.add('hidden');
-  init();
-}
+window.addEventListener('load', ()=>{
+  // デバッグ：Leafletの読み込み状態を表示
+  const dbg = document.createElement('div');
+  dbg.id = 'debug-bar';
+  dbg.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.8);color:#0f0;font-size:10px;padding:4px 8px;z-index:9999;font-family:monospace';
+  dbg.textContent = 'L=' + typeof L + ' | init...';
+  document.body.appendChild(dbg);
+
+  if(localStorage.getItem('umi_started')){
+    document.getElementById('onboarding').classList.add('hidden');
+    init().then(()=>{
+      dbg.textContent = 'L=' + typeof L + ' | done';
+      setTimeout(()=>dbg.remove(), 5000);
+    }).catch(e=>{
+      dbg.textContent = 'ERROR: ' + e.message;
+    });
+  } else {
+    dbg.textContent = 'L=' + typeof L + ' | waiting onboarding';
+    setTimeout(()=>dbg.remove(), 5000);
+  }
+});
 </script>
 
 </body>
