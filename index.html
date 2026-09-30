@@ -17,7 +17,7 @@
 html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Inter',sans-serif;overflow:hidden}
 
 /* ONBOARDING */
-#ob{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;z-index:1000;background:linear-gradient(180deg,#020408 0%,#04111C 30%,#061828 60%,#0A2030 80%,#020408 100%)}
+#ob{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;z-index:1000;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
 #ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:36px}
 .ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:24px}
 .ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.2);border:1px solid rgba(26,122,154,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
@@ -26,7 +26,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #ob-btn{width:100%;max-width:320px;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif}
 
 /* MAP */
-#app{position:fixed;inset:0;display:none;flex-direction:column;background:linear-gradient(180deg,#020408 0%,#04111C 100%)}
+#app{position:fixed;inset:0;display:none;flex-direction:column;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
 #app.show{display:flex}
 #map{flex:1;position:relative;z-index:1}
 #leafmap{position:absolute;inset:0}
@@ -117,22 +117,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #camcanvas{display:none}
 #filein{display:none}
 
-/* 時間帯別背景 */
-#app{transition:background 3s ease}
-/* 朝焼け 5-7時 */
-.sky-dawn{background:linear-gradient(180deg,#1A0A2E 0%,#7B2D5E 25%,#E8723A 55%,#F4A94E 75%,#2A6B8A 100%)}
-/* 朝 7-10時 */
-.sky-morning{background:linear-gradient(180deg,#1B5E8C 0%,#3B9EC7 30%,#7DCDE8 60%,#B8E8F5 80%,#1A5C7A 100%)}
-/* 昼 10-14時 */
-.sky-noon{background:linear-gradient(180deg,#0E4C7A 0%,#1A7AAA 25%,#2AA0CC 55%,#5CBFE0 80%,#0D3D5E 100%)}
-/* 昼下がり 14-17時 */
-.sky-afternoon{background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
-/* 夕焼け 17-19時 */
-.sky-sunset{background:linear-gradient(180deg,#0A1A3A 0%,#4A2A6A 20%,#C04A2A 45%,#F07A2A 65%,#F4C060 80%,#1A4A6A 100%)}
-/* 薄暗い 19-21時 */
-.sky-dusk{background:linear-gradient(180deg,#050A1A 0%,#0A1A3A 30%,#1A3A6A 60%,#2A5A8A 80%,#0A1A2A 100%)}
-/* 夜 21-5時 */
-.sky-night{background:linear-gradient(180deg,#020408 0%,#04111C 30%,#061828 60%,#0A2030 80%,#020408 100%)}
+
 
 .umi-pin{
   width:12px;height:12px;border-radius:50%;
@@ -340,27 +325,6 @@ async function loadRecords(){
     initMap(35.316,139.473,13);
   }
 }
-
-// ── 時間帯背景 ──
-function setSkyBg(){
-  const h = new Date().getHours();
-  const app = document.getElementById('app');
-  const ob = document.getElementById('ob');
-  let cls;
-  if(h>=5&&h<7)   cls='sky-dawn';
-  else if(h>=7&&h<10)  cls='sky-morning';
-  else if(h>=10&&h<14) cls='sky-noon';
-  else if(h>=14&&h<17) cls='sky-afternoon';
-  else if(h>=17&&h<19) cls='sky-sunset';
-  else if(h>=19&&h<21) cls='sky-dusk';
-  else cls='sky-night';
-  app.className = app.className.replace(/sky-\w+/g,'').trim();
-  app.classList.add(cls);
-  ob.className = ob.className.replace(/sky-\w+/g,'').trim();
-  ob.classList.add(cls);
-}
-setSkyBg();
-setInterval(setSkyBg, 60000); // 1分ごとに更新
 
 // ── ONBOARDING ──
 let preloaded = false;
