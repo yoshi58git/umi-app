@@ -3,701 +3,439 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>umi — 海のごみを記録する</title>
+<title>umi</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --sea-deep:#04111C;
-  --wave:#1A7A9A;
-  --foam:#AADDEE;
-  --white:#FFFFFF;
-  --dot-sea:#22CCEE;
-  --dot-river:#44BB88;
-  --dot-city:#FFAA44;
-  --dot-life:#FF7766;
-  --radius:16px;
+  --deep:#04111C;--wave:#1A7A9A;--foam:#AADDEE;--white:#FFFFFF;
+  --sea:#22CCEE;--river:#44BB88;--city:#FFAA44;--life:#FF7766;
+  --r:16px;
 }
-html,body{height:100%;background:var(--sea-deep);color:var(--white);font-family:'Inter',sans-serif;overflow:hidden}
+html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Inter',sans-serif;overflow:hidden}
 
-#map-view{position:fixed;inset:0;display:flex;flex-direction:column}
-#map-bg{
-  position:absolute;inset:0;
-  background:linear-gradient(180deg,#04111C 0%,#061F2E 100%);
-}
-#map-bg::before{
-  content:'';position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(26,122,154,0.06) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(26,122,154,0.06) 1px,transparent 1px);
-  background-size:40px 40px;
-}
-.dot{position:absolute;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;transition:transform 0.2s}
-.dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid currentColor;opacity:0.4;animation:pulse 2.5s infinite}
-.dot:hover{transform:translate(-50%,-50%) scale(1.6)}
-.dot.sea{background:var(--dot-sea);color:var(--dot-sea)}
-.dot.river{background:var(--dot-river);color:var(--dot-river)}
-.dot.city{background:var(--dot-city);color:var(--dot-city)}
-.dot.life{background:var(--dot-life);color:var(--dot-life)}
-@keyframes pulse{0%{transform:scale(1);opacity:0.4}70%{transform:scale(2.2);opacity:0}100%{transform:scale(1);opacity:0}}
+/* ONBOARDING */
+#ob{position:fixed;inset:0;background:var(--deep);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;z-index:1000}
+#ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:36px}
+.ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:24px}
+.ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.2);border:1px solid rgba(26,122,154,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.ob-tx{font-size:13px;color:var(--foam);line-height:1.6}
+.ob-tx strong{color:var(--white)}
+#ob-btn{width:100%;max-width:320px;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif}
 
-#header{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,16px) 20px 12px;background:linear-gradient(180deg,rgba(4,17,28,0.95) 0%,rgba(4,17,28,0) 100%)}
-#logo{font-size:22px;font-weight:300;letter-spacing:0.15em;color:var(--foam)}
-#counter-num{font-size:20px;font-weight:500;color:var(--white);line-height:1;text-align:right}
-#counter-label{font-size:10px;color:var(--foam);opacity:0.7;letter-spacing:0.08em}
+/* MAP */
+#app{position:fixed;inset:0;display:none;flex-direction:column}
+#app.show{display:flex}
+#map{flex:1;position:relative;z-index:1}
+#leafmap{position:absolute;inset:0}
+.leaflet-tile{filter:brightness(.85) saturate(.7)}
 
-#legend{position:relative;z-index:20;display:flex;gap:12px;padding:8px 20px}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--foam);opacity:0.7;letter-spacing:0.04em}
-.legend-dot{width:6px;height:6px;border-radius:50%}
+/* HEADER */
+#hdr{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,16px) 20px 12px;background:linear-gradient(180deg,rgba(4,17,28,.95) 0%,transparent 100%)}
+#logo{font-size:22px;font-weight:300;letter-spacing:.15em;color:var(--foam)}
+#cnt-num{font-size:20px;font-weight:500;text-align:right}
+#cnt-lbl{font-size:10px;color:var(--foam);opacity:.7;letter-spacing:.08em}
 
-#map-area{flex:1;position:relative;overflow:hidden}
+/* LEGEND */
+#leg{position:relative;z-index:20;display:flex;gap:12px;padding:6px 20px}
+.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--foam);opacity:.7}
+.ld{width:6px;height:6px;border-radius:50%}
 
-#bottom-bar{position:relative;z-index:20;padding:0 20px env(safe-area-inset-bottom,20px);background:linear-gradient(0deg,rgba(4,17,28,0.98) 60%,rgba(4,17,28,0) 100%);padding-top:32px}
-#camera-btn{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:var(--wave);border:none;cursor:pointer;margin:0 auto 20px;transition:transform 0.15s;animation:glow 3s infinite}
-#camera-btn:active{transform:scale(0.92)}
-#camera-btn svg{width:28px;height:28px;fill:none;stroke:var(--white);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-@keyframes glow{0%{box-shadow:0 0 0 0 rgba(26,122,154,0.5)}70%{box-shadow:0 0 0 16px rgba(26,122,154,0)}100%{box-shadow:0 0 0 0 rgba(26,122,154,0)}}
+/* BOTTOM */
+#btm{position:relative;z-index:20;padding:0 20px env(safe-area-inset-bottom,20px);background:linear-gradient(0deg,rgba(4,17,28,.98) 60%,transparent 100%);padding-top:28px}
+#cam-btn{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:var(--wave);border:none;cursor:pointer;margin:0 auto 18px;animation:glow 3s infinite}
+#cam-btn:active{transform:scale(.92)}
+#cam-btn svg{width:28px;height:28px;fill:none;stroke:var(--white);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(26,122,154,.5)}70%{box-shadow:0 0 0 16px rgba(26,122,154,0)}100%{box-shadow:0 0 0 0 rgba(26,122,154,0)}}
+#stats{display:flex;justify-content:space-around;padding-bottom:4px}
+.st{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sn{font-size:16px;font-weight:500}
+.sl{font-size:9px;color:var(--foam);opacity:.6;letter-spacing:.06em}
 
-#stats-row{display:flex;justify-content:space-around;padding-bottom:4px}
-.stat{display:flex;flex-direction:column;align-items:center;gap:3px}
-.stat-num{font-size:16px;font-weight:500;color:var(--white)}
-.stat-label{font-size:9px;color:var(--foam);opacity:0.6;letter-spacing:0.06em}
+/* CAMERA */
+#camv{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:100}
+#camv.show{display:flex}
+#campre{flex:1;position:relative;overflow:hidden}
+#camvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#camfrm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#camfrm-in{width:72%;aspect-ratio:1;border:1.5px solid rgba(255,255,255,.4);border-radius:12px;position:relative}
+#camfrm-in::before{content:'';position:absolute;top:-1px;left:-1px;width:20px;height:20px;border-top:2px solid var(--white);border-left:2px solid var(--white);border-radius:3px 0 0 0}
+#camfrm-in::after{content:'';position:absolute;bottom:-1px;right:-1px;width:20px;height:20px;border-bottom:2px solid var(--white);border-right:2px solid var(--white);border-radius:0 0 3px 0}
+#shtbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px env(safe-area-inset-bottom,20px);background:rgba(4,17,28,.95)}
+#backbtn{width:44px;height:44px;background:none;border:1.5px solid rgba(255,255,255,.3);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#backbtn svg{width:20px;height:20px;fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round}
+#shutter{width:68px;height:68px;border-radius:50%;background:var(--white);border:none;cursor:pointer;box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+#shutter:active{transform:scale(.88)}
+#gallbtn{width:44px;height:44px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#gallbtn svg{width:20px;height:20px;fill:none;stroke:var(--white);stroke-width:1.8}
 
-#camera-view{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:100}
-#camera-view.active{display:flex}
-#cam-preview{flex:1;position:relative;overflow:hidden;background:#000}
-#cam-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#cam-frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-#cam-frame-inner{width:72%;aspect-ratio:1;border:1.5px solid rgba(255,255,255,0.4);border-radius:12px;position:relative}
-#cam-frame-inner::before{content:'';position:absolute;top:-1px;left:-1px;width:20px;height:20px;border-top:2px solid var(--white);border-left:2px solid var(--white);border-radius:3px 0 0 0}
-#cam-frame-inner::after{content:'';position:absolute;bottom:-1px;right:-1px;width:20px;height:20px;border-bottom:2px solid var(--white);border-right:2px solid var(--white);border-radius:0 0 3px 0}
+/* CONFIRM */
+#confv{position:fixed;inset:0;background:var(--deep);display:none;flex-direction:column;z-index:200}
+#confv.show{display:flex}
+#confimg{flex:1;position:relative;overflow:hidden}
+#confpre{width:100%;height:100%;object-fit:cover}
+#jover{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(0deg,rgba(4,17,28,.98) 0%,transparent 100%)}
+#jbadge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(34,204,238,.15);border:1px solid rgba(34,204,238,.4);margin-bottom:10px}
+#jtxt{font-size:12px;color:var(--sea);letter-spacing:.04em}
+#jitems{font-size:12px;color:var(--foam);line-height:1.7;opacity:.9;max-height:120px;overflow-y:auto}
+#confbtns{padding:16px 24px env(safe-area-inset-bottom,20px);background:var(--deep);display:flex;gap:12px}
+#btn-retry{flex:1;padding:14px;background:none;border:1.5px solid rgba(255,255,255,.2);border-radius:var(--r);color:var(--foam);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
+#btn-send{flex:2;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
 
-#shutter-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px env(safe-area-inset-bottom,20px);background:rgba(4,17,28,0.95)}
-#back-btn{width:44px;height:44px;background:none;border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#back-btn svg{width:20px;height:20px;fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round}
-#shutter{width:68px;height:68px;border-radius:50%;background:var(--white);border:none;cursor:pointer;transition:transform 0.1s;box-shadow:0 0 0 3px rgba(255,255,255,0.15)}
-#shutter:active{transform:scale(0.88)}
-#gallery-btn{width:44px;height:44px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#gallery-btn svg{width:20px;height:20px;fill:none;stroke:var(--white);stroke-width:1.8}
+/* LOADING */
+#ldg{position:fixed;inset:0;background:rgba(4,17,28,.92);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:500}
+#ldg.show{display:flex}
+.spin{width:40px;height:40px;border:2px solid rgba(26,122,154,.3);border-top-color:var(--wave);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#ldgtxt{font-size:13px;color:var(--foam);opacity:.7;letter-spacing:.06em}
 
-#confirm-view{position:fixed;inset:0;background:var(--sea-deep);display:none;flex-direction:column;z-index:200}
-#confirm-view.active{display:flex}
-#confirm-img{flex:1;position:relative;overflow:hidden}
-#confirm-preview{width:100%;height:100%;object-fit:cover}
-#judge-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(0deg,rgba(4,17,28,0.98) 0%,rgba(4,17,28,0) 100%)}
-#judge-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(34,204,238,0.15);border:1px solid rgba(34,204,238,0.4);margin-bottom:10px}
-#judge-text{font-size:12px;color:var(--dot-sea);letter-spacing:0.04em}
-#judge-items{font-size:12px;color:var(--foam);line-height:1.7;opacity:0.9;max-height:120px;overflow-y:auto}
-#confirm-btns{padding:16px 24px env(safe-area-inset-bottom,20px);background:var(--sea-deep);display:flex;gap:12px}
-#btn-retry{flex:1;padding:14px;background:none;border:1.5px solid rgba(255,255,255,0.2);border-radius:var(--radius);color:var(--foam);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
-#btn-send{flex:2;padding:14px;background:var(--wave);border:none;border-radius:var(--radius);color:var(--white);font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+/* DONE */
+#donev{position:fixed;inset:0;background:var(--deep);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:300}
+#donev.show{display:flex}
+#done-rip{width:120px;height:120px;border-radius:50%;background:rgba(26,122,154,.15);border:1px solid rgba(26,122,154,.4);display:flex;align-items:center;justify-content:center;margin-bottom:32px}
+#done-rip svg{width:48px;height:48px;fill:none;stroke:var(--wave);stroke-width:1.5;stroke-linecap:round}
+#done-num{font-size:48px;font-weight:300;line-height:1;margin-bottom:6px}
+#done-lbl{font-size:12px;color:var(--foam);opacity:.6;letter-spacing:.08em;margin-bottom:36px}
+#done-imp{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 28px;background:rgba(26,122,154,.1);border:1px solid rgba(26,122,154,.25);border-radius:var(--r);width:82%;max-width:320px;margin-bottom:36px}
+.imp-ln{font-size:12px;color:var(--foam);opacity:.8;text-align:center;line-height:1.5}
+.imp-ln strong{color:var(--white);font-weight:500}
+#btn-back{padding:14px 40px;background:none;border:1.5px solid rgba(255,255,255,.2);border-radius:var(--r);color:var(--foam);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
 
-#loading-overlay{position:fixed;inset:0;background:rgba(4,17,28,0.92);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:500}
-#loading-overlay.active{display:flex}
-.spinner{width:40px;height:40px;border:2px solid rgba(26,122,154,0.3);border-top-color:var(--wave);border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading-text{font-size:13px;color:var(--foam);opacity:0.7;letter-spacing:0.06em}
-
-#done-view{position:fixed;inset:0;background:var(--sea-deep);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:300}
-#done-view.active{display:flex}
-#done-ripple{width:120px;height:120px;border-radius:50%;background:rgba(26,122,154,0.15);border:1px solid rgba(26,122,154,0.4);display:flex;align-items:center;justify-content:center;margin-bottom:32px;position:relative}
-#done-ripple::before{content:'';position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(26,122,154,0.2);animation:expand 1.5s ease-out forwards}
-@keyframes expand{from{transform:scale(0.8);opacity:1}to{transform:scale(1.4);opacity:0}}
-#done-ripple svg{width:48px;height:48px;fill:none;stroke:var(--wave);stroke-width:1.5;stroke-linecap:round}
-#done-num{font-size:48px;font-weight:300;color:var(--white);letter-spacing:-0.02em;line-height:1;margin-bottom:6px}
-#done-label{font-size:12px;color:var(--foam);opacity:0.6;letter-spacing:0.08em;margin-bottom:40px}
-#done-impact{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 32px;background:rgba(26,122,154,0.1);border:1px solid rgba(26,122,154,0.25);border-radius:var(--radius);width:82%;max-width:320px;margin-bottom:40px}
-.impact-line{font-size:12px;color:var(--foam);opacity:0.8;text-align:center;line-height:1.5}
-.impact-line strong{color:var(--white);font-weight:500}
-#btn-back-map{padding:14px 40px;background:none;border:1.5px solid rgba(255,255,255,0.2);border-radius:var(--radius);color:var(--foam);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
-
-#dot-panel{position:fixed;bottom:0;left:0;right:0;background:rgba(6,26,40,0.98);border-top:1px solid rgba(26,122,154,0.3);border-radius:20px 20px 0 0;padding:16px 20px env(safe-area-inset-bottom,20px);z-index:50;transform:translateY(100%);transition:transform 0.3s ease}
-#dot-panel.open{transform:translateY(0)}
-#panel-handle{width:36px;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 16px}
-#panel-content{font-size:12px;color:var(--foam);line-height:1.7;opacity:0.9}
-#panel-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--foam);font-size:20px;cursor:pointer;opacity:0.5}
-
-#cam-canvas{display:none}
-#file-input{display:none}
-
-#onboarding{
-  position:fixed;inset:0;background:var(--sea-deep);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:1000;padding:40px 32px;
-}
-#onboarding.hidden{display:none}
-#ob-logo{font-size:32px;font-weight:300;letter-spacing:0.2em;color:var(--foam);margin-bottom:40px}
-.ob-item{
-  display:flex;align-items:flex-start;gap:16px;
-  width:100%;max-width:320px;margin-bottom:28px;
-}
-.ob-icon{
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(26,122,154,0.2);border:1px solid rgba(26,122,154,0.4);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:16px;
-}
-.ob-text{font-size:13px;color:var(--foam);line-height:1.6;opacity:0.9}
-.ob-text strong{color:var(--white);font-weight:500}
-#ob-btn{
-  width:100%;max-width:320px;padding:14px;
-  background:var(--wave);border:none;border-radius:var(--radius);
-  color:var(--white);font-size:15px;font-weight:500;
-  cursor:pointer;margin-top:16px;font-family:'Inter',sans-serif;
-  letter-spacing:0.04em;
-}
-</style>
-<style>
-#leaflet-map{position:absolute;inset:0;width:100%;height:100%;z-index:1}
-.leaflet-popup-content-wrapper{
-  background:rgba(6,20,32,0.97)!important;
-  border:1px solid rgba(26,122,154,0.4)!important;
-  border-radius:12px!important;
-  box-shadow:0 4px 24px rgba(0,0,0,0.5)!important;
-  color:var(--white)!important;
-  padding:0!important;
-}
+/* POPUP */
+.leaflet-popup-content-wrapper{background:rgba(6,20,32,.97)!important;border:1px solid rgba(26,122,154,.4)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(0,0,0,.5)!important;color:var(--white)!important;padding:0!important}
 .leaflet-popup-content{margin:0!important;width:220px!important}
-.leaflet-popup-tip{background:rgba(6,20,32,0.97)!important}
-.leaflet-popup-close-button{color:rgba(170,221,238,0.6)!important;font-size:18px!important;top:8px!important;right:10px!important}
-.umi-popup img{width:100%;height:130px;object-fit:cover;border-radius:12px 12px 0 0;display:block}
-.umi-popup-body{padding:10px 12px 12px}
-.umi-popup-cat{font-size:10px;letter-spacing:0.08em;color:var(--foam);opacity:0.6;margin-bottom:4px}
-.umi-popup-items{font-size:12px;color:var(--white);line-height:1.55;margin-bottom:6px}
-.umi-popup-risk{font-size:11px;font-weight:500}
-.leaflet-tile{filter:brightness(0.85) saturate(0.7)}
+.leaflet-popup-tip{background:rgba(6,20,32,.97)!important}
+.leaflet-popup-close-button{color:rgba(170,221,238,.6)!important;font-size:18px!important;top:8px!important;right:10px!important}
+.umi-pop img{width:100%;height:130px;object-fit:cover;border-radius:12px 12px 0 0;display:block}
+.umi-pop-body{padding:10px 12px 12px}
+.umi-pop-cat{font-size:10px;letter-spacing:.08em;color:var(--foam);opacity:.6;margin-bottom:4px}
+.umi-pop-items{font-size:12px;color:var(--white);line-height:1.55;margin-bottom:6px}
+.umi-pop-risk{font-size:11px;font-weight:500}
+
+#camcanvas{display:none}
+#filein{display:none}
 </style>
 </head>
 <body>
 
-<div id="map-view">
-  <div id="map-bg"></div>
-  <!-- Google Maps は map-area 内に描画 -->
-  <div id="header">
+<!-- ONBOARDING -->
+<div id="ob">
+  <div id="ob-logo">umi</div>
+  <div class="ob-row"><div class="ob-ic">📍</div><div class="ob-tx"><strong>写真のGPS情報を使います</strong><br>撮影時の位置情報が自動で記録されます</div></div>
+  <div class="ob-row"><div class="ob-ic">🔒</div><div class="ob-tx"><strong>ブラウザのGPSは使いません</strong><br>デバイスの現在地には一切アクセスしません</div></div>
+  <div class="ob-row"><div class="ob-ic">📷</div><div class="ob-tx"><strong>位置情報オンで撮影した写真を</strong><br>GPS情報のない写真は受け付けられません</div></div>
+  <button id="ob-btn" onclick="startApp()">はじめる</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="hdr">
     <div id="logo">umi</div>
-    <div>
-      <div id="counter-num">0</div>
-      <div id="counter-label">records today</div>
-    </div>
+    <div><div id="cnt-num">0</div><div id="cnt-lbl">records</div></div>
   </div>
-  <div id="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:var(--dot-sea)"></div>sea</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--dot-river)"></div>river</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--dot-city)"></div>city</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--dot-life)"></div>life</div>
+  <div id="leg">
+    <div class="li"><div class="ld" style="background:var(--sea)"></div>sea</div>
+    <div class="li"><div class="ld" style="background:var(--river)"></div>river</div>
+    <div class="li"><div class="ld" style="background:var(--city)"></div>city</div>
+    <div class="li"><div class="ld" style="background:var(--life)"></div>life</div>
   </div>
-  <div id="map-area"></div>
-  <div id="bottom-bar">
-    <button id="camera-btn" onclick="openCamera()">
+  <div id="map"><div id="leafmap"></div></div>
+  <div id="btm">
+    <button id="cam-btn" onclick="openCam()">
       <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     </button>
-    <div id="stats-row">
-      <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">TOTAL</div></div>
-      <div class="stat"><div class="stat-num" id="stat-sea">0</div><div class="stat-label">SEA</div></div>
-      <div class="stat"><div class="stat-num" id="stat-city">0</div><div class="stat-label">CITY</div></div>
+    <div id="stats">
+      <div class="st"><div class="sn" id="s-total">0</div><div class="sl">TOTAL</div></div>
+      <div class="st"><div class="sn" id="s-sea">0</div><div class="sl">SEA</div></div>
+      <div class="st"><div class="sn" id="s-city">0</div><div class="sl">CITY</div></div>
     </div>
   </div>
 </div>
 
-<div id="camera-view">
-  <div id="cam-preview">
-    <video id="cam-video" autoplay playsinline muted></video>
-    <canvas id="cam-canvas"></canvas>
-    <div id="cam-frame"><div id="cam-frame-inner"></div></div>
+<!-- CAMERA -->
+<div id="camv">
+  <div id="campre">
+    <video id="camvid" autoplay playsinline muted></video>
+    <canvas id="camcanvas"></canvas>
+    <div id="camfrm"><div id="camfrm-in"></div></div>
   </div>
-  <div id="shutter-bar">
-    <button id="back-btn" onclick="closeCamera()">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    </button>
+  <div id="shtbar">
+    <button id="backbtn" onclick="closeCam()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
     <div id="shutter" onclick="takePhoto()"></div>
-    <button id="gallery-btn" onclick="document.getElementById('file-input').click()">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    </button>
+    <button id="gallbtn" onclick="document.getElementById('filein').click()"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
   </div>
 </div>
 
-<div id="confirm-view">
-  <div id="confirm-img">
-    <img id="confirm-preview" src="" alt="">
-    <div id="judge-overlay">
-      <div id="judge-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--dot-sea)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span id="judge-text">解析完了</span>
-      </div>
-      <div id="judge-items"></div>
+<!-- CONFIRM -->
+<div id="confv">
+  <div id="confimg"><img id="confpre" src="" alt="">
+    <div id="jover">
+      <div id="jbadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--sea)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span id="jtxt">解析完了</span></div>
+      <div id="jitems"></div>
     </div>
   </div>
-  <div id="confirm-btns">
-    <button id="btn-retry" onclick="retakePhoto()">やり直す</button>
-    <button id="btn-send" onclick="sendPhoto()">記録する</button>
+  <div id="confbtns">
+    <button id="btn-retry" onclick="retake()">やり直す</button>
+    <button id="btn-send" onclick="send()">記録する</button>
   </div>
 </div>
 
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div id="loading-text">AI解析中...</div>
-</div>
+<!-- LOADING -->
+<div id="ldg"><div class="spin"></div><div id="ldgtxt">AI解析中...</div></div>
 
-<div id="done-view">
-  <div id="done-ripple">
-    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg>
-  </div>
+<!-- DONE -->
+<div id="donev">
+  <div id="done-rip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg></div>
   <div id="done-num">0</div>
-  <div id="done-label">RECORDS</div>
-  <div id="done-impact">
-    <div class="impact-line" id="impact-text">記録されました</div>
-    <div class="impact-line" style="margin-top:8px;opacity:0.6;font-size:11px">あなたの記録が海を守ります</div>
+  <div id="done-lbl">RECORDS</div>
+  <div id="done-imp">
+    <div class="imp-ln" id="imp-txt">記録されました</div>
+    <div class="imp-ln" style="margin-top:6px;opacity:.6;font-size:11px">あなたの記録が海を守ります</div>
   </div>
-  <button id="btn-back-map" onclick="backToMap()">地図に戻る</button>
+  <button id="btn-back" onclick="backToMap()">地図に戻る</button>
 </div>
 
-<div id="dot-panel">
-  <div id="panel-handle"></div>
-  <button id="panel-close" onclick="closePanel()">×</button>
-  <div id="panel-content"></div>
-</div>
-
-<input type="file" id="file-input" accept="image/*" onchange="handleFile(this)">
+<input type="file" id="filein" accept="image/*" onchange="onFile(this)">
 
 <script>
-// ══ 設定 ══
-const SUPABASE_URL = 'https://imqgpzgpytwvfkgscezn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcWdwemdweXR3dmZrZ3NjZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODM3MDksImV4cCI6MjEwNjI1OTcwOX0.Wso1DnlSPDJfjH-4AWKOCGke-6vPau5V6cBeFZ_npZ4';
-const EDGE_FUNCTION_URL = SUPABASE_URL + '/functions/v1/analyze-image';
+const SB_URL = 'https://imqgpzgpytwvfkgscezn.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcWdwemdweXR3dmZrZ3NjZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODM3MDksImV4cCI6MjEwNjI1OTcwOX0.Wso1DnlSPDJfjH-4AWKOCGke-6vPau5V6cBeFZ_npZ4';
+const EDGE_URL = SB_URL + '/functions/v1/analyze-image';
 
-let capturedBlob = null;
-let capturedDataUrl = null;
-let analysisResult = null;
+let lmap = null;
+let capturedBlob = null, capturedUrl = null, analysisResult = null;
 let userLat = null, userLng = null;
 let videoStream = null;
-let totalCount = 0;
+let total = 0;
 
-// ══ SUPABASE ══
+const catCol = {SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',LIFE:'#FF7766'};
+
+// ── SUPABASE ──
 async function sb(path, method='GET', body=null){
-  const headers = {
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': method==='POST' ? 'return=representation' : ''
-  };
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    method, headers,
-    body: body ? JSON.stringify(body) : null
-  });
-  if(!res.ok) throw new Error(await res.text());
-  return res.json().catch(()=>({}));
+  const h = {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+  if(method==='POST') h['Prefer']='return=representation';
+  const r = await fetch(SB_URL+'/rest/v1/'+path,{method,headers:h,body:body?JSON.stringify(body):null});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json().catch(()=>({}));
 }
 
-async function uploadImage(blob){
-  const filename = 'record_' + Date.now() + '.jpg';
-  const res = await fetch(SUPABASE_URL + '/storage/v1/object/images/' + filename, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Content-Type': 'image/jpeg'
-    },
-    body: blob
+async function upload(blob){
+  const name='record_'+Date.now()+'.jpg';
+  const r = await fetch(SB_URL+'/storage/v1/object/images/'+name,{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'image/jpeg'},
+    body:blob
   });
-  if(!res.ok) throw new Error('画像アップロード失敗');
-  return SUPABASE_URL + '/storage/v1/object/public/images/' + filename;
+  if(!r.ok) throw new Error('upload failed');
+  return SB_URL+'/storage/v1/object/public/images/'+name;
 }
 
-// ══ AI解析（Edge Function経由） ══
-async function analyzeImage(dataUrl){
-  const base64 = dataUrl.split(',')[1];
-  const res = await fetch(EDGE_FUNCTION_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-    },
-    body: JSON.stringify({ imageBase64: base64, lat: userLat, lng: userLng })
-  });
-  if(!res.ok) throw new Error('AI解析失敗');
-  return res.json();
+// ── MAP ──
+function initMap(clat, clng, zoom){
+  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,zoomControl:true,attributionControl:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19
+  }).addTo(lmap);
 }
 
-// ══ MAP (Leaflet + OpenStreetMap) ══
-let leafmap = null;
-const catColors = {
-  SEA:'#22CCEE', RIVER:'#44BB88', CITY:'#FFAA44', LIFE:'#FF7766'
-};
-
-function initLeafletMap(centerLat, centerLng, zoom){
-  const mapArea = document.getElementById('map-area');
-  const mapDiv = document.createElement('div');
-  mapDiv.id = 'leaflet-map';
-  mapArea.appendChild(mapDiv);
-
-  leafmap = L.map('leaflet-map', {
-    center: [centerLat, centerLng],
-    zoom: zoom || 13,
-    zoomControl: true,
-    attributionControl: true,
+function addPin(r){
+  if(!lmap||!r.lat||!r.lng) return;
+  const cat=(r.category||'SEA').toUpperCase();
+  const col=catCol[cat]||'#22CCEE';
+  const icon=L.divIcon({
+    className:'',
+    html:`<div style="width:12px;height:12px;border-radius:50%;background:${col};border:2px solid rgba(255,255,255,.6);box-shadow:0 0 0 3px ${col}44"></div>`,
+    iconSize:[12,12],iconAnchor:[6,6],popupAnchor:[0,-8]
   });
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 19,
-  }).addTo(leafmap);
-}
-
-function addMarker(record){
-  if(!leafmap || !record.lat || !record.lng) return;
-  const cat = (record.category||'SEA').toUpperCase();
-  const color = catColors[cat] || '#22CCEE';
-
-  const icon = L.divIcon({
-    className: '',
-    html: `<div style="
-      width:12px;height:12px;border-radius:50%;
-      background:${color};
-      border:2px solid rgba(255,255,255,0.6);
-      box-shadow:0 0 0 3px ${color}44;
-    "></div>`,
-    iconSize: [12,12],
-    iconAnchor: [6,6],
-    popupAnchor: [0,-8],
-  });
-
-  const riskColor = record.mp_risk==='高'?'#FF7766':record.mp_risk==='中'?'#FFAA44':'#44BB88';
-  const imgHtml = record.image_url
-    ? `<img src="${record.image_url}" alt="" onerror="this.style.display='none'">`
-    : '';
-  const itemsShort = (record.items||'').split('\n').slice(0,3).join('<br>');
-  const dateStr = record.created_at ? record.created_at.slice(0,10) : '';
-  const locName = record.location_name && record.location_name !== '不明'
-    ? record.location_name + ' — ' : '';
-
-  const popup = L.popup({
-    maxWidth: 240,
-    className: 'umi-leaflet-popup',
-    closeButton: true,
-  }).setContent(`
-    <div class="umi-popup">
-      ${imgHtml}
-      <div class="umi-popup-body">
-        <div class="umi-popup-cat">${cat} ${locName}${dateStr}</div>
-        <div class="umi-popup-items">${itemsShort}</div>
-        ${record.mp_risk ? `<div class="umi-popup-risk" style="color:${riskColor}">MPリスク：${record.mp_risk}</div>` : ''}
-      </div>
-    </div>
-  `);
-
-  L.marker([record.lat, record.lng], {icon}).addTo(leafmap).bindPopup(popup);
+  const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
+  const img=r.image_url?`<img src="${r.image_url}" alt="" onerror="this.style.display='none'">`:'';
+  const items=(r.items||'').split('\n').slice(0,3).join('<br>');
+  const loc=r.location_name&&r.location_name!=='不明'?r.location_name+' — ':'';
+  const dt=r.created_at?r.created_at.slice(0,10):'';
+  L.marker([r.lat,r.lng],{icon}).addTo(lmap).bindPopup(
+    `<div class="umi-pop">${img}<div class="umi-pop-body"><div class="umi-pop-cat">${cat} ${loc}${dt}</div><div class="umi-pop-items">${items}</div>${r.mp_risk?`<div class="umi-pop-risk" style="color:${rc}">MPリスク：${r.mp_risk}</div>`:''}</div></div>`,
+    {maxWidth:240,closeButton:true}
+  );
 }
 
 async function loadRecords(){
-  // Leafletが読み込まれるまで待つ
-  await new Promise(resolve=>{
-    const check=()=>typeof L!=='undefined'?resolve():setTimeout(check,100);
-    check();
-  });
   try{
     const data = await sb('records?select=*&order=created_at.desc&limit=500');
-    let sea=0, city=0, sumLat=0, sumLng=0, count=0;
-
+    let sea=0,city=0,slat=0,slng=0,cnt=0;
     if(Array.isArray(data)){
       data.forEach(r=>{
-        const cat=(r.category||'').toUpperCase();
-        if(cat==='SEA'||cat==='RIVER') sea++;
-        if(cat==='CITY'||cat==='LIFE') city++;
-        if(r.lat && r.lng){ sumLat+=r.lat; sumLng+=r.lng; count++; }
+        const c=(r.category||'').toUpperCase();
+        if(c==='SEA'||c==='RIVER') sea++;
+        if(c==='CITY'||c==='LIFE') city++;
+        if(r.lat&&r.lng){slat+=r.lat;slng+=r.lng;cnt++;}
       });
-
-      totalCount = data.length;
-      document.getElementById('counter-num').textContent = totalCount;
-      document.getElementById('stat-total').textContent = totalCount;
-      document.getElementById('stat-sea').textContent = sea;
-      document.getElementById('stat-city').textContent = city;
-
-      // レコードの重心で地図を初期化
-      const centerLat = count > 0 ? sumLat/count : 35.316;
-      const centerLng = count > 0 ? sumLng/count : 139.473;
-      initLeafletMap(centerLat, centerLng, count > 0 ? 14 : 10);
-
-      data.forEach(r=>{ if(r.lat && r.lng) addMarker(r); });
+      total=data.length;
+      document.getElementById('cnt-num').textContent=total;
+      document.getElementById('s-total').textContent=total;
+      document.getElementById('s-sea').textContent=sea;
+      document.getElementById('s-city').textContent=city;
+      const clat=cnt>0?slat/cnt:35.316;
+      const clng=cnt>0?slng/cnt:139.473;
+      initMap(clat,clng,cnt>0?14:10);
+      data.forEach(r=>addPin(r));
     } else {
-      initLeafletMap(35.316, 139.473, 13);
+      initMap(35.316,139.473,13);
     }
   }catch(e){
-    console.error('読み込みエラー:', e);
-    initLeafletMap(35.316, 139.473, 13);
-  }
-}
-
-function showPanel(r){
-  const colors = {SEA:'var(--dot-sea)',RIVER:'var(--dot-river)',CITY:'var(--dot-city)',LIFE:'var(--dot-life)'};
-  const cat = (r.category||'SEA').toUpperCase();
-  document.getElementById('panel-content').innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-      <div style="width:8px;height:8px;border-radius:50%;background:${colors[cat]||'var(--dot-sea)'}"></div>
-      <span style="font-size:10px;letter-spacing:0.08em;color:var(--foam);opacity:0.7">${cat} — ${r.created_at?r.created_at.slice(0,10):''}</span>
-    </div>
-    ${r.items ? `<div style="margin-bottom:8px">${r.items.replace(/\n/g,'<br>')}</div>` : ''}
-    ${r.manufacturer&&r.manufacturer!=='不明' ? `<div style="font-size:11px;color:var(--foam);opacity:0.7;margin-bottom:4px">メーカー：${r.manufacturer}</div>` : ''}
-    ${r.mp_risk ? `<div style="font-size:11px;color:${r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88'}">MPリスク：${r.mp_risk}</div>` : ''}
-  `;
-  document.getElementById('dot-panel').classList.add('open');
-}
-function closePanel(){ document.getElementById('dot-panel').classList.remove('open') }
-
-// ══ GPS ══ (EXIFのみ使用)
-
-// ══ CAMERA ══
-async function openCamera(){
-  document.getElementById('camera-view').classList.add('active');
-  try{
-    videoStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-    document.getElementById('cam-video').srcObject = videoStream;
-  }catch(e){ console.log('カメラアクセス不可') }
-  // GPS はEXIFから取得
-}
-
-function closeCamera(){
-  if(videoStream){ videoStream.getTracks().forEach(t=>t.stop()); videoStream=null; }
-  document.getElementById('camera-view').classList.remove('active');
-}
-
-function takePhoto(){
-  const video = document.getElementById('cam-video');
-  const canvas = document.getElementById('cam-canvas');
-  if(video.videoWidth){
-    canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-    canvas.getContext('2d').drawImage(video,0,0);
-    canvas.toBlob(blob=>{
-      capturedBlob=blob;
-      capturedDataUrl=canvas.toDataURL('image/jpeg',0.85);
-      closeCamera(); runAnalysis();
-    },'image/jpeg',0.85);
-  } else {
-    alert('カメラが起動していません。ギャラリーから選んでください。');
-  }
-}
-
-function handleFile(input){
-  if(!input.files[0]) return;
-  const file = input.files[0];
-  capturedBlob = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    capturedDataUrl = e.target.result;
-    // EXIFからGPS取得を試みる
-    extractGPSFromEXIF(file).then(loc => {
-      if(loc){ userLat=loc.lat; userLng=loc.lng; }
-      closeCamera();
-      runAnalysis();
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
-async function extractGPSFromEXIF(file){
-  return new Promise(resolve=>{
-    const reader = new FileReader();
-    reader.onload = e => {
-      try{
-        const view = new DataView(e.target.result);
-        console.log('File size:', e.target.result.byteLength);
-        // JPEG SOI check
-        const soi = view.getUint16(0);
-        console.log('SOI marker:', '0x'+soi.toString(16));
-        if(soi !== 0xFFD8){ console.log('Not JPEG'); resolve(null); return; }
-        let offset = 2;
-        let found = false;
-        while(offset < view.byteLength - 4){
-          const marker = view.getUint16(offset);
-          const size = view.getUint16(offset + 2);
-          console.log('Marker:', '0x'+marker.toString(16), 'size:', size, 'offset:', offset);
-          if(marker === 0xFFE1){
-            found = true;
-            const exif = view.buffer.slice(offset + 4, offset + 2 + size);
-            const result = parseExifGPS(exif);
-            console.log('parseExifGPS result:', result);
-            resolve(result);
-            return;
-          }
-          if(size < 2){ console.log('Invalid size'); break; }
-          offset += 2 + size;
-        }
-        if(!found) console.log('APP1 not found');
-        resolve(null);
-      }catch(e){ console.log('EXIF parse error:', e); resolve(null); }
-    };
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-function parseExifGPS(buffer){
-  try{
-    const view = new DataView(buffer);
-    const len = buffer.byteLength;
-
-    // Exif header check
-    if(len < 6) return null;
-    const header = String.fromCharCode(
-      view.getUint8(0),view.getUint8(1),view.getUint8(2),view.getUint8(3)
-    );
-    if(header !== 'Exif') return null;
-
-    const tiff = 6;
-    if(tiff+8 > len) return null;
-
-    const byteOrder = view.getUint16(tiff);
-    const le = byteOrder === 0x4949;
-
-    const safe16 = o => (tiff+o+2 <= len) ? view.getUint16(tiff+o, le) : 0;
-    const safe32 = o => (tiff+o+4 <= len) ? view.getUint32(tiff+o, le) : 0;
-    const safeU8 = o => (o < len) ? view.getUint8(o) : 0;
-
-    const ifd0 = safe32(4);
-    if(ifd0 === 0 || tiff+ifd0+2 > len) return null;
-    const n0 = safe16(ifd0);
-
-    let gpsOff = -1;
-    for(let i=0; i<n0; i++){
-      const base = ifd0+2+i*12;
-      if(tiff+base+12 > len) break;
-      if(safe16(base) === 0x8825){
-        gpsOff = safe32(base+8); break;
-      }
-    }
-    if(gpsOff < 0) return null;
-    if(tiff+gpsOff+2 > len) return null;
-
-    const gpsCount = safe16(gpsOff);
-    let latRef='N', lngRef='E', lat=null, lng=null;
-
-    const rat = o => {
-      if(o+8 > len) return 0;
-      const n = view.getUint32(o, le);
-      const d = view.getUint32(o+4, le);
-      return d === 0 ? 0 : n/d;
-    };
-
-    for(let i=0; i<gpsCount; i++){
-      const b = gpsOff+2+i*12;
-      if(tiff+b+12 > len) break;
-      const tag = safe16(b);
-      const vo = safe32(b+8);
-      const absOff = tiff+vo;
-
-      if(tag===0x01 && absOff < len){
-        latRef = String.fromCharCode(safeU8(absOff));
-      } else if(tag===0x03 && absOff < len){
-        lngRef = String.fromCharCode(safeU8(absOff));
-      } else if((tag===0x02||tag===0x04) && absOff+24 <= len){
-        const deg = rat(absOff) + rat(absOff+8)/60 + rat(absOff+16)/3600;
-        if(tag===0x02) lat=deg; else lng=deg;
-      }
-    }
-
-    if(lat===null||lng===null) return null;
-    console.log('EXIF GPS OK:', latRef, lat.toFixed(6), lngRef, lng.toFixed(6));
-    return {
-      lat: latRef==='S' ? -lat : lat,
-      lng: lngRef==='W' ? -lng : lng
-    };
-  }catch(e){ console.log('GPS parse error:', e); return null; }
-}
-
-async function runAnalysis(){
-  // GPS確認
-  if(!userLat || !userLng){
-    alert('この写真にはGPS情報が含まれていません。\nカメラアプリで位置情報をオンにして撮影した写真を使ってください。');
-    return;
-  }
-  showLoading('AI解析中...');
-  try{
-    analysisResult = await analyzeImage(capturedDataUrl);
-    hideLoading(); showConfirm();
-  }catch(e){
-    hideLoading();
-    alert('解析に失敗しました。もう一度お試しください。');
     console.error(e);
+    initMap(35.316,139.473,13);
   }
 }
 
-// ══ CONFIRM ══
-function showConfirm(){
-  document.getElementById('confirm-preview').src = capturedDataUrl;
-  const r = analysisResult;
-  document.getElementById('judge-text').textContent = 'AI解析完了 — ' + (r.category||'SEA');
-  document.getElementById('judge-items').innerHTML = (r.items||'').replace(/\n/g,'<br>');
-  document.getElementById('confirm-view').classList.add('active');
-}
-
-function retakePhoto(){
-  document.getElementById('confirm-view').classList.remove('active');
-  openCamera();
-}
-
-async function sendPhoto(){
-  document.getElementById('confirm-view').classList.remove('active');
-  showLoading('保存中...');
-  try{
-    const imageUrl = await uploadImage(capturedBlob);
-    const r = analysisResult;
-    const record = {
-      lat:userLat, lng:userLng,
-      image_url:imageUrl,
-      category:r.category||'SEA',
-      category_reason:r.category_reason,
-      items:r.items, material_type:r.material_type,
-      size_class:r.size_class, estimated_weight_g:r.estimated_weight_g,
-      degradation_level:r.degradation_level, mp_risk:r.mp_risk,
-      drift_days_est:r.drift_days_est, beach_days_est:r.beach_days_est,
-      mp_years_est:r.mp_years_est, manufacturer:r.manufacturer,
-      brand_name:r.brand_name, product_name:r.product_name,
-      barcode:r.barcode, origin_country:r.origin_country,
-      design_issue:r.design_issue, affected_species:r.affected_species,
-      human_route:r.human_route, discharge_route:r.discharge_route,
-      source_category:r.source_category, runoff_risk:r.runoff_risk,
-      analysis_json:r
-    };
-    await sb('records','POST',record);
-    hideLoading();
-    totalCount++;
-    document.getElementById('done-num').textContent = totalCount;
-    document.getElementById('impact-text').textContent = r.summary||'記録されました';
-    if(userLat&&userLng) addMarker({...record, created_at: new Date().toISOString()});
-    document.getElementById('counter-num').textContent = totalCount;
-    document.getElementById('stat-total').textContent = totalCount;
-    document.getElementById('done-view').classList.add('active');
-  }catch(e){
-    hideLoading();
-    alert('保存に失敗しました: ' + e.message);
-    console.error(e);
-  }
-}
-
-function backToMap(){ document.getElementById('done-view').classList.remove('active') }
-
-function showLoading(text){ document.getElementById('loading-text').textContent=text; document.getElementById('loading-overlay').classList.add('active') }
-function hideLoading(){ document.getElementById('loading-overlay').classList.remove('active') }
-
-// ══ ONBOARDING ══
+// ── ONBOARDING ──
 function startApp(){
-  document.getElementById('onboarding').classList.add('hidden');
+  document.getElementById('ob').style.display='none';
+  document.getElementById('app').classList.add('show');
   loadRecords();
 }
 
-// ══ INIT ══
-// map-area click handled by Leaflet
-
-
-
-function centerMap(lat, lng){
-  if(leafmap){
-    leafmap.setView([lat, lng], 14);
-  }
+// ── CAMERA ──
+async function openCam(){
+  document.getElementById('camv').classList.add('show');
+  try{
+    videoStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    document.getElementById('camvid').srcObject=videoStream;
+  }catch(e){console.log('cam error',e)}
+}
+function closeCam(){
+  if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}
+  document.getElementById('camv').classList.remove('show');
+}
+function takePhoto(){
+  const v=document.getElementById('camvid');
+  const c=document.getElementById('camcanvas');
+  if(v.videoWidth){
+    c.width=v.videoWidth;c.height=v.videoHeight;
+    c.getContext('2d').drawImage(v,0,0);
+    c.toBlob(b=>{capturedBlob=b;capturedUrl=c.toDataURL('image/jpeg',.85);closeCam();analyze();},'image/jpeg',.85);
+  } else alert('カメラが起動していません。ギャラリーから選んでください。');
+}
+function onFile(input){
+  if(!input.files[0]) return;
+  capturedBlob=input.files[0];
+  const rd=new FileReader();
+  rd.onload=e=>{capturedUrl=e.target.result;extractGPS(input.files[0]).then(loc=>{if(loc){userLat=loc.lat;userLng=loc.lng;}closeCam();analyze();});};
+  rd.readAsDataURL(input.files[0]);
 }
 
-// onboardingの「はじめる」ボタンからstartApp()が呼ばれる
-</script>
+// ── EXIF GPS ──
+async function extractGPS(file){
+  return new Promise(resolve=>{
+    const rd=new FileReader();
+    rd.onload=e=>{
+      try{
+        const view=new DataView(e.target.result);
+        if(view.getUint16(0)!==0xFFD8){resolve(null);return;}
+        let off=2;
+        while(off<view.byteLength-4){
+          const mk=view.getUint16(off);
+          const sz=view.getUint16(off+2);
+          if(mk===0xFFE1){resolve(parseGPS(view.buffer.slice(off+4,off+2+sz)));return;}
+          if(sz<2) break;
+          off+=2+sz;
+        }
+        resolve(null);
+      }catch(e){resolve(null);}
+    };
+    rd.readAsArrayBuffer(file);
+  });
+}
+function parseGPS(buf){
+  try{
+    const v=new DataView(buf),len=buf.byteLength;
+    if(len<6) return null;
+    const hdr=String.fromCharCode(v.getUint8(0),v.getUint8(1),v.getUint8(2),v.getUint8(3));
+    if(hdr!=='Exif') return null;
+    const t=6;
+    const le=v.getUint16(t)===0x4949;
+    const r16=o=>v.getUint16(t+o,le);
+    const r32=o=>v.getUint32(t+o,le);
+    const ifd=r32(4);
+    if(t+ifd+2>len) return null;
+    const n=r16(ifd);
+    let go=-1;
+    for(let i=0;i<n;i++){const b=ifd+2+i*12;if(t+b+12>len)break;if(r16(b)===0x8825){go=r32(b+8);break;}}
+    if(go<0||t+go+2>len) return null;
+    const gn=r16(go);
+    let latR='N',lngR='E',lat=null,lng=null;
+    const rat=o=>{if(o+8>len)return 0;const n=v.getUint32(o,le),d=v.getUint32(o+4,le);return d===0?0:n/d;};
+    for(let i=0;i<gn;i++){
+      const b=go+2+i*12;if(t+b+12>len)break;
+      const tag=r16(b),vo=r32(b+8),ao=t+vo;
+      if(tag===0x01&&ao<len) latR=String.fromCharCode(v.getUint8(ao));
+      else if(tag===0x03&&ao<len) lngR=String.fromCharCode(v.getUint8(ao));
+      else if((tag===0x02||tag===0x04)&&ao+24<=len){
+        const deg=rat(ao)+rat(ao+8)/60+rat(ao+16)/3600;
+        if(tag===0x02)lat=deg;else lng=deg;
+      }
+    }
+    if(lat===null||lng===null) return null;
+    return{lat:latR==='S'?-lat:lat,lng:lngR==='W'?-lng:lng};
+  }catch(e){return null;}
+}
 
+// ── ANALYZE ──
+async function analyze(){
+  if(!userLat||!userLng){alert('この写真にはGPS情報が含まれていません。\n位置情報をオンにして撮影した写真を使ってください。');return;}
+  showLoad('AI解析中...');
+  try{
+    const b64=capturedUrl.split(',')[1];
+    const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng})});
+    if(!r.ok) throw new Error('AI解析失敗');
+    analysisResult=await r.json();
+    hideLoad();
+    showConfirm();
+  }catch(e){hideLoad();alert('解析に失敗しました。もう一度お試しください。');console.error(e);}
+}
+
+// ── CONFIRM ──
+function showConfirm(){
+  document.getElementById('confpre').src=capturedUrl;
+  document.getElementById('jtxt').textContent='AI解析完了 — '+(analysisResult.category||'SEA');
+  document.getElementById('jitems').innerHTML=(analysisResult.items||'').replace(/\n/g,'<br>');
+  document.getElementById('confv').classList.add('show');
+}
+function retake(){document.getElementById('confv').classList.remove('show');openCam();}
+async function send(){
+  document.getElementById('confv').classList.remove('show');
+  showLoad('保存中...');
+  try{
+    const imgUrl=await upload(capturedBlob);
+    const r=analysisResult;
+    const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
+      category:r.category||'SEA',category_reason:r.category_reason,
+      items:r.items,material_type:r.material_type,size_class:r.size_class,
+      estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
+      mp_risk:r.mp_risk,drift_days_est:r.drift_days_est,beach_days_est:r.beach_days_est,
+      mp_years_est:r.mp_years_est,manufacturer:r.manufacturer,brand_name:r.brand_name,
+      product_name:r.product_name,barcode:r.barcode,origin_country:r.origin_country,
+      import_route:r.import_route,distributor:r.distributor,retailer_category:r.retailer_category,
+      recyclable:r.recyclable,design_issue:r.design_issue,affected_species:r.affected_species,
+      human_route:r.human_route,discharge_route:r.discharge_route,source_category:r.source_category,
+      runoff_risk:r.runoff_risk,analysis_json:r};
+    await sb('records','POST',rec);
+    hideLoad();
+    total++;
+    document.getElementById('done-num').textContent=total;
+    document.getElementById('cnt-num').textContent=total;
+    document.getElementById('s-total').textContent=total;
+    document.getElementById('imp-txt').textContent=r.summary||'記録されました';
+    addPin({...rec,created_at:new Date().toISOString()});
+    document.getElementById('donev').classList.add('show');
+  }catch(e){hideLoad();alert('保存に失敗しました: '+e.message);console.error(e);}
+}
+function backToMap(){document.getElementById('donev').classList.remove('show');}
+
+// ── LOADING ──
+function showLoad(t){document.getElementById('ldgtxt').textContent=t;document.getElementById('ldg').classList.add('show');}
+function hideLoad(){document.getElementById('ldg').classList.remove('show');}
+</script>
 </body>
 </html>
