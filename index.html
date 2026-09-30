@@ -104,15 +104,54 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #btn-back{padding:14px 40px;background:none;border:1.5px solid rgba(255,255,255,.2);border-radius:var(--r);color:var(--foam);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
 
 /* POPUP */
-.leaflet-popup-content-wrapper{background:rgba(6,20,32,.97)!important;border:1px solid rgba(26,122,154,.4)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(0,0,0,.5)!important;color:var(--white)!important;padding:0!important}
-.leaflet-popup-content{margin:0!important;width:220px!important}
-.leaflet-popup-tip{background:rgba(6,20,32,.97)!important}
-.leaflet-popup-close-button{color:rgba(170,221,238,.6)!important;font-size:18px!important;top:8px!important;right:10px!important}
-.umi-pop img{width:100%;height:130px;object-fit:cover;border-radius:12px 12px 0 0;display:block}
-.umi-pop-body{padding:10px 12px 12px}
-.umi-pop-cat{font-size:10px;letter-spacing:.08em;color:var(--foam);opacity:.6;margin-bottom:4px}
-.umi-pop-items{font-size:12px;color:var(--white);line-height:1.55;margin-bottom:6px}
-.umi-pop-risk{font-size:11px;font-weight:500}
+.leaflet-popup-content-wrapper{
+  background:rgba(10,30,50,.75)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+  border:1px solid rgba(100,200,255,.2)!important;
+  border-radius:16px!important;
+  box-shadow:0 8px 32px rgba(0,0,0,.3)!important;
+  color:var(--white)!important;
+  padding:0!important;
+}
+.leaflet-popup-content{margin:0!important;width:260px!important}
+.leaflet-popup-tip-container{display:none!important}
+.leaflet-popup-close-button{
+  color:rgba(255,255,255,.5)!important;
+  font-size:20px!important;
+  top:10px!important;right:12px!important;
+  z-index:10;
+}
+.leaflet-popup-close-button:hover{color:rgba(255,255,255,.9)!important}
+.umi-pop img{
+  width:100%;height:160px;
+  object-fit:cover;
+  border-radius:16px 16px 0 0;
+  display:block;
+}
+.umi-pop-body{padding:12px 14px 14px}
+.umi-pop-header{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:8px;
+}
+.umi-pop-cat-badge{
+  display:inline-block;
+  padding:2px 8px;border-radius:20px;
+  font-size:10px;letter-spacing:.08em;font-weight:500;
+  background:rgba(255,255,255,.12);
+  color:var(--foam);
+}
+.umi-pop-date{font-size:10px;color:rgba(255,255,255,.4);margin-left:auto}
+.umi-pop-loc{font-size:11px;color:var(--foam);opacity:.7;margin-bottom:8px}
+.umi-pop-divider{height:1px;background:rgba(255,255,255,.08);margin:8px 0}
+.umi-pop-items{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:8px}
+.umi-pop-footer{display:flex;align-items:center;justify-content:space-between}
+.umi-pop-risk{
+  font-size:11px;font-weight:500;
+  padding:2px 10px;border-radius:20px;
+  background:rgba(255,255,255,.08);
+}
+.umi-pop-weight{font-size:10px;color:rgba(255,255,255,.4)}
 
 #camcanvas{display:none}
 #filein{display:none}
@@ -287,12 +326,29 @@ function addPin(r){
   });
   const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
   const img=r.image_url?`<img src="${r.image_url}" alt="" onerror="this.style.display='none'">`:'';
-  const items=(r.items||'').split('\n').slice(0,3).join('<br>');
-  const loc=r.location_name&&r.location_name!=='不明'?r.location_name+' — ':'';
+  const items=(r.items||'').split('\n').slice(0,4).join('<br>');
+  const loc=r.location_name&&r.location_name!=='不明'?`<div class="umi-pop-loc">📍 ${r.location_name}</div>`:'';
   const dt=r.created_at?r.created_at.slice(0,10):'';
+  const wt=r.estimated_weight_g?`約${r.estimated_weight_g}g`:'';
+  const mat=r.material_type&&r.material_type!=='不明'?`<span class="umi-pop-weight">${r.material_type.split('、')[0]}</span>`:'';
   L.marker([r.lat,r.lng],{icon}).addTo(lmap).bindPopup(
-    `<div class="umi-pop">${img}<div class="umi-pop-body"><div class="umi-pop-cat">${cat} ${loc}${dt}</div><div class="umi-pop-items">${items}</div>${r.mp_risk?`<div class="umi-pop-risk" style="color:${rc}">MPリスク：${r.mp_risk}</div>`:''}</div></div>`,
-    {maxWidth:240,closeButton:true}
+    `<div class="umi-pop">
+      ${img}
+      <div class="umi-pop-body">
+        <div class="umi-pop-header">
+          <span class="umi-pop-cat-badge" style="color:${col}">${cat}</span>
+          <span class="umi-pop-date">${dt}</span>
+        </div>
+        ${loc}
+        <div class="umi-pop-divider"></div>
+        <div class="umi-pop-items">${items}</div>
+        <div class="umi-pop-footer">
+          ${r.mp_risk?`<div class="umi-pop-risk" style="color:${rc}">MP ${r.mp_risk}</div>`:'<div></div>'}
+          ${mat}
+        </div>
+      </div>
+    </div>`,
+    {maxWidth:280,closeButton:true}
   );
 }
 
