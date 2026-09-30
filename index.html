@@ -391,6 +391,11 @@ function addMarker(record){
 }
 
 async function loadRecords(){
+  // Leafletが読み込まれるまで待つ
+  await new Promise(resolve=>{
+    const check=()=>typeof L!=='undefined'?resolve():setTimeout(check,100);
+    check();
+  });
   try{
     const data = await sb('records?select=*&order=created_at.desc&limit=500');
     let sea=0, city=0, sumLat=0, sumLng=0, count=0;
@@ -674,28 +679,16 @@ function backToMap(){ document.getElementById('done-view').classList.remove('act
 function showLoading(text){ document.getElementById('loading-text').textContent=text; document.getElementById('loading-overlay').classList.add('active') }
 function hideLoading(){ document.getElementById('loading-overlay').classList.remove('active') }
 
-// Leafletが確実に読み込まれるまで待つ
-function waitForLeaflet(cb, tries=0){
-  if(typeof L !== 'undefined') cb();
-  else if(tries < 20) setTimeout(()=>waitForLeaflet(cb, tries+1), 200);
-  else console.error('Leaflet load timeout');
-}
-
 // ══ ONBOARDING ══
 function startApp(){
-  try{ localStorage.setItem('umi_started', '1'); }catch(e){}
   document.getElementById('onboarding').classList.add('hidden');
-  waitForLeaflet(async ()=>{ await loadRecords(); });
+  loadRecords();
 }
 
 // ══ INIT ══
 // map-area click handled by Leaflet
 
-async function init(){
-  waitForLeaflet(async ()=>{
-    await loadRecords();
-  });
-}
+
 
 function centerMap(lat, lng){
   if(leafmap){
@@ -703,14 +696,7 @@ function centerMap(lat, lng){
   }
 }
 
-window.addEventListener('load', ()=>{
-  let started = false;
-  try{ started = !!localStorage.getItem('umi_started'); }catch(e){}
-  if(started){
-    document.getElementById('onboarding').classList.add('hidden');
-    waitForLeaflet(async ()=>{ await loadRecords(); });
-  }
-});
+// onboardingの「はじめる」ボタンからstartApp()が呼ばれる
 </script>
 
 </body>
