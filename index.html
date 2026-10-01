@@ -624,25 +624,39 @@ function updateNavInfo(type){
 
 function goTo(type, idx){
   const recs=type==='mine'?mineRecs:digestRecs;
-  if(!recs||recs.length===0){ return; }
+  if(!recs||recs.length===0) return;
   idx=((idx%recs.length)+recs.length)%recs.length;
   if(type==='mine') mineIdx=idx;
   else digestIdx=idx;
   updateNavInfo(type);
   const r=recs[idx];
   if(!lmap||!r.lat||!r.lng) return;
+
   lmap.closePopup();
-  lmap.setView([r.lat,r.lng],15,{animate:true});
-  setTimeout(()=>{
-    lmap.eachLayer(layer=>{
-      if(layer instanceof L.Marker){
-        const p=layer.getLatLng();
-        if(Math.abs(p.lat-r.lat)<0.0002&&Math.abs(p.lng-r.lng)<0.0002){
-          layer.openPopup();
-        }
+
+  // 現在の地図表示範囲内かどうかを確認
+  const bounds=lmap.getBounds();
+  const inView=bounds.contains(L.latLng(r.lat,r.lng));
+
+  if(inView){
+    // 画面内：地図は動かさずポップアップだけ切り替え
+    openMarkerPopup(r);
+  } else {
+    // 画面外：地図をアニメーションで移動してからポップアップ
+    lmap.flyTo([r.lat,r.lng],15,{animate:true,duration:0.6});
+    setTimeout(()=>openMarkerPopup(r), 700);
+  }
+}
+
+function openMarkerPopup(r){
+  lmap.eachLayer(layer=>{
+    if(layer instanceof L.Marker){
+      const p=layer.getLatLng();
+      if(Math.abs(p.lat-r.lat)<0.0002&&Math.abs(p.lng-r.lng)<0.0002){
+        layer.openPopup();
       }
-    });
-  },450);
+    }
+  });
 }
 
 function initNav(){
