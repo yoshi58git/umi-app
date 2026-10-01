@@ -304,6 +304,88 @@ window.addEventListener('load', async ()=>{
 });
 
 const SB_URL = 'https://imqgpzgpytwvfkgscezn.supabase.co';
+
+// ── ユーザー管理 ──
+let currentUserId = null;
+let currentNickname = null;
+let authMode = 'new';
+
+function getCookie(name){
+  const m=document.cookie.match(new RegExp('(^| )'+name+'=([^;]+)'));
+  return m?decodeURIComponent(m[2]):null;
+}
+function setCookie(name,val,days=365){
+  const d=new Date();d.setTime(d.getTime()+days*864e5);
+  document.cookie=name+'='+encodeURIComponent(val)+';expires='+d.toUTCString()+';path=/;SameSite=Lax';
+}
+
+function showLogin(){
+  document.getElementById('ob-info').style.display='none';
+  document.getElementById('ob-auth').style.display='block';
+}
+
+function switchTab(mode){
+  authMode=mode;
+  document.getElementById('tab-new').style.background=mode==='new'?'var(--wave)':'transparent';
+  document.getElementById('tab-new').style.color=mode==='new'?'var(--white)':'var(--foam)';
+  document.getElementById('tab-login').style.background=mode==='login'?'var(--wave)':'transparent';
+  document.getElementById('tab-login').style.color=mode==='login'?'var(--white)':'var(--foam)';
+  document.getElementById('ob-auth-btn').textContent=mode==='new'?'はじめる':'ログイン';
+  document.getElementById('ob-auth-err').style.display='none';
+}
+
+async function doAuth(){
+  const nick=document.getElementById('inp-nick').value.trim();
+  const pin=document.getElementById('inp-pin').value.trim();
+  const errEl=document.getElementById('ob-auth-err');
+  errEl.style.display='none';
+  if(!nick){errEl.textContent='ニックネームを入力してください';errEl.style.display='block';return;}
+  if(pin.length!==4||!/^[0-9]{4}$/.test(pin)){errEl.textContent='PINは4桁の数字です';errEl.style.display='block';return;}
+  document.getElementById('ob-auth-btn').textContent='確認中...';
+  try{
+    if(authMode==='new'){
+      const existing=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&select=id');
+      if(Array.isArray(existing)&&existing.length>0){
+        errEl.textContent='このニックネームはすでに使われています';errEl.style.display='block';
+        document.getElementById('ob-auth-btn').textContent='はじめる';return;
+      }
+      const result=await sb('users','POST',{nickname:nick,pin:pin,total_records:0});
+      const user=Array.isArray(result)?result[0]:result;
+      currentUserId=user.id;currentNickname=nick;
+    } else {
+      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pin)+'&select=id,nickname');
+      if(!Array.isArray(result)||result.length===0){
+        errEl.textContent='ニックネームまたはPINが違います';errEl.style.display='block';
+        document.getElementById('ob-auth-btn').textContent='ログイン';return;
+      }
+      currentUserId=result[0].id;currentNickname=result[0].nickname;
+    }
+    setCookie('umi_uid',currentUserId);
+    setCookie('umi_nick',currentNickname);
+    try{localStorage.setItem('umi_uid',currentUserId);localStorage.setItem('umi_nick',currentNickname);}catch(e){}
+    startApp();
+  }catch(e){
+    errEl.textContent='エラーが発生しました。もう一度お試しください。';
+    errEl.style.display='block';
+    document.getElementById('ob-auth-btn').textContent=authMode==='new'?'はじめる':'ログイン';
+    console.error(e);
+  }
+}
+
+async function restoreSession(){
+  let uid=getCookie('umi_uid');
+  let nick=getCookie('umi_nick');
+  try{if(!uid)uid=localStorage.getItem('umi_uid');if(!nick)nick=localStorage.getItem('umi_nick');}catch(e){}
+  if(uid&&nick){
+    try{
+      const result=await sb('users?id=eq.'+uid+'&select=id,nickname');
+      if(Array.isArray(result)&&result.length>0){
+        currentUserId=uid;currentNickname=nick;return true;
+      }
+    }catch(e){}
+  }
+  return false;
+}
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcWdwemdweXR3dmZrZ3NjZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODM3MDksImV4cCI6MjEwNjI1OTcwOX0.Wso1DnlSPDJfjH-4AWKOCGke-6vPau5V6cBeFZ_npZ4';
 const EDGE_URL = SB_URL + '/functions/v1/analyze-image';
 
