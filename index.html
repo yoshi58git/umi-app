@@ -167,6 +167,12 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   position:fixed;
   display:flex;flex-direction:column;align-items:center;gap:4px;
   z-index:500;
+  padding:8px;
+  border-radius:20px;
+  cursor:pointer;
+}
+.nav-pair:hover{
+  background:rgba(26,122,154,.08);
 }
 #nav-mine{ left:12px; bottom:160px; }
 #nav-digest{ right:12px; bottom:160px; }
@@ -262,16 +268,16 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div id="leafmap"></div>
     <!-- 自分の記録ナビ（左） -->
     <div class="nav-pair" id="nav-mine">
-      <button class="nav-btn" onclick="goTo('mine',mineIdx-1)">‹</button>
+      <button class="nav-btn" onclick="goTo('mine',mineIdx-1)">∧</button>
       <div class="nav-label">MY</div>
-      <button class="nav-btn" onclick="goTo('mine',mineIdx+1)">›</button>
+      <button class="nav-btn" onclick="goTo('mine',mineIdx+1)">∨</button>
       <div class="nav-count" id="nav-mine-info"></div>
     </div>
     <!-- みんなのダイジェスト（右） -->
     <div class="nav-pair" id="nav-digest">
-      <button class="nav-btn" onclick="goTo('digest',digestIdx-1)">‹</button>
+      <button class="nav-btn" onclick="goTo('digest',digestIdx-1)">∧</button>
       <div class="nav-label">ALL</div>
-      <button class="nav-btn" onclick="goTo('digest',digestIdx+1)">›</button>
+      <button class="nav-btn" onclick="goTo('digest',digestIdx+1)">∨</button>
       <div class="nav-count" id="nav-digest-info"></div>
     </div>
   </div>
@@ -640,16 +646,31 @@ function goTo(type, idx){
 }
 
 function initNav(){
-  // PCホバースクロール
   ['nav-mine','nav-digest'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
     const type=id==='nav-mine'?'mine':'digest';
+    let lastScroll=0;
     el.addEventListener('wheel',(e)=>{
       e.preventDefault();
+      e.stopPropagation();
+      const now=Date.now();
+      if(now-lastScroll<300) return; // 連続スクロール防止
+      lastScroll=now;
       const idx=type==='mine'?mineIdx:digestIdx;
       goTo(type, idx+(e.deltaY>0?1:-1));
     },{passive:false});
+
+    // スマホ：タッチスワイプ
+    let touchY=0;
+    el.addEventListener('touchstart',(e)=>{ touchY=e.touches[0].clientY; },{passive:true});
+    el.addEventListener('touchend',(e)=>{
+      const diff=touchY-e.changedTouches[0].clientY;
+      if(Math.abs(diff)>30){
+        const idx=type==='mine'?mineIdx:digestIdx;
+        goTo(type, idx+(diff>0?1:-1));
+      }
+    },{passive:true});
   });
 }
 
