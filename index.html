@@ -477,6 +477,7 @@ async function upload(blob){
 
 // ── MAP ──
 function initMap(clat, clng, zoom){
+  if(lmap) return; // すでに初期化済みなら何もしない
   lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,minZoom:2,maxZoom:19,zoomControl:true,attributionControl:true});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -663,8 +664,9 @@ function startApp(){
   initNav();
   if(preloaded){
     if(lmap) lmap.invalidateSize();
+    buildNavRecs(); // セッション復元後にナビをビルド
   } else {
-    setTimeout(loadRecords, 50);
+    setTimeout(()=>loadRecords().then(()=>buildNavRecs()), 50);
   }
 }
 
