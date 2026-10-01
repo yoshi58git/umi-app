@@ -322,10 +322,19 @@ function showLogin(){
 function switchTab(mode){
   authMode=mode;
   const btn=document.getElementById('ob-auth-btn');
-  const sub=document.getElementById('ob-sub-link');
   if(btn) btn.textContent=mode==='new'?'新規登録':'はじめる';
-  if(sub && mode==='new') sub.innerHTML='アカウントあり？ <a href="#" onclick="switchTab('login');return false;" style="color:rgba(170,221,238,.5)">ログイン</a>';
-  if(sub && mode!=='new') sub.innerHTML='はじめて？ <a href="#" onclick="switchTab('new');return false;" style="color:rgba(170,221,238,.5)">新規登録</a>';
+  const sub=document.getElementById('ob-sub-link');
+  if(sub){
+    sub.textContent='';
+    const txt=document.createTextNode(mode==='new'?'アカウントあり？ ':'はじめて？ ');
+    const a=document.createElement('a');
+    a.href='#';
+    a.textContent=mode==='new'?'ログイン':'新規登録';
+    a.style.color='rgba(170,221,238,.5)';
+    a.onclick=function(e){e.preventDefault();switchTab(mode==='new'?'login':'new');};
+    sub.appendChild(txt);
+    sub.appendChild(a);
+  }
   document.getElementById('ob-auth-err').style.display='none';
 }
 
