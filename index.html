@@ -567,6 +567,7 @@ async function loadRecords(){
         if(c==='CITY'||c==='GROUND') city++;
         if(r.lat&&r.lng){slat+=r.lat;slng+=r.lng;cnt++;}
       });
+      window.allRecords=data;
       total=data.length;
       document.getElementById('cnt-num').textContent=total;
       document.getElementById('s-total').textContent=total;
