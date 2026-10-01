@@ -528,7 +528,10 @@ function addPin(r){
   const routeHtml=r.discharge_route&&r.discharge_route!=='不明'?`
     <div class="umi-pop-route">${r.discharge_route}</div>`:'';
 
-  L.marker([r.lat,r.lng],{icon}).addTo(lmap).bindPopup(
+  const marker = L.marker([r.lat,r.lng],{icon}).addTo(lmap);
+  marker._umiRecord = r; // レコードを紐付け
+  allMarkers.push(marker);
+  marker.bindPopup(
     `<div class="umi-pop">
       ${img}
       <div class="umi-pop-body">
@@ -559,9 +562,11 @@ function addPin(r){
     </div>`,
     {maxWidth:290,closeButton:true}
   );
+  return marker;
 }
 
 async function loadRecords(){
+  allMarkers = []; // リセット
   try{
     const data = await sb('records?select=*&order=created_at.desc&limit=500');
     preloaded = true;
@@ -649,14 +654,27 @@ function goTo(type, idx){
 }
 
 function openMarkerPopup(r){
-  lmap.eachLayer(layer=>{
-    if(layer instanceof L.Marker){
-      const p=layer.getLatLng();
-      if(Math.abs(p.lat-r.lat)<0.0002&&Math.abs(p.lng-r.lng)<0.0002){
-        layer.openPopup();
-      }
-    }
+  // allMarkersからレコードに対応するマーカーを探す
+  const marker = allMarkers.find(m=>{
+    const rec = m._umiRecord;
+    return rec && Math.abs(rec.lat-r.lat)<0.0002 && Math.abs(rec.lng-r.lng)<0.0002;
   });
+  if(!marker) return;
+
+  // フォーカスアニメーション：ピンを一時的に大きくする
+  const el = marker.getElement();
+  if(el){
+    const pin = el.querySelector('.umi-pin');
+    if(pin){
+      pin.style.transform='scale(2)';
+      pin.style.boxShadow='0 0 0 8px rgba(255,255,255,.3)';
+      setTimeout(()=>{
+        pin.style.transform='';
+        pin.style.boxShadow='';
+      }, 600);
+    }
+  }
+  marker.openPopup();
 }
 
 function initNav(){
