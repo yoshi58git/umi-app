@@ -580,6 +580,7 @@ async function loadRecords(){
       });
       window.allRecords=data;
       total=data.length;
+      setTimeout(buildNavRecs, 100);
       document.getElementById('cnt-num').textContent=total;
       document.getElementById('s-total').textContent=total;
       document.getElementById('s-sea').textContent=sea;
