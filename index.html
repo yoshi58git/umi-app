@@ -23,6 +23,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.2);border:1px solid rgba(26,122,154,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
 .ob-tx{font-size:13px;color:var(--foam);line-height:1.6}
 .ob-tx strong{color:var(--white)}
+#inp-nick:focus,#inp-pin:focus{border-color:rgba(26,122,154,.6)!important}
 #ob-btn{width:100%;max-width:320px;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif}
 
 /* MAP */
@@ -182,10 +183,35 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 <!-- ONBOARDING -->
 <div id="ob">
   <div id="ob-logo">umi</div>
-  <div class="ob-row"><div class="ob-ic">📍</div><div class="ob-tx"><strong>写真のGPS情報を使います</strong><br>撮影時の位置情報が自動で記録されます</div></div>
-  <div class="ob-row"><div class="ob-ic">🔒</div><div class="ob-tx"><strong>ブラウザのGPSは使いません</strong><br>デバイスの現在地には一切アクセスしません</div></div>
-  <div class="ob-row"><div class="ob-ic">📷</div><div class="ob-tx"><strong>位置情報オンで撮影した写真を</strong><br>GPS情報のない写真は受け付けられません</div></div>
-  <button id="ob-btn" onclick="startApp()">はじめる</button>
+
+  <!-- 説明画面 -->
+  <div id="ob-info">
+    <div class="ob-row"><div class="ob-ic">📍</div><div class="ob-tx"><strong>写真のGPS情報を使います</strong><br>撮影時の位置情報が自動で記録されます</div></div>
+    <div class="ob-row"><div class="ob-ic">🔒</div><div class="ob-tx"><strong>ブラウザのGPSは使いません</strong><br>デバイスの現在地には一切アクセスしません</div></div>
+    <div class="ob-row"><div class="ob-ic">📷</div><div class="ob-tx"><strong>位置情報オンで撮影した写真を</strong><br>GPS情報のない写真は受け付けられません</div></div>
+    <button id="ob-btn" onclick="showLogin()">はじめる</button>
+  </div>
+
+  <!-- ログイン・新規画面 -->
+  <div id="ob-auth" style="display:none;width:100%;max-width:320px">
+    <div id="ob-auth-tabs" style="display:flex;gap:8px;margin-bottom:20px">
+      <button onclick="switchTab('new')" id="tab-new" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:var(--wave);color:var(--white);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">新規</button>
+      <button onclick="switchTab('login')" id="tab-login" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--foam);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">ログイン</button>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px">ニックネーム</div>
+      <input id="inp-nick" type="text" placeholder="例: yoshi" maxlength="20"
+        style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none">
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px">PIN（4桁）</div>
+      <input id="inp-pin" type="password" placeholder="0000" maxlength="4" inputmode="numeric"
+        style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:18px;letter-spacing:.3em;font-family:'Inter',sans-serif;outline:none">
+    </div>
+    <div id="ob-auth-note" style="font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:14px">個人情報は一切使用しません</div>
+    <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">はじめる</button>
+    <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-top:10px;display:none"></div>
+  </div>
 </div>
 
 <!-- APP -->
@@ -260,7 +286,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 <script>
 // ページ読み込み後すぐにバックグラウンド処理開始
-window.addEventListener('load', ()=>{
+window.addEventListener('load', async ()=>{
   // Leafletが読み込まれたらすぐに地図とデータを準備
   const waitL = setInterval(()=>{
     if(typeof L !== 'undefined'){
@@ -424,8 +450,11 @@ let preloaded = false;
 function startApp(){
   document.getElementById('ob').style.display='none';
   document.getElementById('app').classList.add('show');
+  // ヘッダーにニックネーム表示
+  if(currentNickname){
+    document.getElementById('cnt-lbl').textContent=currentNickname;
+  }
   if(preloaded){
-    // すでに読み込み済みなら地図を表示するだけ
     if(lmap) lmap.invalidateSize();
   } else {
     setTimeout(loadRecords, 50);
@@ -629,7 +658,7 @@ async function send(){
     const imgUrl=await upload(capturedBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
-      category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:r.photo_taken_at||null,
+      user_id:currentUserId,category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
       estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
       mp_risk:r.mp_risk,drift_days_est:r.drift_days_est,beach_days_est:r.beach_days_est,
