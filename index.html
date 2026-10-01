@@ -205,10 +205,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     </div>
     <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px">ログイン</button>
     <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-bottom:10px;display:none"></div>
-    <div style="text-align:center">
-      <span style="font-size:11px;color:rgba(255,255,255,.3)">はじめて？</span>
-      <button onclick="switchTab('new')" style="background:none;border:none;color:rgba(170,221,238,.5);font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline;margin-left:4px">新規登録</button>
-    </div>
+    <div id="ob-sub-link" style="text-align:center;font-size:11px;color:rgba(255,255,255,.3)">はじめて？ <a href="#" onclick="switchTab('new');return false;" style="color:rgba(170,221,238,.5)">新規登録</a></div>
   </div>
 </div>
 
@@ -324,20 +321,11 @@ function showLogin(){
 
 function switchTab(mode){
   authMode=mode;
-  document.getElementById('tab-new').style.background=mode==='new'?'var(--wave)':'transparent';
-  document.getElementById('tab-new').style.color=mode==='new'?'var(--white)':'var(--foam)';
-  document.getElementById('tab-login').style.background=mode==='login'?'var(--wave)':'transparent';
-  document.getElementById('tab-login').style.color=mode==='login'?'var(--white)':'var(--foam)';
-  document.getElementById('ob-auth-btn').textContent=mode==='new'?'新規登録':'はじめる';
-  // 新規/ログイン切り替えでサブリンク表示を変える
-  const subLink=document.querySelector('#ob-auth div:last-child');
-  if(subLink){
-    if(mode==='new'){
-      subLink.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.3)">アカウントあり？</span><button onclick="switchTab('login')" style="background:none;border:none;color:rgba(170,221,238,.5);font-size:11px;cursor:pointer;font-family:Inter,sans-serif;text-decoration:underline;margin-left:4px">ログイン</button>';
-    } else {
-      subLink.innerHTML='<span style="font-size:11px;color:rgba(255,255,255,.3)">はじめて？</span><button onclick="switchTab('new')" style="background:none;border:none;color:rgba(170,221,238,.5);font-size:11px;cursor:pointer;font-family:Inter,sans-serif;text-decoration:underline;margin-left:4px">新規登録</button>';
-    }
-  }
+  const btn=document.getElementById('ob-auth-btn');
+  const sub=document.getElementById('ob-sub-link');
+  if(btn) btn.textContent=mode==='new'?'新規登録':'はじめる';
+  if(sub && mode==='new') sub.innerHTML='アカウントあり？ <a href="#" onclick="switchTab('login');return false;" style="color:rgba(170,221,238,.5)">ログイン</a>';
+  if(sub && mode!=='new') sub.innerHTML='はじめて？ <a href="#" onclick="switchTab('new');return false;" style="color:rgba(170,221,238,.5)">新規登録</a>';
   document.getElementById('ob-auth-err').style.display='none';
 }
 
