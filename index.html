@@ -200,7 +200,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     </div>
     <div style="margin-bottom:14px">
       <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px">ニックネーム</div>
-      <input id="inp-nick" type="text" placeholder="例: yoshi" maxlength="20"
+      <input id="inp-nick" type="text" placeholder="例: umi" maxlength="20"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none">
     </div>
     <div style="margin-bottom:20px">
@@ -354,19 +354,9 @@ async function doAuth(){
       const user=Array.isArray(result)?result[0]:result;
       currentUserId=user.id;currentNickname=nick;
     } else {
-      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname,pin');
-      console.log('login result:', JSON.stringify(result));
-      console.log('nick:', nick, 'pinClean:', pinClean);
+      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname');
       if(!Array.isArray(result)||result.length===0){
-        // ニックネームだけで検索して詳細確認
-        const byNick=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&select=id,nickname,pin');
-        console.log('byNick:', JSON.stringify(byNick));
-        if(Array.isArray(byNick)&&byNick.length>0){
-          errEl.textContent='PINが違います（入力: '+pinClean+' / 登録: '+byNick[0].pin+' ）';
-        } else {
-          errEl.textContent='ニックネームが見つかりません';
-        }
-        errEl.style.display='block';
+        errEl.textContent='ニックネームまたはPINが違います';errEl.style.display='block';
         document.getElementById('ob-auth-btn').textContent='ログイン';return;
       }
       currentUserId=result[0].id;currentNickname=result[0].nickname;
