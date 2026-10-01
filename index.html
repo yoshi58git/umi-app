@@ -354,9 +354,19 @@ async function doAuth(){
       const user=Array.isArray(result)?result[0]:result;
       currentUserId=user.id;currentNickname=nick;
     } else {
-      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname');
+      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname,pin');
+      console.log('login result:', JSON.stringify(result));
+      console.log('nick:', nick, 'pinClean:', pinClean);
       if(!Array.isArray(result)||result.length===0){
-        errEl.textContent='ニックネームまたはPINが違います';errEl.style.display='block';
+        // ニックネームだけで検索して詳細確認
+        const byNick=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&select=id,nickname,pin');
+        console.log('byNick:', JSON.stringify(byNick));
+        if(Array.isArray(byNick)&&byNick.length>0){
+          errEl.textContent='PINが違います（入力: '+pinClean+' / 登録: '+byNick[0].pin+' ）';
+        } else {
+          errEl.textContent='ニックネームが見つかりません';
+        }
+        errEl.style.display='block';
         document.getElementById('ob-auth-btn').textContent='ログイン';return;
       }
       currentUserId=result[0].id;currentNickname=result[0].nickname;
