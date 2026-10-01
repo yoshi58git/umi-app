@@ -162,6 +162,55 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #camcanvas{display:none}
 #filein{display:none}
 
+/* ── ナビゲーションバー ── */
+#nav-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:30;
+  background:rgba(4,17,28,.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid rgba(100,200,255,.12);
+  padding:8px 16px env(safe-area-inset-bottom,12px);
+  display:none;
+}
+#nav-bar.show{display:block}
+#nav-tabs{display:flex;gap:8px;margin-bottom:8px}
+.nav-tab{
+  flex:1;padding:5px 0;
+  background:none;border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;color:rgba(255,255,255,.5);
+  font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;
+  letter-spacing:.04em;
+}
+.nav-tab.active{background:rgba(26,122,154,.3);border-color:rgba(26,122,154,.5);color:var(--white)}
+#nav-slider-wrap{
+  display:flex;align-items:center;gap:10px;
+}
+#nav-prev,#nav-next{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:var(--white);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+#nav-prev:active,#nav-next:active{background:rgba(26,122,154,.4)}
+#nav-slider{
+  flex:1;height:4px;
+  -webkit-appearance:none;appearance:none;
+  background:rgba(255,255,255,.15);border-radius:2px;outline:none;cursor:pointer;
+}
+#nav-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--wave);border:2px solid var(--white);
+  cursor:pointer;
+}
+#nav-info{
+  text-align:center;font-size:10px;
+  color:rgba(255,255,255,.4);margin-top:4px;
+  letter-spacing:.04em;
+}
+
 
 
 .umi-pin{
@@ -222,10 +271,28 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div class="li"><div class="ld" style="background:var(--life)"></div>ground</div>
   </div>
   <div id="map"><div id="leafmap"></div></div>
+  <!-- ナビゲーションバー -->
+  <div id="nav-bar">
+    <div id="nav-tabs">
+      <button class="nav-tab active" id="tab-mine" onclick="setNavMode('mine')">自分の記録</button>
+      <button class="nav-tab" id="tab-digest" onclick="setNavMode('digest')">みんなのダイジェスト</button>
+    </div>
+    <div id="nav-slider-wrap">
+      <button id="nav-prev" onclick="navStep(-1)">‹</button>
+      <input type="range" id="nav-slider" min="0" value="0" step="1">
+      <button id="nav-next" onclick="navStep(1)">›</button>
+    </div>
+    <div id="nav-info">— / —</div>
+  </div>
+
   <div id="btm">
-    <button id="cam-btn" onclick="openCam()">
-      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    </button>
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:18px">
+      <button id="nav-toggle-btn" onclick="toggleNav()" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--foam);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">≡</button>
+      <button id="cam-btn" onclick="openCam()" style="margin:0">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+      <div style="width:44px"></div>
+    </div>
     <div id="stats">
       <div class="st"><div class="sn" id="s-total">0</div><div class="sl">TOTAL</div></div>
       <div class="st"><div class="sn" id="s-sea">0</div><div class="sl">SEA</div></div>
@@ -531,6 +598,109 @@ async function loadRecords(){
   }
 }
 
+// ── ナビゲーション ──
+let navMode = 'mine'; // 'mine' or 'digest'
+let navIndex = 0;
+let navRecords = [];
+let navOpen = false;
+
+function toggleNav(){
+  navOpen = !navOpen;
+  const bar = document.getElementById('nav-bar');
+  if(navOpen){
+    bar.classList.add('show');
+    buildNavRecords();
+  } else {
+    bar.classList.remove('show');
+    if(lmap) lmap.closePopup();
+  }
+}
+
+function setNavMode(mode){
+  navMode = mode;
+  navIndex = 0;
+  document.getElementById('tab-mine').classList.toggle('active', mode==='mine');
+  document.getElementById('tab-digest').classList.toggle('active', mode==='digest');
+  buildNavRecords();
+}
+
+function buildNavRecords(){
+  // allRecordsはloadRecords後にセット
+  if(!window.allRecords) return;
+  if(navMode==='mine'){
+    navRecords = window.allRecords
+      .filter(r=>r.user_id===currentUserId)
+      .sort((a,b)=>new Date(a.photo_taken_at||a.created_at)-new Date(b.photo_taken_at||b.created_at));
+  } else {
+    // ダイジェスト：MPリスク高優先・最新順
+    navRecords = window.allRecords
+      .filter(r=>r.user_id!==currentUserId)
+      .sort((a,b)=>{
+        const riskScore={高:3,中:2,低:1};
+        const ra=riskScore[a.mp_risk]||0, rb=riskScore[b.mp_risk]||0;
+        if(ra!==rb) return rb-ra;
+        return new Date(b.created_at)-new Date(a.created_at);
+      });
+  }
+  const slider = document.getElementById('nav-slider');
+  slider.max = Math.max(0, navRecords.length-1);
+  slider.value = 0;
+  navIndex = 0;
+  updateNavInfo();
+  if(navRecords.length>0) goToRecord(0);
+}
+
+function updateNavInfo(){
+  const info = document.getElementById('nav-info');
+  if(navRecords.length===0){
+    info.textContent = navMode==='mine'?'自分の記録はまだありません':'記録がありません';
+    return;
+  }
+  const r = navRecords[navIndex];
+  const dt = (r.photo_taken_at||r.created_at||'').slice(0,10);
+  const loc = r.location_name&&r.location_name!=='不明'?r.location_name:'';
+  info.textContent = (navIndex+1)+' / '+navRecords.length+(dt?' — '+dt:'')+(loc?' — '+loc:'');
+}
+
+function goToRecord(idx){
+  if(!lmap||navRecords.length===0) return;
+  navIndex = Math.max(0, Math.min(navRecords.length-1, idx));
+  document.getElementById('nav-slider').value = navIndex;
+  updateNavInfo();
+  const r = navRecords[navIndex];
+  if(r.lat&&r.lng){
+    lmap.setView([r.lat,r.lng], 15, {animate:true});
+    // 対応するマーカーのポップアップを開く
+    setTimeout(()=>{
+      lmap.eachLayer(layer=>{
+        if(layer instanceof L.Marker){
+          const pos=layer.getLatLng();
+          if(Math.abs(pos.lat-r.lat)<0.0001&&Math.abs(pos.lng-r.lng)<0.0001){
+            layer.openPopup();
+          }
+        }
+      });
+    }, 400);
+  }
+}
+
+function navStep(dir){
+  goToRecord(navIndex+dir);
+}
+
+// スライダーイベント
+document.addEventListener('DOMContentLoaded',()=>{
+  const slider=document.getElementById('nav-slider');
+  if(slider){
+    slider.addEventListener('input',()=>goToRecord(parseInt(slider.value)));
+    // PCスクロール操作
+    slider.addEventListener('wheel',(e)=>{
+      e.preventDefault();
+      navStep(e.deltaY>0?1:-1);
+    },{passive:false});
+  }
+});
+
 // ── ONBOARDING ──
 let preloaded = false;
 
@@ -763,6 +933,8 @@ async function send(){
     document.getElementById('s-total').textContent=total;
     document.getElementById('imp-txt').textContent=r.summary||'記録されました';
     addPin({...rec,created_at:new Date().toISOString()});
+    if(!window.allRecords) window.allRecords=[];
+    window.allRecords.unshift({...rec,created_at:new Date().toISOString()});
     document.getElementById('donev').classList.add('show');
   }catch(e){hideLoad();alert('保存に失敗しました: '+e.message);console.error(e);}
 }
