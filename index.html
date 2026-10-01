@@ -339,8 +339,9 @@ async function doAuth(){
   const pin=document.getElementById('inp-pin').value.trim();
   const errEl=document.getElementById('ob-auth-err');
   errEl.style.display='none';
+  const pinClean=pin.replace(/\D/g,''); // 数字以外を除去
   if(!nick){errEl.textContent='ニックネームを入力してください';errEl.style.display='block';return;}
-  if(pin.length!==4||!/^[0-9]{4}$/.test(pin)){errEl.textContent='PINは4桁の数字です';errEl.style.display='block';return;}
+  if(pinClean.length!==4){errEl.textContent='PINは4桁の数字です';errEl.style.display='block';return;}
   document.getElementById('ob-auth-btn').textContent='確認中...';
   try{
     if(authMode==='new'){
@@ -349,11 +350,11 @@ async function doAuth(){
         errEl.textContent='このニックネームはすでに使われています';errEl.style.display='block';
         document.getElementById('ob-auth-btn').textContent='はじめる';return;
       }
-      const result=await sb('users','POST',{nickname:nick,pin:pin,total_records:0});
+      const result=await sb('users','POST',{nickname:nick,pin:pinClean,total_records:0});
       const user=Array.isArray(result)?result[0]:result;
       currentUserId=user.id;currentNickname=nick;
     } else {
-      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pin)+'&select=id,nickname');
+      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname');
       if(!Array.isArray(result)||result.length===0){
         errEl.textContent='ニックネームまたはPINが違います';errEl.style.display='block';
         document.getElementById('ob-auth-btn').textContent='ログイン';return;
