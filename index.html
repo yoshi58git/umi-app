@@ -105,53 +105,58 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 /* POPUP */
 .leaflet-popup-content-wrapper{
-  background:rgba(10,30,50,.75)!important;
-  backdrop-filter:blur(16px)!important;
-  -webkit-backdrop-filter:blur(16px)!important;
-  border:1px solid rgba(100,200,255,.2)!important;
-  border-radius:16px!important;
-  box-shadow:0 8px 32px rgba(0,0,0,.3)!important;
+  background:rgba(8,24,40,.82)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  border:1px solid rgba(100,200,255,.18)!important;
+  border-radius:18px!important;
+  box-shadow:0 8px 40px rgba(0,0,0,.35)!important;
   color:var(--white)!important;
   padding:0!important;
 }
-.leaflet-popup-content{margin:0!important;width:260px!important}
+.leaflet-popup-content{margin:0!important;width:270px!important}
 .leaflet-popup-tip-container{display:none!important}
 .leaflet-popup-close-button{
-  color:rgba(255,255,255,.5)!important;
+  color:rgba(255,255,255,.45)!important;
   font-size:20px!important;
   top:10px!important;right:12px!important;
-  z-index:10;
+  z-index:10;line-height:1!important;
 }
 .leaflet-popup-close-button:hover{color:rgba(255,255,255,.9)!important}
-.umi-pop img{
-  width:100%;height:160px;
-  object-fit:cover;
-  border-radius:16px 16px 0 0;
-  display:block;
-}
+/* 写真 */
+.umi-pop img{width:100%;height:170px;object-fit:cover;border-radius:18px 18px 0 0;display:block}
+/* 本文 */
 .umi-pop-body{padding:12px 14px 14px}
-.umi-pop-header{
-  display:flex;align-items:center;gap:8px;
+/* ヘッダー行 */
+.umi-pop-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.umi-pop-badge{padding:2px 9px;border-radius:20px;font-size:10px;letter-spacing:.07em;font-weight:600;background:rgba(255,255,255,.1)}
+.umi-pop-loc{font-size:11px;color:rgba(255,255,255,.55);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.umi-pop-date{font-size:10px;color:rgba(255,255,255,.35);margin-left:auto;flex-shrink:0}
+/* 区切り */
+.umi-pop-div{height:1px;background:rgba(255,255,255,.07);margin:8px 0}
+/* ごみ品目 */
+.umi-pop-items{font-size:12px;color:rgba(255,255,255,.88);line-height:1.65;margin-bottom:8px}
+/* 数値行 */
+.umi-pop-nums{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.umi-pop-num{
+  flex:1;min-width:70px;
+  padding:5px 8px;border-radius:10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+}
+.umi-pop-num-label{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.05em;margin-bottom:2px}
+.umi-pop-num-val{font-size:12px;font-weight:500;color:rgba(255,255,255,.9)}
+/* 推定関与者 */
+.umi-pop-stakeholder{
+  padding:6px 10px;border-radius:10px;
+  background:rgba(26,122,154,.15);
+  border:1px solid rgba(26,122,154,.25);
   margin-bottom:8px;
 }
-.umi-pop-cat-badge{
-  display:inline-block;
-  padding:2px 8px;border-radius:20px;
-  font-size:10px;letter-spacing:.08em;font-weight:500;
-  background:rgba(255,255,255,.12);
-  color:var(--foam);
-}
-.umi-pop-date{font-size:10px;color:rgba(255,255,255,.4);margin-left:auto}
-.umi-pop-loc{font-size:11px;color:var(--foam);opacity:.7;margin-bottom:8px}
-.umi-pop-divider{height:1px;background:rgba(255,255,255,.08);margin:8px 0}
-.umi-pop-items{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:8px}
-.umi-pop-footer{display:flex;align-items:center;justify-content:space-between}
-.umi-pop-risk{
-  font-size:11px;font-weight:500;
-  padding:2px 10px;border-radius:20px;
-  background:rgba(255,255,255,.08);
-}
-.umi-pop-weight{font-size:10px;color:rgba(255,255,255,.4)}
+.umi-pop-stakeholder-label{font-size:9px;color:rgba(170,221,238,.6);letter-spacing:.06em;margin-bottom:3px}
+.umi-pop-stakeholder-val{font-size:12px;color:rgba(255,255,255,.85)}
+/* 排出経路 */
+.umi-pop-route{font-size:11px;color:rgba(255,255,255,.5);line-height:1.5}
 
 #camcanvas{display:none}
 #filein{display:none}
@@ -327,28 +332,59 @@ function addPin(r){
   const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
   const img=r.image_url?`<img src="${r.image_url}" alt="" onerror="this.style.display='none'">`:'';
   const items=(r.items||'').split('\n').slice(0,4).join('<br>');
-  const loc=r.location_name&&r.location_name!=='不明'?`<div class="umi-pop-loc">📍 ${r.location_name}</div>`:'';
-  const dt=r.created_at?r.created_at.slice(0,10):'';
-  const wt=r.estimated_weight_g?`約${r.estimated_weight_g}g`:'';
-  const mat=r.material_type&&r.material_type!=='不明'?`<span class="umi-pop-weight">${r.material_type.split('、')[0]}</span>`:'';
+  const dt=(r.photo_taken_at||r.created_at||'').slice(0,10);
+  const loc=r.location_name&&r.location_name!=='不明'?r.location_name:'';
+
+  // 数値情報
+  const mpYears=r.mp_years_est&&r.mp_years_est!=='不明'?r.mp_years_est:'—';
+  const weight=r.estimated_weight_g?`約${r.estimated_weight_g}g`:'—';
+  const degrade=r.degradation_level?`劣化 ${r.degradation_level}/5`:'—';
+
+  // 推定関与者（柔らかく表現）
+  const stakeholders=[];
+  if(r.manufacturer&&r.manufacturer!=='不明') stakeholders.push(r.manufacturer);
+  if(r.brand_name&&r.brand_name!=='不明'&&r.brand_name!==r.manufacturer) stakeholders.push(r.brand_name);
+  if(r.source_category&&r.source_category!=='不明') stakeholders.push(r.source_category);
+  const stakeholderHtml=stakeholders.length>0?`
+    <div class="umi-pop-stakeholder">
+      <div class="umi-pop-stakeholder-label">改善に取り組める主体</div>
+      <div class="umi-pop-stakeholder-val">${stakeholders.join('・')}</div>
+    </div>`:'';
+
+  // 排出経路
+  const routeHtml=r.discharge_route&&r.discharge_route!=='不明'?`
+    <div class="umi-pop-route">${r.discharge_route}</div>`:'';
+
   L.marker([r.lat,r.lng],{icon}).addTo(lmap).bindPopup(
     `<div class="umi-pop">
       ${img}
       <div class="umi-pop-body">
-        <div class="umi-pop-header">
-          <span class="umi-pop-cat-badge" style="color:${col}">${cat}</span>
+        <div class="umi-pop-hdr">
+          <span class="umi-pop-badge" style="color:${col}">${cat}</span>
+          <span class="umi-pop-loc">${loc}</span>
           <span class="umi-pop-date">${dt}</span>
         </div>
-        ${loc}
-        <div class="umi-pop-divider"></div>
+        <div class="umi-pop-div"></div>
         <div class="umi-pop-items">${items}</div>
-        <div class="umi-pop-footer">
-          ${r.mp_risk?`<div class="umi-pop-risk" style="color:${rc}">MP ${r.mp_risk}</div>`:'<div></div>'}
-          ${mat}
+        <div class="umi-pop-nums">
+          <div class="umi-pop-num">
+            <div class="umi-pop-num-label">MPリスク</div>
+            <div class="umi-pop-num-val" style="color:${rc}">${r.mp_risk||'—'}</div>
+          </div>
+          <div class="umi-pop-num">
+            <div class="umi-pop-num-label">粒子化まで</div>
+            <div class="umi-pop-num-val">${mpYears}</div>
+          </div>
+          <div class="umi-pop-num">
+            <div class="umi-pop-num-label">推定質量</div>
+            <div class="umi-pop-num-val">${weight}</div>
+          </div>
         </div>
+        ${stakeholderHtml}
+        ${routeHtml}
       </div>
     </div>`,
-    {maxWidth:280,closeButton:true}
+    {maxWidth:290,closeButton:true}
   );
 }
 
@@ -417,11 +453,23 @@ function takePhoto(){
     c.toBlob(b=>{capturedBlob=b;capturedUrl=c.toDataURL('image/jpeg',.85);closeCam();analyze();},'image/jpeg',.85);
   } else alert('カメラが起動していません。ギャラリーから選んでください。');
 }
+let photoTakenAt=null;
+
 function onFile(input){
   if(!input.files[0]) return;
   capturedBlob=input.files[0];
   const rd=new FileReader();
-  rd.onload=e=>{capturedUrl=e.target.result;extractGPS(input.files[0]).then(loc=>{if(loc){userLat=loc.lat;userLng=loc.lng;}closeCam();analyze();});};
+  rd.onload=async e=>{
+    capturedUrl=e.target.result;
+    const [loc,dt]=await Promise.all([
+      extractGPS(input.files[0]),
+      extractPhotoDate(input.files[0])
+    ]);
+    if(loc){userLat=loc.lat;userLng=loc.lng;}
+    photoTakenAt=dt;
+    closeCam();
+    analyze();
+  };
   rd.readAsDataURL(input.files[0]);
 }
 
@@ -481,16 +529,87 @@ function parseGPS(buf){
   }catch(e){return null;}
 }
 
+// ── EXIF 撮影日 ──
+async function extractPhotoDate(file){
+  return new Promise(resolve=>{
+    const rd=new FileReader();
+    rd.onload=e=>{
+      try{
+        const view=new DataView(e.target.result);
+        if(view.getUint16(0)!==0xFFD8){resolve(null);return;}
+        let off=2;
+        while(off<view.byteLength-4){
+          const mk=view.getUint16(off);
+          const sz=view.getUint16(off+2);
+          if(mk===0xFFE1){
+            const buf=e.target.result.slice(off+4,off+2+sz);
+            resolve(parseDateFromExif(buf));
+            return;
+          }
+          if(sz<2) break;
+          off+=2+sz;
+        }
+        resolve(null);
+      }catch(e){resolve(null);}
+    };
+    rd.readAsArrayBuffer(file);
+  });
+}
+
+function parseDateFromExif(buffer){
+  try{
+    const view=new DataView(buffer);
+    const len=buffer.byteLength;
+    if(len<6) return null;
+    const hdr=String.fromCharCode(view.getUint8(0),view.getUint8(1),view.getUint8(2),view.getUint8(3));
+    if(hdr!=='Exif') return null;
+    const t=6;
+    const le=view.getUint16(t)===0x4949;
+    const r16=o=>view.getUint16(t+o,le);
+    const r32=o=>view.getUint32(t+o,le);
+    const ifd=r32(4);
+    if(t+ifd+2>len) return null;
+    const n=r16(ifd);
+    // DateTimeOriginal tag: 0x9003
+    for(let i=0;i<n;i++){
+      const b=ifd+2+i*12;
+      if(t+b+12>len) break;
+      const tag=r16(b);
+      if(tag===0x9003){
+        const vo=r32(b+8);
+        // ASCII形式 "YYYY:MM:DD HH:MM:SS"
+        let str='';
+        for(let j=0;j<19;j++){
+          const c=view.getUint8(t+vo+j);
+          if(c===0) break;
+          str+=String.fromCharCode(c);
+        }
+        if(str.length>=10){
+          // "YYYY:MM:DD HH:MM:SS" → ISO形式に変換
+          const iso=str.replace(/^(\d{4}):(\d{2}):(\d{2})/,'$1-$2-$3');
+          return new Date(iso).toISOString();
+        }
+      }
+    }
+    return null;
+  }catch(e){return null;}
+}
+
 // ── ANALYZE ──
 async function analyze(){
   if(!userLat||!userLng){alert('この写真にはGPS情報が含まれていません。\n位置情報をオンにして撮影した写真を使ってください。');return;}
   showLoad('AI解析中...');
   try{
     const b64=capturedUrl.split(',')[1];
-    const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng})});
+    const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt})});
     if(!r.ok) throw new Error('AI解析失敗');
     analysisResult=await r.json();
     hideLoad();
+    // ごみ判定
+    if(analysisResult.is_trash === false){
+      alert('ごみが見つかりませんでした。\n海岸・街中などで見つけたごみを撮影してください。');
+      return;
+    }
     showConfirm();
   }catch(e){hideLoad();alert('解析に失敗しました。もう一度お試しください。');console.error(e);}
 }
@@ -510,7 +629,7 @@ async function send(){
     const imgUrl=await upload(capturedBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
-      category:r.category||'SEA',category_reason:r.category_reason,
+      category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
       estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
       mp_risk:r.mp_risk,drift_days_est:r.drift_days_est,beach_days_est:r.beach_days_est,
