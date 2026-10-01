@@ -165,12 +165,12 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 /* ── ナビゲーションバー ── */
 #nav-bar{
   position:fixed;bottom:0;left:0;right:0;
-  z-index:30;
-  background:rgba(4,17,28,.92);
+  z-index:40;
+  background:rgba(4,17,28,.95);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
-  border-top:1px solid rgba(100,200,255,.12);
-  padding:8px 16px env(safe-area-inset-bottom,12px);
+  border-top:1px solid rgba(100,200,255,.15);
+  padding:10px 16px env(safe-area-inset-bottom,14px);
   display:none;
 }
 #nav-bar.show{display:block}
@@ -206,9 +206,9 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   cursor:pointer;
 }
 #nav-info{
-  text-align:center;font-size:10px;
-  color:rgba(255,255,255,.4);margin-top:4px;
-  letter-spacing:.04em;
+  text-align:center;font-size:11px;
+  color:rgba(170,221,238,.6);margin-top:6px;
+  letter-spacing:.04em;min-height:16px;
 }
 
 
@@ -688,18 +688,17 @@ function navStep(dir){
   goToRecord(navIndex+dir);
 }
 
-// スライダーイベント
-document.addEventListener('DOMContentLoaded',()=>{
+// スライダーイベント初期化（startApp後に呼ぶ）
+function initNavSlider(){
   const slider=document.getElementById('nav-slider');
   if(slider){
     slider.addEventListener('input',()=>goToRecord(parseInt(slider.value)));
-    // PCスクロール操作
     slider.addEventListener('wheel',(e)=>{
       e.preventDefault();
       navStep(e.deltaY>0?1:-1);
     },{passive:false});
   }
-});
+}
 
 // ── ONBOARDING ──
 let preloaded = false;
@@ -707,10 +706,10 @@ let preloaded = false;
 function startApp(){
   document.getElementById('ob').style.display='none';
   document.getElementById('app').classList.add('show');
-  // ヘッダーにニックネーム表示
   if(currentNickname){
     document.getElementById('cnt-lbl').textContent=currentNickname;
   }
+  initNavSlider();
   if(preloaded){
     if(lmap) lmap.invalidateSize();
   } else {
