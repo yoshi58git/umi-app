@@ -328,7 +328,7 @@ function switchTab(mode){
   document.getElementById('tab-new').style.color=mode==='new'?'var(--white)':'var(--foam)';
   document.getElementById('tab-login').style.background=mode==='login'?'var(--wave)':'transparent';
   document.getElementById('tab-login').style.color=mode==='login'?'var(--white)':'var(--foam)';
-  document.getElementById('ob-auth-btn').textContent=mode==='new'?'新規登録':'ログイン';
+  document.getElementById('ob-auth-btn').textContent=mode==='new'?'新規登録':'はじめる';
   // 新規/ログイン切り替えでサブリンク表示を変える
   const subLink=document.querySelector('#ob-auth div:last-child');
   if(subLink){
@@ -364,7 +364,7 @@ async function doAuth(){
       const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname');
       if(!Array.isArray(result)||result.length===0){
         errEl.textContent='ニックネームまたはPINが違います';errEl.style.display='block';
-        document.getElementById('ob-auth-btn').textContent='ログイン';return;
+        document.getElementById('ob-auth-btn').textContent='はじめる';return;
       }
       currentUserId=result[0].id;currentNickname=result[0].nickname;
     }
@@ -375,7 +375,7 @@ async function doAuth(){
   }catch(e){
     errEl.textContent='エラーが発生しました。もう一度お試しください。';
     errEl.style.display='block';
-    document.getElementById('ob-auth-btn').textContent=authMode==='new'?'はじめる':'ログイン';
+    document.getElementById('ob-auth-btn').textContent=authMode==='new'?'新規登録':'はじめる';
     console.error(e);
   }
 }
