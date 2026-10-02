@@ -655,24 +655,22 @@ function goTo(type, idx){
 }
 
 function openMarkerPopup(r){
-  // allMarkersからレコードに対応するマーカーを探す
-  const marker = allMarkers.find(m=>{
-    const rec = m._umiRecord;
-    return rec && Math.abs(rec.lat-r.lat)<0.0002 && Math.abs(rec.lng-r.lng)<0.0002;
-  });
-  if(!marker) return;
+  const marker = allMarkers.find(m=>
+    m._umiRecord &&
+    Math.abs(m._umiRecord.lat-r.lat)<0.001 &&
+    Math.abs(m._umiRecord.lng-r.lng)<0.001
+  );
+  if(!marker){ console.log('marker not found for', r.lat, r.lng); return; }
 
-  // フォーカスアニメーション：ピンを一時的に大きくする
+  // フォーカスアニメーション
   const el = marker.getElement();
   if(el){
     const pin = el.querySelector('.umi-pin');
     if(pin){
-      pin.style.transform='scale(2)';
-      pin.style.boxShadow='0 0 0 8px rgba(255,255,255,.3)';
-      setTimeout(()=>{
-        pin.style.transform='';
-        pin.style.boxShadow='';
-      }, 600);
+      pin.style.transition='transform .2s,box-shadow .2s';
+      pin.style.transform='scale(2.5)';
+      pin.style.boxShadow='0 0 0 10px rgba(255,255,255,.25)';
+      setTimeout(()=>{pin.style.transform='';pin.style.boxShadow='';}, 700);
     }
   }
   marker.openPopup();
