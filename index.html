@@ -634,8 +634,9 @@ function updateNavInfo(type){
 }
 
 function goTo(type, idx){
+  console.log('goTo called:', type, idx);
   const recs=type==='mine'?mineRecs:digestRecs;
-  if(!recs||recs.length===0) return;
+  if(!recs||recs.length===0){ console.log('recs empty'); return; }
   idx=((idx%recs.length)+recs.length)%recs.length;
   if(type==='mine') mineIdx=idx;
   else digestIdx=idx;
