@@ -640,15 +640,12 @@ function goTo(type, idx){
 
   lmap.closePopup();
 
-  // 現在の地図表示範囲内かどうかを確認
   const bounds=lmap.getBounds();
   const inView=bounds.contains(L.latLng(r.lat,r.lng));
 
   if(inView){
-    // 画面内：地図は動かさずポップアップだけ切り替え
-    openMarkerPopup(r);
+    setTimeout(()=>openMarkerPopup(r), 100);
   } else {
-    // 画面外：地図をアニメーションで移動してからポップアップ
     lmap.flyTo([r.lat,r.lng],15,{animate:true,duration:0.6});
     setTimeout(()=>openMarkerPopup(r), 700);
   }
