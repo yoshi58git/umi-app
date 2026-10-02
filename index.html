@@ -30,6 +30,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #app{position:fixed;inset:0;display:none;flex-direction:column;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
 #app.show{display:flex}
 #map{flex:1;position:relative;z-index:1}
+.leaflet-container{z-index:1}
 #leafmap{position:absolute;inset:0}
 .leaflet-tile{filter:brightness(.85) saturate(.7)}
 
@@ -166,10 +167,11 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .nav-pair{
   position:fixed;
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  z-index:500;
+  z-index:9999;
   padding:8px;
   border-radius:20px;
   cursor:pointer;
+  pointer-events:all;
 }
 .nav-pair:hover{
   background:rgba(26,122,154,.08);
@@ -188,6 +190,9 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   transition:all .15s;
   user-select:none;
   line-height:1;
+  pointer-events:all;
+  position:relative;
+  z-index:9999;
 }
 .nav-btn:hover,.nav-btn:focus{
   background:rgba(26,122,154,.5);
