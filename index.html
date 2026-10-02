@@ -107,91 +107,61 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 /* POPUP */
 .leaflet-popup-content-wrapper{
-  background:rgba(6,18,32,.80)!important;
-  backdrop-filter:blur(24px)!important;
-  -webkit-backdrop-filter:blur(24px)!important;
+  background:rgba(6,18,32,.85)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
   border:1px solid rgba(100,200,255,.15)!important;
-  border-radius:18px!important;
-  box-shadow:0 12px 48px rgba(0,0,0,.4)!important;
+  border-radius:16px!important;
+  box-shadow:0 8px 32px rgba(0,0,0,.4)!important;
   color:var(--white)!important;
   padding:0!important;
   overflow:hidden!important;
 }
-.leaflet-popup-content{margin:0!important;width:270px!important}
+.leaflet-popup-content{margin:0!important;width:260px!important}
 .leaflet-popup-tip-container{display:none!important}
 .leaflet-popup-close-button{
   color:rgba(255,255,255,.5)!important;
   font-size:18px!important;
   top:8px!important;right:10px!important;
   z-index:20;line-height:1!important;
-  text-shadow:0 1px 4px rgba(0,0,0,.5)!important;
 }
 .leaflet-popup-close-button:hover{color:var(--white)!important}
 
-/* 写真 */
-.umi-pop-img{position:relative}
-.umi-pop-img img{width:100%;height:160px;object-fit:cover;display:block}
-.umi-pop-img-fade{
-  position:absolute;bottom:0;left:0;right:0;height:48px;
-  background:linear-gradient(0deg,rgba(6,18,32,.80) 0%,transparent 100%);
+/* 写真 - 固定高さ */
+.umi-pop img{
+  width:100%;height:150px;
+  object-fit:cover;display:block;
+  flex-shrink:0;
 }
 
-/* スクロールボディ */
-.umi-pop-body{
-  max-height:240px;
-  overflow-y:scroll;
-  overflow-x:hidden;
-  padding:10px 14px 32px;
-  position:relative;
-  scrollbar-width:none;
-}
-.umi-pop-body::-webkit-scrollbar{display:none}
-
-/* フェードアウト（下部） */
-.umi-pop-wrap{position:relative}
-.umi-pop-fade{
-  position:absolute;bottom:0;left:0;right:0;height:36px;
-  background:linear-gradient(0deg,rgba(6,18,32,.90) 0%,transparent 100%);
-  pointer-events:none;
-  border-radius:0 0 18px 18px;
-}
+/* 本文 - スクロールなし */
+.umi-pop-body{padding:10px 12px 12px}
 
 /* ヘッダー */
-.umi-pop-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.umi-pop-badge{padding:2px 9px;border-radius:20px;font-size:10px;letter-spacing:.07em;font-weight:600;background:rgba(255,255,255,.1)}
-.umi-pop-loc{font-size:11px;color:rgba(255,255,255,.5);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.umi-pop-date{font-size:10px;color:rgba(255,255,255,.3);margin-left:auto;flex-shrink:0}
+.umi-pop-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.umi-pop-badge{padding:2px 8px;border-radius:20px;font-size:10px;letter-spacing:.06em;font-weight:600;background:rgba(255,255,255,.1)}
+.umi-pop-loc{font-size:10px;color:rgba(255,255,255,.45);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:120px}
+.umi-pop-date{font-size:10px;color:rgba(255,255,255,.3);margin-left:auto}
 
 /* 区切り */
-.umi-pop-div{height:1px;background:rgba(255,255,255,.06);margin:8px 0}
+.umi-pop-div{height:1px;background:rgba(255,255,255,.06);margin:7px 0}
 
 /* ごみ品目 */
-.umi-pop-items{font-size:12px;color:rgba(255,255,255,.85);line-height:1.7;margin-bottom:10px}
+.umi-pop-items{font-size:11px;color:rgba(255,255,255,.82);line-height:1.6;margin-bottom:8px}
 
 /* 数値カード */
-.umi-pop-nums{display:flex;gap:5px;margin-bottom:10px}
-.umi-pop-num{
-  flex:1;padding:5px 7px;border-radius:10px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.07);
-}
-.umi-pop-num-label{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.04em;margin-bottom:2px}
-.umi-pop-num-val{font-size:12px;font-weight:500;color:rgba(255,255,255,.88)}
+.umi-pop-nums{display:flex;gap:5px;margin-bottom:8px}
+.umi-pop-num{flex:1;padding:5px 6px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
+.umi-pop-num-label{font-size:9px;color:rgba(255,255,255,.35);margin-bottom:2px}
+.umi-pop-num-val{font-size:11px;font-weight:500;color:rgba(255,255,255,.88)}
 
 /* 推定関与者 */
-.umi-pop-stakeholder{
-  padding:7px 10px;border-radius:10px;
-  background:rgba(26,122,154,.12);
-  border:1px solid rgba(26,122,154,.2);
-  margin-bottom:10px;
-}
-.umi-pop-stakeholder-label{font-size:9px;color:rgba(170,221,238,.5);letter-spacing:.06em;margin-bottom:3px}
-.umi-pop-stakeholder-val{font-size:12px;color:rgba(255,255,255,.82)}
+.umi-pop-stakeholder{padding:6px 9px;border-radius:8px;background:rgba(26,122,154,.12);border:1px solid rgba(26,122,154,.2);margin-bottom:6px}
+.umi-pop-stakeholder-label{font-size:9px;color:rgba(170,221,238,.5);margin-bottom:2px}
+.umi-pop-stakeholder-val{font-size:11px;color:rgba(255,255,255,.8)}
 
-/* 追加情報 */
-.umi-pop-row{margin-bottom:8px}
-.umi-pop-row-label{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.06em;margin-bottom:2px}
-.umi-pop-row-val{font-size:11px;color:rgba(255,255,255,.7);line-height:1.5}
+/* 排出経路 */
+.umi-pop-route{font-size:10px;color:rgba(255,255,255,.4);line-height:1.5}
 
 #camcanvas{display:none}
 #filein{display:none}
@@ -728,8 +698,9 @@ function initNav(){
     let last=0;
     el.addEventListener('wheel',(e)=>{
       e.preventDefault();
+      e.stopPropagation();
       const now=Date.now();
-      if(now-last<300) return;
+      if(now-last<400) return;
       last=now;
       goTo(type,(type==='mine'?mineIdx:digestIdx)+(e.deltaY>0?1:-1));
     },{passive:false});
