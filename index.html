@@ -116,8 +116,17 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   color:var(--white)!important;
   padding:0!important;
   overflow:hidden!important;
+  resize:none!important;
 }
-.leaflet-popup-content{margin:0!important;width:260px!important}
+.leaflet-popup-content{
+  margin:0!important;
+  width:260px!important;
+  overflow:hidden!important;
+}
+.umi-pop{
+  overflow:hidden;
+  width:260px;
+}
 .leaflet-popup-tip-container{display:none!important}
 .leaflet-popup-close-button{
   color:rgba(255,255,255,.5)!important;
@@ -127,15 +136,22 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 }
 .leaflet-popup-close-button:hover{color:var(--white)!important}
 
-/* 写真 - 固定高さ */
+/* 写真 - 完全固定 */
 .umi-pop img{
-  width:100%;height:150px;
-  object-fit:cover;display:block;
+  width:100%;
+  height:150px !important;
+  min-height:150px !important;
+  max-height:150px !important;
+  object-fit:cover;
+  display:block;
   flex-shrink:0;
 }
 
-/* 本文 - スクロールなし */
-.umi-pop-body{padding:10px 12px 12px}
+/* 本文 - スクロールなし・固定 */
+.umi-pop-body{
+  padding:10px 12px 12px;
+  overflow:hidden;
+}
 
 /* ヘッダー */
 .umi-pop-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
