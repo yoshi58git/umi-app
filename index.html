@@ -271,20 +271,20 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   </div>
   <div id="map">
     <div id="leafmap"></div>
-    <!-- 自分の記録ナビ（左） -->
-    <div class="nav-pair" id="nav-mine">
-      <button class="nav-btn" onclick="goTo('mine',mineIdx-1)">∧</button>
-      <div class="nav-label">MY</div>
-      <button class="nav-btn" onclick="goTo('mine',mineIdx+1)">∨</button>
-      <div class="nav-count" id="nav-mine-info"></div>
-    </div>
-    <!-- みんなのダイジェスト（右） -->
-    <div class="nav-pair" id="nav-digest">
-      <button class="nav-btn" onclick="goTo('digest',digestIdx-1)">∧</button>
-      <div class="nav-label">ALL</div>
-      <button class="nav-btn" onclick="goTo('digest',digestIdx+1)">∨</button>
-      <div class="nav-count" id="nav-digest-info"></div>
-    </div>
+  </div>
+  <!-- 自分の記録ナビ（左） -->
+  <div class="nav-pair" id="nav-mine">
+    <button class="nav-btn" onclick="goTo('mine',mineIdx-1)">∧</button>
+    <div class="nav-label">MY</div>
+    <button class="nav-btn" onclick="goTo('mine',mineIdx+1)">∨</button>
+    <div class="nav-count" id="nav-mine-info"></div>
+  </div>
+  <!-- みんなのダイジェスト（右） -->
+  <div class="nav-pair" id="nav-digest">
+    <button class="nav-btn" onclick="goTo('digest',digestIdx-1)">∧</button>
+    <div class="nav-label">ALL</div>
+    <button class="nav-btn" onclick="goTo('digest',digestIdx+1)">∨</button>
+    <div class="nav-count" id="nav-digest-info"></div>
   </div>
   <div id="btm">
     <button id="cam-btn" onclick="openCam()">
