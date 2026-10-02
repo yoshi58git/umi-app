@@ -508,7 +508,7 @@ async function upload(blob){
 // ── MAP ──
 function initMap(clat, clng, zoom){
   if(lmap) return; // すでに初期化済みなら何もしない
-  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,minZoom:2,maxZoom:19,zoomControl:true,attributionControl:true});
+  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,minZoom:2,maxZoom:19,zoomControl:true,attributionControl:true,scrollWheelZoom:false});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom:19,
@@ -719,7 +719,7 @@ function initNav(){
       if(now-last<400) return;
       last=now;
       goTo(type,(type==='mine'?mineIdx:digestIdx)+(e.deltaY>0?1:-1));
-    },{passive:false});
+    },{passive:false,capture:true});
     let ty=0;
     el.addEventListener('touchstart',(e)=>{ty=e.touches[0].clientY;},{passive:true});
     el.addEventListener('touchend',(e)=>{
