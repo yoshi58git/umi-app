@@ -534,8 +534,8 @@ function addPin(r){
     <div class="umi-pop-route">${r.discharge_route}</div>`:'';
 
   const marker = L.marker([r.lat,r.lng],{icon}).addTo(lmap);
-  marker._umiRecord = r; // レコードを紐付け
-  allMarkers.push(marker);
+  marker._umiRecord = r;
+  if(r.id) markerMap[r.id] = marker;
   marker.bindPopup(
     `<div class="umi-pop">
       ${img}
@@ -571,7 +571,7 @@ function addPin(r){
 }
 
 async function loadRecords(){
-  allMarkers = []; // リセット
+  markerMap = {}; // リセット
   try{
     const data = await sb('records?select=*&order=created_at.desc&limit=500');
     preloaded = true;
@@ -658,12 +658,8 @@ function goTo(type, idx){
 }
 
 function openMarkerPopup(r){
-  const marker = allMarkers.find(m=>
-    m._umiRecord &&
-    Math.abs(m._umiRecord.lat-r.lat)<0.001 &&
-    Math.abs(m._umiRecord.lng-r.lng)<0.001
-  );
-  if(!marker){ console.log('marker not found for', r.lat, r.lng); return; }
+  const marker = r.id ? markerMap[r.id] : null;
+  if(!marker){ console.log('marker not found:', r.id); return; }
 
   // フォーカスアニメーション
   const el = marker.getElement();
@@ -946,7 +942,9 @@ async function send(){
     document.getElementById('imp-txt').textContent=r.summary||'記録されました';
     addPin({...rec,created_at:new Date().toISOString()});
     if(!window.allRecords) window.allRecords=[];
-    window.allRecords.unshift({...rec,created_at:new Date().toISOString()});
+    const newRec={...rec,created_at:new Date().toISOString()};
+    window.allRecords.unshift(newRec);
+    if(newRec.id) markerMap[newRec.id]=null; // 後でaddPinで設定
     buildNavRecs();
     document.getElementById('donev').classList.add('show');
   }catch(e){hideLoad();alert('保存に失敗しました: '+e.message);console.error(e);}
