@@ -634,9 +634,9 @@ function updateNavInfo(type){
 }
 
 function goTo(type, idx){
-  console.log('goTo called:', type, idx);
   const recs=type==='mine'?mineRecs:digestRecs;
-  if(!recs||recs.length===0){ console.log('recs empty'); return; }
+  if(!recs||recs.length===0){
+ return; }
   idx=((idx%recs.length)+recs.length)%recs.length;
   if(type==='mine') mineIdx=idx;
   else digestIdx=idx;
@@ -659,7 +659,8 @@ function goTo(type, idx){
 
 function openMarkerPopup(r){
   const marker = r.id ? markerMap[r.id] : null;
-  if(!marker){ console.log('marker not found:', r.id); return; }
+  if(!marker){
+ return; }
 
   // フォーカスアニメーション
   const el = marker.getElement();
@@ -732,10 +733,8 @@ async function openCam(){
   try{
     videoStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
     document.getElementById('camvid').srcObject=videoStream;
-  }catch(e){console.log('cam error',e)}
-}
-function closeCam(){
-  if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}
+  }catch(e){
+videoStream=null;}
   document.getElementById('camv').classList.remove('show');
 }
 function takePhoto(){
