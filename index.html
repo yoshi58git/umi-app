@@ -749,13 +749,17 @@ function startApp(){
 
 // ── CAMERA ──
 async function openCam(){
-  document.getElementById('camv').classList.add('show');
   try{
-    videoStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    // iPhoneはカメラ取得後に画面表示する
+    videoStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'}},audio:false
+    });
     document.getElementById('camvid').srcObject=videoStream;
+    document.getElementById('camv').classList.add('show');
   }catch(e){
-videoStream=null;}
-  document.getElementById('camv').classList.remove('show');
+    // カメラ不可の場合はギャラリーを直接開く
+    document.getElementById('filein').click();
+  }
 }
 function takePhoto(){
   const v=document.getElementById('camvid');
