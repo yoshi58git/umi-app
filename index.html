@@ -182,6 +182,46 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #camcanvas{display:none}
 #filein{display:none}
 
+/* ── 確認画面サマリー ── */
+#conf-summary{
+  padding:12px 14px;
+  background:rgba(4,17,28,.95);
+  overflow-y:auto;
+  max-height:50vh;
+  scrollbar-width:none;
+}
+#conf-summary::-webkit-scrollbar{display:none}
+.cs-row{
+  display:flex;align-items:flex-start;
+  padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  gap:10px;
+}
+.cs-row:last-child{border-bottom:none}
+.cs-label{
+  font-size:10px;color:rgba(170,221,238,.5);
+  letter-spacing:.06em;min-width:72px;flex-shrink:0;
+  padding-top:2px;
+}
+.cs-val{font-size:12px;color:rgba(255,255,255,.88);line-height:1.5;flex:1}
+.cs-edit{
+  font-size:10px;color:rgba(26,122,154,.8);
+  cursor:pointer;padding:2px 8px;
+  border-radius:6px;border:1px solid rgba(26,122,154,.3);
+  background:rgba(26,122,154,.1);flex-shrink:0;
+  white-space:nowrap;
+}
+.cs-edit:hover{background:rgba(26,122,154,.25)}
+.cs-warn{color:#FFAA44}
+.cs-cat-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.cs-cat-btn{
+  padding:3px 10px;border-radius:12px;font-size:11px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);
+  cursor:pointer;
+}
+.cs-cat-btn.active{border-color:var(--c);background:rgba(var(--cr),var(--cg),var(--cb),.2);color:var(--white);}
+
 /* ── ナビゲーションボタン ── */
 .nav-pair{
   position:fixed;
@@ -333,12 +373,16 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 <!-- CONFIRM -->
 <div id="confv">
-  <div id="confimg"><img id="confpre" src="" alt="">
-    <div id="jover">
-      <div id="jbadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--sea)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span id="jtxt">解析完了</span></div>
-      <div id="jitems"></div>
+  <div id="confimg" style="position:relative;flex-shrink:0">
+    <img id="confpre" src="" alt="" style="width:100%;height:180px;object-fit:cover;display:block">
+    <div style="position:absolute;top:8px;left:8px">
+      <span id="jbadge" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:16px;background:rgba(4,17,28,.75);backdrop-filter:blur(8px);border:1px solid rgba(100,200,255,.2);font-size:11px;color:var(--foam)">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--sea)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="jtxt">解析完了</span>
+      </span>
     </div>
   </div>
+  <div id="conf-summary"></div>
   <div id="confbtns">
     <button id="btn-retry" onclick="retake()">やり直す</button>
     <button id="btn-send" onclick="send()">記録する</button>
@@ -974,10 +1018,100 @@ async function analyze(){
 
 // ── CONFIRM ──
 function showConfirm(){
+  const r=analysisResult;
   document.getElementById('confpre').src=capturedUrl;
-  document.getElementById('jtxt').textContent='AI解析完了 — '+(analysisResult.category||'SEA');
-  document.getElementById('jitems').innerHTML=(analysisResult.items||'').replace(/\n/g,'<br>');
+  document.getElementById('jtxt').textContent='AI解析完了 — '+(r.category||'SEA');
+
+  // カテゴリ色
+  const catCol={SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',GROUND:'#FF7766'};
+  const cat=r.category||'SEA';
+  const col=catCol[cat]||'#22CCEE';
+
+  // GPS情報
+  const gpsHtml=userLat?
+    `${userLat.toFixed(5)}, ${userLng.toFixed(5)}`:
+    `<span class="cs-warn">GPS情報なし ⚠</span>`;
+
+  // 撮影日
+  const dtHtml=photoTakenAt?
+    photoTakenAt.slice(0,10):
+    `<span class="cs-warn">撮影日不明</span>`;
+
+  // カテゴリ選択ボタン
+  const catBtns=['SEA','RIVER','CITY','GROUND'].map(c=>{
+    const cc=catCol[c]||'#22CCEE';
+    const isActive=c===cat;
+    return `<button class="cs-cat-btn${isActive?' active':''}" 
+      style="--c:${cc}" 
+      onclick="changeCategory('${c}')">${c}</button>`;
+  }).join('');
+
+  // MPリスク色
+  const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
+
+  document.getElementById('conf-summary').innerHTML=`
+    <div class="cs-row">
+      <div class="cs-label">カテゴリ</div>
+      <div class="cs-val">
+        <div style="color:${col};font-weight:500;margin-bottom:4px">${cat}</div>
+        <div class="cs-cat-btns">${catBtns}</div>
+      </div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-label">場所</div>
+      <div class="cs-val">${r.location_name||'不明'}</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-label">GPS</div>
+      <div class="cs-val">${gpsHtml}</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-label">撮影日</div>
+      <div class="cs-val">${dtHtml}</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-label">ごみ品目</div>
+      <div class="cs-val">${(r.items||'不明').replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-label">MPリスク</div>
+      <div class="cs-val" style="color:${rc};font-weight:500">${r.mp_risk||'不明'}</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-label">粒子化まで</div>
+      <div class="cs-val">${r.mp_years_est||'不明'}</div>
+    </div>
+    ${r.manufacturer&&r.manufacturer!=='不明'?`
+    <div class="cs-row">
+      <div class="cs-label">メーカー</div>
+      <div class="cs-val">${r.manufacturer}</div>
+    </div>`:''}
+    ${r.brand_name&&r.brand_name!=='不明'?`
+    <div class="cs-row">
+      <div class="cs-label">ブランド</div>
+      <div class="cs-val">${r.brand_name}</div>
+    </div>`:''}
+    <div class="cs-row">
+      <div class="cs-label">要約</div>
+      <div class="cs-val" style="color:rgba(255,255,255,.6);font-size:11px">${r.summary||''}</div>
+    </div>
+  `;
+
   document.getElementById('confv').classList.add('show');
+}
+
+function changeCategory(cat){
+  analysisResult.category=cat;
+  // ボタンのactive状態を更新
+  document.querySelectorAll('.cs-cat-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent===cat);
+  });
+  // バッジも更新
+  document.getElementById('jtxt').textContent='AI解析完了 — '+cat;
+  // カテゴリ表示色も更新
+  const catCol={SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',GROUND:'#FF7766'};
+  const col=catCol[cat]||'#22CCEE';
+  document.querySelector('#conf-summary .cs-cat-btns').previousElementSibling.style.color=col;
 }
 function retake(){document.getElementById('confv').classList.remove('show');openCam();}
 async function send(){
