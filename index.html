@@ -1059,7 +1059,8 @@ function showConfirm(){
     </div>
     <div class="cs-row">
       <div class="cs-label">場所</div>
-      <div class="cs-val">${r.location_name||'不明'}</div>
+      <div class="cs-val" id="cs-loc-val">${r.location_name||'不明'}</div>
+      <span class="cs-edit" onclick="editField('location')">編集</span>
     </div>
     <div class="cs-row">
       <div class="cs-label">GPS</div>
@@ -1067,7 +1068,8 @@ function showConfirm(){
     </div>
     <div class="cs-row">
       <div class="cs-label">撮影日</div>
-      <div class="cs-val">${dtHtml}</div>
+      <div class="cs-val" id="cs-date-val">${dtHtml}</div>
+      <span class="cs-edit" onclick="editField('date')">編集</span>
     </div>
     <div class="cs-row">
       <div class="cs-label">ごみ品目</div>
@@ -1098,6 +1100,30 @@ function showConfirm(){
   `;
 
   document.getElementById('confv').classList.add('show');
+}
+
+function editField(field){
+  if(field==='location'){
+    const cur=analysisResult.location_name||'';
+    const val=prompt('場所名を入力してください', cur);
+    if(val!==null){
+      analysisResult.location_name=val;
+      document.getElementById('cs-loc-val').textContent=val||'不明';
+    }
+  } else if(field==='date'){
+    const cur=photoTakenAt?photoTakenAt.slice(0,10):'';
+    const val=prompt('撮影日を入力してください（例: 2026-09-27）', cur);
+    if(val!==null){
+      // ISO形式に変換して保存
+      const d=new Date(val);
+      if(!isNaN(d.getTime())){
+        photoTakenAt=d.toISOString();
+        document.getElementById('cs-date-val').textContent=val;
+      } else {
+        alert('日付の形式が正しくありません（例: 2026-09-27）');
+      }
+    }
+  }
 }
 
 function changeCategory(cat){
