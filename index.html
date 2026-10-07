@@ -916,12 +916,43 @@ function parseDateFromExif(buffer){
   }catch(e){return null;}
 }
 
+// ── 画像圧縮 ──
+function resizeAndCompress(dataUrl, maxPx, quality){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width, h=img.height;
+      if(w>maxPx||h>maxPx){
+        if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}
+        else{w=Math.round(w*maxPx/h);h=maxPx;}
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src=dataUrl;
+  });
+}
+
+// AI解析用：長辺1920px・品質0.82（約500KB〜1MB）
+async function compressForAnalysis(dataUrl){
+  return resizeAndCompress(dataUrl, 1920, 0.82);
+}
+
+// ストレージ保存用：長辺800px・品質0.75（約100〜200KB）
+async function compressForStorage(dataUrl){
+  return resizeAndCompress(dataUrl, 800, 0.75);
+}
+
 // ── ANALYZE ──
 async function analyze(){
   if(!userLat||!userLng){alert('この写真にはGPS情報が含まれていません。\n位置情報をオンにして撮影した写真を使ってください。');return;}
   showLoad('AI解析中...');
   try{
-    const b64=capturedUrl.split(',')[1];
+    // 10MB制限対策：送信前に圧縮
+    const compressed=await compressForAnalysis(capturedUrl);
+    const b64=compressed.split(',')[1];
     const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt})});
     if(!r.ok) throw new Error('AI解析失敗');
     analysisResult=await r.json();
@@ -947,7 +978,10 @@ async function send(){
   document.getElementById('confv').classList.remove('show');
   showLoad('保存中...');
   try{
-    const imgUrl=await upload(capturedBlob);
+    // ストレージ保存用に圧縮（長辺800px・約150KB）
+    const compressedForUpload=await compressForStorage(capturedUrl);
+    const compBlob=await(await fetch(compressedForUpload)).blob();
+    const imgUrl=await upload(compBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
       user_id:currentUserId,category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:r.photo_taken_at||null,
