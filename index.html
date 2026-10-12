@@ -326,7 +326,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div class="li"><div class="ld" style="background:var(--sea)"></div>sea</div>
     <div class="li"><div class="ld" style="background:var(--river)"></div>river</div>
     <div class="li"><div class="ld" style="background:var(--city)"></div>city</div>
-    <div class="li"><div class="ld" style="background:var(--life)"></div>ground</div>
+    <div class="li"><div class="ld" style="background:var(--ground)"></div>ground</div>
   </div>
   <div id="map">
     <div id="leafmap"></div>
@@ -574,9 +574,14 @@ function initMap(clat, clng, zoom){
   }).addTo(lmap);
 }
 
+function normCat(c){
+  const u=String(c||'').toUpperCase();
+  if(u==='LIFE') return 'GROUND'; // 旧カテゴリ名
+  return catCol[u]?u:'SEA';
+}
 function addPin(r){
   if(!lmap||!r.lat||!r.lng) return;
-  const cat=(r.category||'SEA').toUpperCase();
+  const cat=normCat(r.category);
   const col=catCol[cat]||'#22CCEE';
   const iconHtml = `<div class="umi-pin" style="--c:${col}" ></div>`;
   const icon=L.divIcon({
@@ -655,7 +660,7 @@ async function loadRecords(){
     let sea=0,city=0,slat=0,slng=0,cnt=0;
     if(Array.isArray(data)){
       data.forEach(r=>{
-        const c=(r.category||'').toUpperCase();
+        const c=normCat(r.category);
         if(c==='SEA'||c==='RIVER') sea++;
         if(c==='CITY'||c==='GROUND') city++;
         if(r.lat&&r.lng){slat+=r.lat;slng+=r.lng;cnt++;}
@@ -1060,8 +1065,7 @@ function showConfirm(){
   document.getElementById('confpre').src=capturedUrl;
   document.getElementById('jtxt').textContent='AI解析完了 — '+(r.category||'SEA');
 
-  // カテゴリ色
-  const catCol={SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',GROUND:'#FF7766'};
+  // カテゴリ色（共通の catCol を使う）
   const cat=r.category||'SEA';
   const col=catCol[cat]||'#22CCEE';
 
@@ -1173,8 +1177,7 @@ function changeCategory(cat){
   });
   // バッジも更新
   document.getElementById('jtxt').textContent='AI解析完了 — '+cat;
-  // カテゴリ表示色も更新
-  const catCol={SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',GROUND:'#FF7766'};
+  // カテゴリ表示色も更新（共通の catCol を使う）
   const col=catCol[cat]||'#22CCEE';
   document.querySelector('#conf-summary .cs-cat-btns').previousElementSibling.style.color=col;
 }
