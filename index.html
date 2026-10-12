@@ -535,6 +535,14 @@ let total = 0;
 
 const catCol = {SEA:'#22CCEE',RIVER:'#44BB88',CITY:'#FFAA44',GROUND:'#FF7766'};
 
+// 日付を端末の現地時刻で YYYY-MM-DD にする（朝の撮影が前日表示になるのを防ぐ）
+function fmtDate(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(isNaN(d.getTime())) return String(iso).slice(0,10);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 // ── SUPABASE ──
 async function sb(path, method='GET', body=null){
   const h = {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
@@ -579,7 +587,7 @@ function addPin(r){
   const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
   const img=r.image_url?`<img src="${r.image_url}" alt="" onerror="this.style.display='none'">`:'';
   const items=(r.items||'').split('\n').slice(0,4).join('<br>');
-  const dt=(r.photo_taken_at||r.created_at||'').slice(0,10);
+  const dt=fmtDate(r.photo_taken_at||r.created_at);
   const loc=r.location_name&&r.location_name!=='不明'?r.location_name:'';
 
   // 数値情報
@@ -798,7 +806,20 @@ function startApp(){
 }
 
 // ── CAMERA ──
+// 現在地を取得（取れなければnull）
+let camPosPromise=null;
+function getCurrentPosition(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation){resolve(null);return;}
+    navigator.geolocation.getCurrentPosition(
+      p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),
+      ()=>resolve(null),
+      {enableHighAccuracy:true,timeout:15000,maximumAge:60000}
+    );
+  });
+}
 async function openCam(){
+  camPosPromise=getCurrentPosition(); // カメラ起動と同時に位置の取得を始める
   try{
     videoStream=await navigator.mediaDevices.getUserMedia({
       video:{facingMode:{ideal:'environment'}},audio:false
@@ -821,7 +842,17 @@ function takePhoto(){
   if(v.videoWidth){
     c.width=v.videoWidth;c.height=v.videoHeight;
     c.getContext('2d').drawImage(v,0,0);
-    c.toBlob(b=>{capturedBlob=b;capturedUrl=c.toDataURL('image/jpeg',.85);closeCam();analyze();},'image/jpeg',.85);
+    c.toBlob(async b=>{
+      capturedBlob=b;capturedUrl=c.toDataURL('image/jpeg',.85);closeCam();
+      // 前の写真の位置・日時を使い回さないよう、撮影ごとにリセット
+      userLat=null;userLng=null;photoTakenAt=new Date().toISOString();
+      showLoad('位置情報を取得中...');
+      const loc=await (camPosPromise||getCurrentPosition());
+      camPosPromise=null;
+      hideLoad();
+      if(loc){userLat=loc.lat;userLng=loc.lng;}
+      analyze();
+    },'image/jpeg',.85);
   } else alert('カメラが起動していません。ギャラリーから選んでください。');
 }
 let photoTakenAt=null;
@@ -829,6 +860,7 @@ let photoTakenAt=null;
 function onFile(input){
   if(!input.files[0]) return;
   capturedBlob=input.files[0];
+  userLat=null;userLng=null;photoTakenAt=null; // 前の写真の位置・日時を使い回さない
   const rd=new FileReader();
   rd.onload=async e=>{
     capturedUrl=e.target.result;
@@ -839,6 +871,7 @@ function onFile(input){
     if(loc){userLat=loc.lat;userLng=loc.lng;}
     photoTakenAt=dt;
     closeCam();
+    input.value=''; // 同じ写真をもう一度選べるように
     analyze();
   };
   rd.readAsDataURL(input.files[0]);
@@ -940,27 +973,32 @@ function parseDateFromExif(buffer){
     const r32=o=>view.getUint32(t+o,le);
     const ifd=r32(4);
     if(t+ifd+2>len) return null;
-    const n=r16(ifd);
-    // DateTimeOriginal tag: 0x9003
-    for(let i=0;i<n;i++){
-      const b=ifd+2+i*12;
-      if(t+b+12>len) break;
-      const tag=r16(b);
-      if(tag===0x9003){
-        const vo=r32(b+8);
-        // ASCII形式 "YYYY:MM:DD HH:MM:SS"
-        let str='';
-        for(let j=0;j<19;j++){
-          const c=view.getUint8(t+vo+j);
-          if(c===0) break;
-          str+=String.fromCharCode(c);
-        }
-        if(str.length>=10){
-          // "YYYY:MM:DD HH:MM:SS" → ISO形式に変換
-          const iso=str.replace(/^(\d{4}):(\d{2}):(\d{2})/,'$1-$2-$3');
-          return new Date(iso).toISOString();
-        }
+    // IFDの中からタグを探して文字列を読む
+    const readTag=(dir,tagId)=>{
+      if(t+dir+2>len) return null;
+      const n=r16(dir);
+      for(let i=0;i<n;i++){
+        const b=dir+2+i*12;
+        if(t+b+12>len) break;
+        if(r16(b)===tagId) return b;
       }
+      return null;
+    };
+    const readAscii=(b)=>{
+      const vo=r32(b+8);let str='';
+      for(let j=0;j<19&&t+vo+j<len;j++){const c=view.getUint8(t+vo+j);if(c===0)break;str+=String.fromCharCode(c);}
+      return str;
+    };
+    // 撮影日時(0x9003)はExifの下の階層にある。なければ更新日時(0x0132)
+    let str='';
+    const exifPtr=readTag(ifd,0x8769);
+    if(exifPtr!==null){const b=readTag(r32(exifPtr+8),0x9003);if(b!==null)str=readAscii(b);}
+    if(!str){const b=readTag(ifd,0x0132);if(b!==null)str=readAscii(b);}
+    const m=str.match(/^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+    if(m){
+      // 撮影した端末の現地時刻として扱う（Safariでも読める形式）
+      const d=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6]);
+      if(!isNaN(d.getTime())) return d.toISOString();
     }
     return null;
   }catch(e){return null;}
@@ -997,7 +1035,7 @@ async function compressForStorage(dataUrl){
 
 // ── ANALYZE ──
 async function analyze(){
-  if(!userLat||!userLng){alert('この写真にはGPS情報が含まれていません。\n位置情報をオンにして撮影した写真を使ってください。');return;}
+  if(userLat==null||userLng==null){alert('位置情報を取得できませんでした。\nカメラで撮る場合はブラウザの位置情報の許可を、ギャラリーから選ぶ場合は位置情報つきで撮影した写真かを確認してください。');return;}
   showLoad('AI解析中...');
   try{
     // 10MB制限対策：送信前に圧縮
@@ -1034,7 +1072,7 @@ function showConfirm(){
 
   // 撮影日
   const dtHtml=photoTakenAt?
-    photoTakenAt.slice(0,10):
+    fmtDate(photoTakenAt):
     `<span class="cs-warn">撮影日不明</span>`;
 
   // カテゴリ選択ボタン
@@ -1111,11 +1149,12 @@ function editField(field){
       document.getElementById('cs-loc-val').textContent=val||'不明';
     }
   } else if(field==='date'){
-    const cur=photoTakenAt?photoTakenAt.slice(0,10):'';
+    const cur=photoTakenAt?fmtDate(photoTakenAt):'';
     const val=prompt('撮影日を入力してください（例: 2026-09-27）', cur);
     if(val!==null){
       // ISO形式に変換して保存
-      const d=new Date(val);
+      const mm=String(val).trim().match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
+      const d=mm?new Date(+mm[1],+mm[2]-1,+mm[3],12,0,0):new Date(NaN);
       if(!isNaN(d.getTime())){
         photoTakenAt=d.toISOString();
         document.getElementById('cs-date-val').textContent=val;
@@ -1150,7 +1189,7 @@ async function send(){
     const imgUrl=await upload(compBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
-      user_id:currentUserId,category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:r.photo_taken_at||null,
+      user_id:currentUserId,category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
       estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
       mp_risk:r.mp_risk,drift_days_est:r.drift_days_est,beach_days_est:r.beach_days_est,
@@ -1160,18 +1199,17 @@ async function send(){
       recyclable:r.recyclable,design_issue:r.design_issue,affected_species:r.affected_species,
       human_route:r.human_route,discharge_route:r.discharge_route,source_category:r.source_category,
       runoff_risk:r.runoff_risk,analysis_json:r};
-    await sb('records','POST',rec);
+    const saved=await sb('records','POST',rec);
+    const savedRec={...rec,created_at:new Date().toISOString(),...(Array.isArray(saved)?saved[0]:saved)};
     hideLoad();
     total++;
     document.getElementById('done-num').textContent=total;
     document.getElementById('cnt-num').textContent=total;
     document.getElementById('s-total').textContent=total;
     document.getElementById('imp-txt').textContent=r.summary||'記録されました';
-    addPin({...rec,created_at:new Date().toISOString()});
+    addPin(savedRec);
     if(!window.allRecords) window.allRecords=[];
-    const newRec={...rec,created_at:new Date().toISOString()};
-    window.allRecords.unshift(newRec);
-    if(newRec.id) markerMap[newRec.id]=null; // 後でaddPinで設定
+    window.allRecords.unshift(savedRec);
     buildNavRecs();
     document.getElementById('donev').classList.add('show');
   }catch(e){hideLoad();alert('保存に失敗しました: '+e.message);console.error(e);}
