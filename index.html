@@ -351,8 +351,10 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     </button>
     <div id="stats">
       <div class="st"><div class="sn" id="s-total">0</div><div class="sl">TOTAL</div></div>
-      <div class="st"><div class="sn" id="s-sea">0</div><div class="sl">SEA</div></div>
-      <div class="st"><div class="sn" id="s-city">0</div><div class="sl">CITY</div></div>
+      <div class="st"><div class="sn" id="s-sea" style="color:var(--sea)">0</div><div class="sl">SEA</div></div>
+      <div class="st"><div class="sn" id="s-river" style="color:var(--river)">0</div><div class="sl">RIVER</div></div>
+      <div class="st"><div class="sn" id="s-city" style="color:var(--city)">0</div><div class="sl">CITY</div></div>
+      <div class="st"><div class="sn" id="s-ground" style="color:var(--ground)">0</div><div class="sl">GROUND</div></div>
     </div>
   </div>
 </div>
@@ -579,6 +581,19 @@ function normCat(c){
   if(u==='LIFE') return 'GROUND'; // 旧カテゴリ名
   return catCol[u]?u:'SEA';
 }
+// カテゴリごとの件数を数えて表示（凡例・ピンと同じ分け方）
+function updateStats(){
+  const recs=window.allRecords||[];
+  const n={SEA:0,RIVER:0,CITY:0,GROUND:0};
+  recs.forEach(r=>{n[normCat(r.category)]++;});
+  total=recs.length;
+  document.getElementById('cnt-num').textContent=total;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-sea').textContent=n.SEA;
+  document.getElementById('s-river').textContent=n.RIVER;
+  document.getElementById('s-city').textContent=n.CITY;
+  document.getElementById('s-ground').textContent=n.GROUND;
+}
 function addPin(r){
   if(!lmap||!r.lat||!r.lng) return;
   const cat=normCat(r.category);
@@ -657,21 +672,14 @@ async function loadRecords(){
   try{
     const data = await sb('records?select=*&order=created_at.desc&limit=500');
     preloaded = true;
-    let sea=0,city=0,slat=0,slng=0,cnt=0;
+    let slat=0,slng=0,cnt=0;
     if(Array.isArray(data)){
       data.forEach(r=>{
-        const c=normCat(r.category);
-        if(c==='SEA'||c==='RIVER') sea++;
-        if(c==='CITY'||c==='GROUND') city++;
         if(r.lat&&r.lng){slat+=r.lat;slng+=r.lng;cnt++;}
       });
       window.allRecords=data;
-      total=data.length;
       setTimeout(buildNavRecs, 100);
-      document.getElementById('cnt-num').textContent=total;
-      document.getElementById('s-total').textContent=total;
-      document.getElementById('s-sea').textContent=sea;
-      document.getElementById('s-city').textContent=city;
+      updateStats();
       const clat=cnt>0?slat/cnt:35.316;
       const clng=cnt>0?slng/cnt:139.473;
       initMap(clat,clng,cnt>0?14:10);
@@ -1205,14 +1213,12 @@ async function send(){
     const saved=await sb('records','POST',rec);
     const savedRec={...rec,created_at:new Date().toISOString(),...(Array.isArray(saved)?saved[0]:saved)};
     hideLoad();
-    total++;
-    document.getElementById('done-num').textContent=total;
-    document.getElementById('cnt-num').textContent=total;
-    document.getElementById('s-total').textContent=total;
-    document.getElementById('imp-txt').textContent=r.summary||'記録されました';
-    addPin(savedRec);
     if(!window.allRecords) window.allRecords=[];
     window.allRecords.unshift(savedRec);
+    updateStats();
+    document.getElementById('done-num').textContent=total;
+    document.getElementById('imp-txt').textContent=r.summary||'記録されました';
+    addPin(savedRec);
     buildNavRecs();
     document.getElementById('donev').classList.add('show');
   }catch(e){hideLoad();alert('保存に失敗しました: '+e.message);console.error(e);}
