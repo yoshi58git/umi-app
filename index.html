@@ -187,6 +187,15 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
+  /* スクロールバーを隠す（スクロールはできる） */
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.umi-pop-body::-webkit-scrollbar{display:none}
+/* 続きがあるときは下端をふわっと消して「まだ下がある」と分かるように */
+.umi-pop-body.has-more{
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 36px),transparent);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 36px),transparent);
 }
 
 /* ヘッダー */
@@ -617,6 +626,10 @@ function initMap(clat, clng, zoom){
     maxZoom:19,
     maxNativeZoom:19
   }).addTo(lmap);
+  lmap.on('popupopen',e=>{
+    const el=e.popup.getElement()&&e.popup.getElement().querySelector('.umi-pop-body');
+    if(el){updatePopFade(el);setTimeout(()=>updatePopFade(el),300);} // 写真の読み込み後にも再判定
+  });
 }
 
 function normCat(c){
@@ -674,6 +687,14 @@ function togglePhotoZoom(e){
   });
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePhoto();});
+
+// ポップアップ本文に続きがあるかを見て、下端のフェードを付け外し
+function updatePopFade(el){
+  el.classList.toggle('has-more', el.scrollHeight-el.scrollTop-el.clientHeight>4);
+}
+document.addEventListener('scroll',e=>{
+  if(e.target.classList&&e.target.classList.contains('umi-pop-body')) updatePopFade(e.target);
+},true);
 
 function addPin(r){
   if(!lmap||!r.lat||!r.lng) return;
