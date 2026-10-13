@@ -47,9 +47,21 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #cnt-lbl{font-size:10px;color:var(--foam);opacity:.7;letter-spacing:.08em}
 
 /* LEGEND */
-#leg{position:relative;z-index:20;display:flex;gap:12px;padding:6px 20px}
-.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--foam);opacity:.7}
-.ld{width:6px;height:6px;border-radius:50%}
+#leg{position:relative;z-index:20;display:flex;flex-wrap:nowrap;gap:5px;padding:4px 12px 8px;overflow-x:auto;scrollbar-width:none}
+#leg::-webkit-scrollbar{display:none}
+.li{
+  display:flex;align-items:center;gap:5px;padding:5px 9px 5px 8px;border-radius:14px;flex-shrink:0;
+  background:rgba(4,17,28,.6);border:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  font-family:inherit;font-size:11px;letter-spacing:.02em;color:rgba(255,255,255,.88);
+  cursor:pointer;transition:opacity .15s,background .15s;-webkit-tap-highlight-color:transparent;
+}
+.li:active{transform:scale(.96)}
+.ld{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c)}
+.li-n{font-weight:600;color:var(--c);min-width:10px;text-align:right}
+.li.off{opacity:.45}
+.li.off .ld{background:transparent;box-shadow:none;border:1.5px solid var(--c);width:5px;height:5px}
+#cnt-lbl{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 
 /* BOTTOM */
 #btm{position:relative;z-index:20;padding:0 20px env(safe-area-inset-bottom,20px);background:linear-gradient(0deg,rgba(4,17,28,.98) 60%,transparent 100%);padding-top:28px}
@@ -57,10 +69,6 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #cam-btn:active{transform:scale(.92)}
 #cam-btn svg{width:28px;height:28px;fill:none;stroke:var(--white);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @keyframes glow{0%{box-shadow:0 0 0 0 rgba(26,122,154,.5)}70%{box-shadow:0 0 0 16px rgba(26,122,154,0)}100%{box-shadow:0 0 0 0 rgba(26,122,154,0)}}
-#stats{display:flex;justify-content:space-around;padding-bottom:4px}
-.st{display:flex;flex-direction:column;align-items:center;gap:3px}
-.sn{font-size:16px;font-weight:500}
-.sl{font-size:9px;color:var(--foam);opacity:.6;letter-spacing:.06em}
 
 /* CAMERA */
 #camv{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:100}
@@ -276,54 +284,40 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 }
 .cs-cat-btn.active{border-color:var(--c);background:rgba(var(--cr),var(--cg),var(--cb),.2);color:var(--white);}
 
-/* ── ナビゲーションボタン ── */
+/* ── ナビゲーション（自分／みんなの記録を順に見る） ── */
 .nav-pair{
-  position:fixed;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  z-index:9999;
-  padding:8px;
-  border-radius:20px;
-  cursor:pointer;
-  pointer-events:all;
+  position:fixed;z-index:30;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+  width:54px;display:flex;flex-direction:column;align-items:stretch;
+  border-radius:28px;overflow:hidden;
+  background:rgba(6,22,36,.82);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border:1px solid rgba(170,221,238,.22);
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:border-color .2s,box-shadow .2s,opacity .2s;
 }
-.nav-pair:hover{
-  background:rgba(26,122,154,.08);
-}
-#nav-mine{ left:12px; bottom:160px; }
-#nav-digest{ right:12px; bottom:160px; }
+#nav-mine{left:16px;--accent:#5FD3E6}
+#nav-digest{right:16px;--accent:#FFD27A}
+.nav-pair.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 6px 20px rgba(0,0,0,.35)}
+.nav-pair.empty{opacity:.45}
 .nav-btn{
-  width:40px;height:40px;border-radius:50%;
-  background:rgba(8,24,40,.65);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(100,200,255,.25);
-  color:rgba(255,255,255,.8);font-size:20px;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
-  user-select:none;
-  line-height:1;
-  pointer-events:all;
-  position:relative;
-  z-index:9999;
+  height:42px;border:none;background:transparent;color:#fff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:background .12s;
 }
-.nav-btn:hover,.nav-btn:focus{
-  background:rgba(26,122,154,.5);
-  border-color:rgba(100,200,255,.5);
-  color:var(--white);
-  outline:none;
+.nav-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn:hover{background:rgba(255,255,255,.08)}
+.nav-btn:active{background:rgba(255,255,255,.16)}
+.nav-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+.nav-mid{
+  display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 0;
+  border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);
 }
-.nav-btn:active{transform:scale(.92)}
-.nav-label{
-  font-size:9px;color:rgba(170,221,238,.6);
-  text-align:center;letter-spacing:.08em;font-weight:500;
-}
-.nav-count{
-  font-size:10px;color:rgba(170,221,238,.5);
-  text-align:center;min-height:14px;
-}
-
-
+.nav-label{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--accent)}
+.nav-count{font-size:12px;color:#fff;font-variant-numeric:tabular-nums;line-height:1.2;text-align:center}
+.nav-count .tot{color:rgba(255,255,255,.55);font-size:10px}
+.nav-count.bump{animation:navbump .25s}
+@keyframes navbump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
 
 .umi-pin{
   width:12px;height:12px;border-radius:50%;
@@ -384,39 +378,30 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div><div id="cnt-num">0</div><div id="cnt-lbl">records</div></div>
   </div>
   <div id="leg">
-    <div class="li"><div class="ld" style="background:var(--sea)"></div>sea</div>
-    <div class="li"><div class="ld" style="background:var(--river)"></div>river</div>
-    <div class="li"><div class="ld" style="background:var(--city)"></div>city</div>
-    <div class="li"><div class="ld" style="background:var(--ground)"></div>ground</div>
+    <button class="li" data-cat="SEA" style="--c:var(--sea)" onclick="toggleCat('SEA')" aria-pressed="true"><span class="ld"></span>SEA<span class="li-n" id="s-sea">0</span></button>
+    <button class="li" data-cat="RIVER" style="--c:var(--river)" onclick="toggleCat('RIVER')" aria-pressed="true"><span class="ld"></span>RIVER<span class="li-n" id="s-river">0</span></button>
+    <button class="li" data-cat="CITY" style="--c:var(--city)" onclick="toggleCat('CITY')" aria-pressed="true"><span class="ld"></span>CITY<span class="li-n" id="s-city">0</span></button>
+    <button class="li" data-cat="GROUND" style="--c:var(--ground)" onclick="toggleCat('GROUND')" aria-pressed="true"><span class="ld"></span>GROUND<span class="li-n" id="s-ground">0</span></button>
   </div>
   <div id="map">
     <div id="leafmap"></div>
   </div>
-  <!-- 自分の記録ナビ（左） -->
-  <div class="nav-pair" id="nav-mine">
-    <button class="nav-btn" id="mine-up">∧</button>
-    <div class="nav-label">MY</div>
-    <button class="nav-btn" id="mine-dn">∨</button>
-    <div class="nav-count" id="nav-mine-info"></div>
+  <!-- 自分の記録ナビ（左）：撮影日の古い順 -->
+  <div class="nav-pair" id="nav-mine" role="group" aria-label="自分の記録">
+    <button class="nav-btn" id="mine-up" aria-label="自分の記録：前へ"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg></button>
+    <div class="nav-mid"><div class="nav-label">自分</div><div class="nav-count" id="nav-mine-info">0</div></div>
+    <button class="nav-btn" id="mine-dn" aria-label="自分の記録：次へ"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
   </div>
-  <!-- みんなのダイジェスト（右） -->
-  <div class="nav-pair" id="nav-digest">
-    <button class="nav-btn" id="digest-up">∧</button>
-    <div class="nav-label">ALL</div>
-    <button class="nav-btn" id="digest-dn">∨</button>
-    <div class="nav-count" id="nav-digest-info"></div>
+  <!-- みんなの記録ナビ（右）：MPリスクの高い順 -->
+  <div class="nav-pair" id="nav-digest" role="group" aria-label="みんなの記録">
+    <button class="nav-btn" id="digest-up" aria-label="みんなの記録：前へ"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg></button>
+    <div class="nav-mid"><div class="nav-label">みんな</div><div class="nav-count" id="nav-digest-info">0</div></div>
+    <button class="nav-btn" id="digest-dn" aria-label="みんなの記録：次へ"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
   </div>
   <div id="btm">
     <button id="cam-btn" onclick="openCam()">
       <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     </button>
-    <div id="stats">
-      <div class="st"><div class="sn" id="s-total">0</div><div class="sl">TOTAL</div></div>
-      <div class="st"><div class="sn" id="s-sea" style="color:var(--sea)">0</div><div class="sl">SEA</div></div>
-      <div class="st"><div class="sn" id="s-river" style="color:var(--river)">0</div><div class="sl">RIVER</div></div>
-      <div class="st"><div class="sn" id="s-city" style="color:var(--city)">0</div><div class="sl">CITY</div></div>
-      <div class="st"><div class="sn" id="s-ground" style="color:var(--ground)">0</div><div class="sl">GROUND</div></div>
-    </div>
   </div>
 </div>
 
@@ -647,6 +632,26 @@ function normCat(c){
   if(u==='LIFE') return 'GROUND'; // 旧カテゴリ名
   return catCol[u]?u:'SEA';
 }
+// カテゴリの表示切り替え（凡例をタップ）
+const hiddenCats=new Set();
+function toggleCat(cat){
+  if(hiddenCats.has(cat)) hiddenCats.delete(cat); else hiddenCats.add(cat);
+  // 全部消えるのは分かりにくいので、最後の1つは消さない
+  if(hiddenCats.size===4){hiddenCats.delete(cat);return;}
+  const chip=document.querySelector('.li[data-cat="'+cat+'"]');
+  if(chip){chip.classList.toggle('off',hiddenCats.has(cat));chip.setAttribute('aria-pressed',String(!hiddenCats.has(cat)));}
+  if(lmap){
+    lmap.closePopup();
+    Object.values(markerMap).forEach(m=>{
+      if(!m||!m._umiRecord) return;
+      const hide=hiddenCats.has(normCat(m._umiRecord.category));
+      if(hide&&lmap.hasLayer(m)) lmap.removeLayer(m);
+      if(!hide&&!lmap.hasLayer(m)) m.addTo(lmap);
+    });
+  }
+  buildNavRecs();
+}
+
 // カテゴリごとの件数を数えて表示（凡例・ピンと同じ分け方）
 function updateStats(){
   const recs=window.allRecords||[];
@@ -654,7 +659,6 @@ function updateStats(){
   recs.forEach(r=>{n[normCat(r.category)]++;});
   total=recs.length;
   document.getElementById('cnt-num').textContent=total;
-  document.getElementById('s-total').textContent=total;
   document.getElementById('s-sea').textContent=n.SEA;
   document.getElementById('s-river').textContent=n.RIVER;
   document.getElementById('s-city').textContent=n.CITY;
@@ -748,6 +752,7 @@ function addPin(r){
 
   const marker = L.marker([r.lat,r.lng],{icon}).addTo(lmap);
   (window._pins=window._pins||[]).push(marker);
+  if(hiddenCats.has(cat)) lmap.removeLayer(marker); // 非表示中のカテゴリ
   marker._umiRecord = r;
   if(r.id) markerMap[r.id] = marker;
   marker.bindPopup(
@@ -781,7 +786,7 @@ function addPin(r){
         ${routeHtml}
       </div>
     </div>`,
-    {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,90],autoPanPaddingBottomRight:[10,190]}
+    {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,90],autoPanPaddingBottomRight:[10,150]}
   );
   return marker;
 }
@@ -819,6 +824,7 @@ async function loadRecords(){
 
 // ── ナビゲーション ──
 let mineIdx=0, digestIdx=0;
+let mineStarted=false, digestStarted=false;
 let mineRecs=[], digestRecs=[];
 
 function buildNavRecs(){
@@ -833,7 +839,10 @@ function buildNavRecs(){
       const d=(sc[b.mp_risk]||0)-(sc[a.mp_risk]||0);
       return d!==0?d:new Date(b.created_at)-new Date(a.created_at);
     });
-  mineIdx=0; digestIdx=0;
+  mineRecs=mineRecs.filter(r=>!hiddenCats.has(normCat(r.category)));
+  digestRecs=digestRecs.filter(r=>!hiddenCats.has(normCat(r.category)));
+  mineIdx=0; digestIdx=0; mineStarted=false; digestStarted=false;
+  document.querySelectorAll('.nav-pair').forEach(e=>e.classList.remove('active'));
   updateNavInfo('mine');
   updateNavInfo('digest');
 }
@@ -843,17 +852,26 @@ function updateNavInfo(type){
   const idx=type==='mine'?mineIdx:digestIdx;
   const el=document.getElementById('nav-'+type+'-info');
   if(!el) return;
-  if(recs.length===0){ el.textContent=''; return; }
-  el.textContent=(idx+1)+'/'+recs.length;
+  const started=type==='mine'?mineStarted:digestStarted;
+  const pairEl=document.getElementById('nav-'+type);
+  if(pairEl) pairEl.classList.toggle('empty',recs.length===0);
+  if(!started||recs.length===0){ el.innerHTML='<span class="tot">'+recs.length+'件</span>'; return; }
+  el.innerHTML=(idx+1)+'<span class="tot">/'+recs.length+'</span>';
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
 }
 
 function goTo(type, idx){
   const recs=type==='mine'?mineRecs:digestRecs;
   if(!recs||recs.length===0){
  return; }
+  // 初めて押したときは、↓なら1件目、↑なら最後の記録へ
+  const started=type==='mine'?mineStarted:digestStarted;
+  if(!started) idx=idx>0?0:recs.length-1;
   idx=((idx%recs.length)+recs.length)%recs.length;
-  if(type==='mine') mineIdx=idx;
-  else digestIdx=idx;
+  if(type==='mine'){mineIdx=idx;mineStarted=true;}
+  else{digestIdx=idx;digestStarted=true;}
+  document.querySelectorAll('.nav-pair').forEach(e=>e.classList.toggle('active',e.id==='nav-'+type));
+  if(navigator.vibrate) try{navigator.vibrate(8);}catch(e){}
   updateNavInfo(type);
   const r=recs[idx];
   if(!lmap||!r.lat||!r.lng) return;
@@ -896,10 +914,18 @@ function initNav(){
   const md=document.getElementById('mine-dn');
   const du=document.getElementById('digest-up');
   const dd=document.getElementById('digest-dn');
-  if(mu) mu.addEventListener('click',()=>goTo('mine',mineIdx-1));
-  if(md) md.addEventListener('click',()=>goTo('mine',mineIdx+1));
-  if(du) du.addEventListener('click',()=>goTo('digest',digestIdx-1));
-  if(dd) dd.addEventListener('click',()=>goTo('digest',digestIdx+1));
+  if(window._navInit) return; window._navInit=true; // 二重登録を防ぐ
+  // タップで1件、押しっぱなしで連続して送る
+  const hold=(btn,type,dir)=>{
+    if(!btn) return;
+    let t=null,iv=null;
+    const step=()=>goTo(type,(type==='mine'?mineIdx:digestIdx)+dir);
+    const stop=()=>{clearTimeout(t);clearInterval(iv);t=iv=null;};
+    btn.addEventListener('pointerdown',e=>{e.preventDefault();step();t=setTimeout(()=>{iv=setInterval(step,450);},500);});
+    ['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,stop));
+    btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();step();}});
+  };
+  hold(mu,'mine',-1); hold(md,'mine',1); hold(du,'digest',-1); hold(dd,'digest',1);
 
   // ホバースクロール
   ['nav-mine','nav-digest'].forEach(id=>{
@@ -915,9 +941,11 @@ function initNav(){
       last=now;
       goTo(type,(type==='mine'?mineIdx:digestIdx)+(e.deltaY>0?1:-1));
     },{passive:false,capture:true});
+    // 中央（ラベル部分）を上下にスワイプしても送れる
+    const mid=el.querySelector('.nav-mid')||el;
     let ty=0;
-    el.addEventListener('touchstart',(e)=>{ty=e.touches[0].clientY;},{passive:true});
-    el.addEventListener('touchend',(e)=>{
+    mid.addEventListener('touchstart',(e)=>{ty=e.touches[0].clientY;},{passive:true});
+    mid.addEventListener('touchend',(e)=>{
       const d=ty-e.changedTouches[0].clientY;
       if(Math.abs(d)>30) goTo(type,(type==='mine'?mineIdx:digestIdx)+(d>0?1:-1));
     },{passive:true});
