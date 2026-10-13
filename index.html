@@ -17,11 +17,18 @@
 html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Inter',sans-serif;overflow:hidden}
 
 /* ONBOARDING */
-#ob{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;z-index:1000;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
-#ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:28px}
+#ob{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 28px) 28px calc(env(safe-area-inset-bottom,0px) + 28px);z-index:1000;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
+#ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:20px;flex-shrink:0}
+#ob>*{flex-shrink:0}
 .ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:16px}
 .ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.25);border:1px solid rgba(170,221,238,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--foam)}
 .ob-tx{font-size:12px;color:var(--foam);line-height:1.6}
+.ob-h{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6);margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.12)}
+.ob-row+.ob-h{margin-top:6px}
+.ob-cat{display:block;font-size:10px;letter-spacing:.08em;font-weight:600;line-height:1.4}
+.ob-mini{display:flex;flex-direction:column;gap:8px}
+.ob-mini-row{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.92)}
+.ob-mini-ic{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--foam);background:rgba(26,122,154,.25);border:1px solid rgba(170,221,238,.3)}
 .ob-tx strong{font-size:14px;font-weight:500}
 .ob-tx strong{color:var(--white)}
 #inp-nick:focus,#inp-pin:focus{border-color:rgba(26,122,154,.6)!important}
@@ -736,8 +743,19 @@ const SPEC_ICONS={
   pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   photo:'<rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/>',
-  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>'
+  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
+  wave:'<path d="M2 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>',
+  share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>'
 };
+// アプリの目的（ログイン画面と左上の案内で共通）
+const PURPOSES=[
+  {ic:'wave',  col:'var(--sea)', cats:'SEA',
+   t:'海のごみ：流出の実態を知る',
+   d:'すでに海に出た、または出る寸前のごみ。出どころが分かりにくいからこそ、実態を記録します'},
+  {ic:'share', col:'var(--city)', cats:'RIVER・CITY・GROUND',
+   t:'海に出る前のごみ：出どころを共有',
+   d:'川・街・自然地のごみ。誰かを責めるためではなく、出どころを知り、みんなで共有するために記録します'},
+];
 const SPECS=[
   {ic:'pin',  t:'写真の位置情報だけを使います', d:'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください'},
   {ic:'lock', t:'正確な位置は、あなたにだけ',   d:'ほかの人には約300m単位でぼかして表示します'},
@@ -748,13 +766,21 @@ const specSvg=(k,w)=>'<svg viewBox="0 0 24 24" width="'+w+'" height="'+w+'" fill
 // ログイン画面の仕様欄を作る
 (function(){
   const box=document.getElementById('ob-specs'); if(!box) return;
-  box.innerHTML=SPECS.map(x=>'<div class="ob-row"><div class="ob-ic">'+specSvg(x.ic,16)+'</div><div class="ob-tx"><strong>'+x.t+'</strong><br>'+x.d+'</div></div>').join('');
+  const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+x.t+'</strong><br>'+x.d+'</div></div>';
+  box.innerHTML=
+    '<div class="ob-h">このアプリの目的</div>'+
+    PURPOSES.map(x=>row(x,'<span class="ob-cat" style="color:'+x.col+'">'+x.cats+'</span>')).join('')+
+    '<div class="ob-h">大切な約束</div>'+
+    '<div class="ob-mini">'+SPECS.map(x=>'<div class="ob-mini-row"><span class="ob-mini-ic">'+specSvg(x.ic,14)+'</span>'+x.t+'</div>').join('')+'</div>';
 })();
 // メイン画面：7秒ごとに1つずつ切り替えて表示。タップで詳しい説明を開く（開いている間は止まる）
+const TIPS=[...PURPOSES,...SPECS];
 let specIdx=0, specTimer=null;
 function showSpec(i){
-  const x=SPECS[i];
-  document.getElementById('spec-ic').innerHTML=specSvg(x.ic,16);
+  const x=TIPS[i];
+  const ic=document.getElementById('spec-ic');
+  ic.innerHTML=specSvg(x.ic,16);
+  ic.style.color=x.col||'';
   document.getElementById('spec-t').textContent=x.t;
   document.getElementById('spec-d').textContent=x.d;
 }
@@ -762,7 +788,7 @@ function nextSpec(){
   const el=document.getElementById('spec-tip');
   if(!el||el.classList.contains('open')) return;
   el.classList.add('fade');
-  setTimeout(()=>{specIdx=(specIdx+1)%SPECS.length;showSpec(specIdx);el.classList.remove('fade');},500);
+  setTimeout(()=>{specIdx=(specIdx+1)%TIPS.length;showSpec(specIdx);el.classList.remove('fade');},500);
 }
 function startSpecTips(){
   const hdr=document.getElementById('hdr'),leg=document.getElementById('leg');
