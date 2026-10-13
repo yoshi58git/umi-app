@@ -118,7 +118,13 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .wp-pos button.on{background:rgba(95,211,230,.25);border-color:#5FD3E6}
 .wp-off .wp-pos,.wp-off .wp-reset{display:none}
 .wp-note{font-size:11px;line-height:1.5;color:rgba(170,221,238,.7);padding:6px 12px 4px;border-top:1px solid rgba(255,255,255,.08);margin-top:4px}
-#hdr-counts{display:flex;gap:16px}
+#hdr-counts{display:flex;gap:14px}
+#hdr-right{display:flex;align-items:center;gap:12px}
+.lang-seg{display:flex;border-radius:12px;overflow:hidden;border:1px solid rgba(170,221,238,.3);background:rgba(4,17,28,.35)}
+.lang-seg button{padding:4px 7px;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lang-seg button.on{background:rgba(95,211,230,.28);color:#fff}
+#ob-lang{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;z-index:2}
+#cnt-lbl{max-width:80px}
 .hc{text-align:right}
 .hc-n{font-size:20px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
 .hc-l{font-size:10px;letter-spacing:.06em;color:var(--a);font-weight:600}
@@ -414,13 +420,14 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 </head>
 <body>
 <div id="photo-viewer" onclick="if(event.target===this||event.target.id==='pv-scroll')closePhoto()">
-  <div id="pv-scroll"><img id="pv-img" src="" alt="記録写真（拡大）" onclick="togglePhotoZoom(event)"></div>
-  <button id="pv-close" onclick="closePhoto()" aria-label="閉じる">&times;</button>
-  <div id="pv-hint">写真をタップで拡大・縮小</div>
+  <div id="pv-scroll"><img id="pv-img" src="" alt="記録写真（拡大）" data-i18n-alt="photo.altZoom" onclick="togglePhotoZoom(event)"></div>
+  <button id="pv-close" onclick="closePhoto()" aria-label="閉じる" data-i18n-aria="close">&times;</button>
+  <div id="pv-hint" data-i18n="photo.hint">写真をタップで拡大・縮小</div>
 </div>
 
 <!-- ONBOARDING -->
 <div id="ob">
+  <div id="ob-lang"><div class="lang-seg" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="setLang('ja')">JA</button><button type="button" data-lang="en" onclick="setLang('en')">EN</button></div></div>
   <div id="ob-logo">umi</div>
 
   <!-- アプリの大事な仕様（中身は SPECS から自動で作る） -->
@@ -429,15 +436,15 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   <!-- ログイン・新規画面 -->
   <div id="ob-auth" style="width:100%;max-width:320px">
     <div style="margin-bottom:14px">
-      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px">ニックネーム</div>
-      <input id="inp-nick" type="text" placeholder="例: umi" maxlength="20"
+      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px" data-i18n="auth.nick">ニックネーム</div>
+      <input id="inp-nick" type="text" placeholder="例: umi" data-i18n-ph="auth.nickPh" maxlength="20"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none">
     </div>
     <div style="margin-bottom:20px">
-      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px">PIN（4桁）</div>
+      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px" data-i18n="auth.pin">PIN（4桁）</div>
       <input id="inp-pin" type="password" placeholder="0000" maxlength="4" inputmode="numeric"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:18px;letter-spacing:.3em;font-family:'Inter',sans-serif;outline:none">
-      <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)">PINは暗号化して保存します。忘れると再発行できません</div>
+      <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="auth.pinNote">PINは暗号化して保存します。忘れると再発行できません</div>
     </div>
     <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px">はじめる</button>
     <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-bottom:10px;display:none"></div>
@@ -450,26 +457,28 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   <div id="wp-layer" aria-hidden="true"></div>
   <div id="hdr">
     <div id="logo">umi<span id="cnt-lbl"></span>
-      <button id="wp-btn" type="button" onclick="toggleWpMenu(event)" aria-label="壁紙の設定" title="壁紙の設定">
+      <button id="wp-btn" type="button" onclick="toggleWpMenu(event)" aria-label="壁紙の設定" title="壁紙の設定" data-i18n-aria="wp.settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M21 16l-5-5-9 9"/></svg>
       </button>
     </div>
     <!-- 壁紙メニュー -->
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-in').click()">壁紙の写真を選ぶ</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-in').click()" data-i18n="wp.choose">壁紙の写真を選ぶ</button>
       <div class="wp-pos" id="wp-pos">
-        <span>表示位置</span>
-        <button type="button" data-pos="top" onclick="setWpPos('top')">上</button>
-        <button type="button" data-pos="center" onclick="setWpPos('center')">中央</button>
-        <button type="button" data-pos="bottom" onclick="setWpPos('bottom')">下</button>
+        <span data-i18n="wp.pos">表示位置</span>
+        <button type="button" data-pos="top" onclick="setWpPos('top')" data-i18n="wp.top">上</button>
+        <button type="button" data-pos="center" onclick="setWpPos('center')" data-i18n="wp.center">中央</button>
+        <button type="button" data-pos="bottom" onclick="setWpPos('bottom')" data-i18n="wp.bottom">下</button>
       </div>
-      <button type="button" class="wp-item wp-reset" id="wp-reset" onclick="clearWallpaper()">元の背景に戻す</button>
-      <div class="wp-note">壁紙はこの端末の中だけに保存され、ほかの人には見えません</div>
+      <button type="button" class="wp-item wp-reset" id="wp-reset" onclick="clearWallpaper()" data-i18n="wp.reset">元の背景に戻す</button>
+      <div class="wp-note" data-i18n="wp.note">壁紙はこの端末の中だけに保存され、ほかの人には見えません</div>
     </div>
     <input type="file" id="wp-in" accept="image/*" style="display:none" onchange="onWallpaperFile(this)">
+    <div id="hdr-right"><div class="lang-seg" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="setLang('ja')">JA</button><button type="button" data-lang="en" onclick="setLang('en')">EN</button></div>
     <div id="hdr-counts">
-      <div class="hc" style="--a:#5FD3E6"><div class="hc-n" id="cnt-mine">0</div><div class="hc-l">自分</div></div>
-      <div class="hc" style="--a:#FFD27A"><div class="hc-n" id="cnt-num">0</div><div class="hc-l">みんな</div></div>
+      <div class="hc" style="--a:#5FD3E6"><div class="hc-n" id="cnt-mine">0</div><div class="hc-l" data-i18n="me">自分</div></div>
+      <div class="hc" style="--a:#FFD27A"><div class="hc-n" id="cnt-num">0</div><div class="hc-l" data-i18n="all">みんな</div></div>
+    </div>
     </div>
   </div>
   <div id="leg">
@@ -487,16 +496,16 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div id="leafmap"></div>
   </div>
   <!-- 自分の記録ナビ（左）：撮影日の古い順 -->
-  <div class="nav-pair" id="nav-mine" role="group" aria-label="自分の記録">
-    <button class="nav-btn" id="mine-up" aria-label="自分の記録：前へ"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg></button>
-    <div class="nav-mid"><div class="nav-label">自分</div><div class="nav-count" id="nav-mine-info">0</div></div>
-    <button class="nav-btn" id="mine-dn" aria-label="自分の記録：次へ"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+  <div class="nav-pair" id="nav-mine" role="group" aria-label="自分の記録" data-i18n-aria="nav.mine">
+    <button class="nav-btn" id="mine-up" aria-label="自分の記録：前へ" data-i18n-nav="nav.mine|nav.prev"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg></button>
+    <div class="nav-mid"><div class="nav-label" data-i18n="me">自分</div><div class="nav-count" id="nav-mine-info">0</div></div>
+    <button class="nav-btn" id="mine-dn" aria-label="自分の記録：次へ" data-i18n-nav="nav.mine|nav.next"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
   </div>
   <!-- みんなの記録ナビ（右）：MPリスクの高い順 -->
-  <div class="nav-pair" id="nav-digest" role="group" aria-label="みんなの記録">
-    <button class="nav-btn" id="digest-up" aria-label="みんなの記録：前へ"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg></button>
-    <div class="nav-mid"><div class="nav-label">みんな</div><div class="nav-count" id="nav-digest-info">0</div></div>
-    <button class="nav-btn" id="digest-dn" aria-label="みんなの記録：次へ"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+  <div class="nav-pair" id="nav-digest" role="group" aria-label="みんなの記録" data-i18n-aria="nav.all">
+    <button class="nav-btn" id="digest-up" aria-label="みんなの記録：前へ" data-i18n-nav="nav.all|nav.prev"><svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg></button>
+    <div class="nav-mid"><div class="nav-label" data-i18n="all">みんな</div><div class="nav-count" id="nav-digest-info">0</div></div>
+    <button class="nav-btn" id="digest-dn" aria-label="みんなの記録：次へ" data-i18n-nav="nav.all|nav.next"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
   </div>
   <div id="btm">
     <button id="cam-btn" onclick="openCam()">
@@ -526,19 +535,19 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <div style="position:absolute;top:8px;left:8px">
       <span id="jbadge" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:16px;background:rgba(4,17,28,.75);backdrop-filter:blur(8px);border:1px solid rgba(100,200,255,.2);font-size:11px;color:var(--foam)">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--sea)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span id="jtxt">解析完了</span>
+        <span id="jtxt" data-i18n="an.done">解析完了</span>
       </span>
     </div>
   </div>
   <div id="conf-summary"></div>
   <div id="confbtns">
-    <button id="btn-retry" onclick="retake()">やり直す</button>
-    <button id="btn-send" onclick="send()">記録する</button>
+    <button id="btn-retry" onclick="retake()" data-i18n="cf.retry">やり直す</button>
+    <button id="btn-send" onclick="send()" data-i18n="cf.send">記録する</button>
   </div>
 </div>
 
 <!-- LOADING -->
-<div id="ldg"><div class="spin"></div><div id="ldgtxt">AI解析中...</div></div>
+<div id="ldg"><div class="spin"></div><div id="ldgtxt" data-i18n="an.loading">AI解析中...</div></div>
 
 <!-- DONE -->
 <div id="donev">
@@ -547,14 +556,113 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
   <div id="done-lbl">RECORDS</div>
   <div id="done-imp">
     <div class="imp-ln" id="imp-txt">記録されました</div>
-    <div class="imp-ln" style="margin-top:6px;opacity:.6;font-size:11px">あなたの記録が海を守ります</div>
+    <div class="imp-ln" style="margin-top:6px;opacity:.6;font-size:11px" data-i18n="dn.thanks">あなたの記録が海を守ります</div>
   </div>
-  <button id="btn-back" onclick="backToMap()">地図に戻る</button>
+  <button id="btn-back" onclick="backToMap()" data-i18n="dn.back">地図に戻る</button>
 </div>
 
 <input type="file" id="filein" accept="image/*" onchange="onFile(this)">
 
 <script>
+// ── 言語（日本語／英語）。文言はすべてここで管理 ──
+const I18N={
+ja:{
+  'photo.alt':'記録写真','photo.altZoom':'記録写真（拡大）','close':'閉じる','photo.hint':'写真をタップで拡大・縮小','photo.tap':'タップで拡大',
+  'auth.nick':'ニックネーム','auth.nickPh':'例: umi','auth.pin':'PIN（4桁）','auth.pinNote':'PINは暗号化して保存します。忘れると再発行できません',
+  'auth.start':'はじめる','auth.register':'新規登録','auth.login':'ログイン','auth.first':'はじめて？ ','auth.have':'アカウントあり？ ',
+  'auth.needNick':'ニックネームを入力してください','auth.pin4':'PINは4桁の数字です','auth.checking':'確認中...','auth.error':'エラーが発生しました。もう一度お試しください。',
+  'net.error':'通信エラー','net.errorCode':'通信エラー（{n}）',
+  'wp.settings':'壁紙の設定','wp.choose':'壁紙の写真を選ぶ','wp.pos':'表示位置','wp.top':'上','wp.center':'中央','wp.bottom':'下','wp.reset':'元の背景に戻す',
+  'wp.note':'壁紙はこの端末の中だけに保存され、ほかの人には見えません','wp.saveFail':'壁紙を保存できませんでした。別の写真をお試しください。','wp.loadFail':'この写真は読み込めませんでした。',
+  'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
+  'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示',
+  'h.purpose':'このアプリの目的','h.promise':'大切な約束',
+  'p1.t':'海のごみ：流出の実態を知る','p1.d':'すでに海に出た、または出る寸前のごみ。出どころが分かりにくいからこそ、実態を記録します',
+  'p2.t':'海に出る前のごみ：出どころを共有','p2.d':'川・街・自然地のごみ。誰かを責めるためではなく、出どころを知り、みんなで共有するために記録します',
+  's1.t':'写真の位置情報だけを使います','s1.d':'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください',
+  's2.t':'正確な位置は、あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
+  's3.t':'写真はみんなに公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
+  's4.t':'AIがごみを解析','s4.d':'素材や発生源を推定し、根拠と確信度を添えて記録します',
+  'pop.stake':'改善に取り組める主体','pop.route':'推定排出経路','pop.items':'見つかったごみ','pop.comment':'AIのコメント',
+  'pop.mp':'MPリスク','pop.years':'粒子化まで','pop.weight':'推定質量','pop.weightVal':'約{n}g',
+  'an.noGps':'この写真には位置情報が含まれていません。\n\nスマホのカメラの位置情報をオンにして撮影した写真を選んでください。\n（このアプリはスマホの現在地を使わず、写真の位置情報だけを使います）',
+  'an.loading':'AI解析中...','an.noTrash':'ごみが見つかりませんでした。\n海岸・街中などで見つけたごみを撮影してください。','an.fail':'解析に失敗しました。もう一度お試しください。',
+  'an.done':'AI解析完了','an.doneCat':'AI解析完了 — {c}','an.noGpsShort':'GPS情報なし','an.noDate':'撮影日不明',
+  'cf.cat':'カテゴリ','cf.place':'場所','cf.edit':'編集','cf.date':'撮影日','cf.items':'ごみ品目','cf.maker':'メーカー','cf.brand':'ブランド','cf.summary':'要約',
+  'cf.retry':'やり直す','cf.send':'記録する','cf.askPlace':'場所名を入力してください','cf.askDate':'撮影日を入力してください（例: 2026-09-27）','cf.badDate':'日付の形式が正しくありません（例: 2026-09-27）',
+  'sv.saving':'保存中...','sv.fail':'保存に失敗しました: ','dn.saved':'記録されました','dn.thanks':'あなたの記録が海を守ります','dn.back':'地図に戻る',
+  'unknown':'不明','lang':'言語'
+},
+en:{
+  'photo.alt':'Record photo','photo.altZoom':'Record photo (zoomed)','close':'Close','photo.hint':'Tap the photo to zoom in or out','photo.tap':'Tap to enlarge',
+  'auth.nick':'Nickname','auth.nickPh':'e.g. umi','auth.pin':'PIN (4 digits)','auth.pinNote':'Your PIN is stored encrypted. It cannot be reissued if you forget it',
+  'auth.start':'Start','auth.register':'Sign up','auth.login':'Log in','auth.first':'New here? ','auth.have':'Have an account? ',
+  'auth.needNick':'Please enter a nickname','auth.pin4':'PIN must be 4 digits','auth.checking':'Checking...','auth.error':'Something went wrong. Please try again.',
+  'net.error':'Connection error','net.errorCode':'Connection error ({n})',
+  'wp.settings':'Wallpaper','wp.choose':'Choose a wallpaper photo','wp.pos':'Position','wp.top':'Top','wp.center':'Center','wp.bottom':'Bottom','wp.reset':'Restore default background',
+  'wp.note':'The wallpaper is saved only on this device and is not visible to others','wp.saveFail':'Could not save the wallpaper. Please try another photo.','wp.loadFail':'This photo could not be loaded.',
+  'me':'Me','all':'Others','nav.mine':'My records','nav.all':'Others\u2019 records','nav.prev':'previous','nav.next':'next','count':'{n}',
+  'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records',
+  'h.purpose':'Why this app','h.promise':'Our promises',
+  'p1.t':'At sea: see the reality','p1.d':'Litter already in the sea or about to enter it. Its origin is hard to trace, so we record the reality',
+  'p2.t':'Upstream: share the source','p2.d':'Litter in rivers, towns and nature. Not to blame anyone, but to learn and share where it comes from',
+  's1.t':'Only photo location is used','s1.d':'The app never accesses your phone\u2019s current location. Choose photos taken with location on',
+  's2.t':'Exact location: only you','s2.d':'Others see it blurred to about 300 m',
+  's3.t':'Photos are public','s3.d':'Avoid faces, homes and license plates',
+  's4.t':'AI analyzes the litter','s4.d':'It estimates material and source, with reasons and confidence',
+  'pop.stake':'Who can help improve this','pop.route':'Likely discharge route','pop.items':'Litter found','pop.comment':'AI comment',
+  'pop.mp':'MP risk','pop.years':'Until fragmenting','pop.weight':'Est. weight','pop.weightVal':'~{n} g',
+  'an.noGps':'This photo has no location data.\n\nPlease choose a photo taken with your camera\u2019s location setting on.\n(This app does not use your phone\u2019s current location, only the photo\u2019s location data.)',
+  'an.loading':'AI analyzing...','an.noTrash':'No litter was found.\nPlease photograph litter you found on a beach, in town, etc.','an.fail':'Analysis failed. Please try again.',
+  'an.done':'AI analysis complete','an.doneCat':'AI analysis complete — {c}','an.noGpsShort':'No GPS data','an.noDate':'Date unknown',
+  'cf.cat':'Category','cf.place':'Place','cf.edit':'Edit','cf.date':'Date taken','cf.items':'Items','cf.maker':'Maker','cf.brand':'Brand','cf.summary':'Summary',
+  'cf.retry':'Retake','cf.send':'Save record','cf.askPlace':'Enter the place name','cf.askDate':'Enter the date taken (e.g. 2026-09-27)','cf.badDate':'Invalid date format (e.g. 2026-09-27)',
+  'sv.saving':'Saving...','sv.fail':'Failed to save: ','dn.saved':'Recorded','dn.thanks':'Your record helps protect the ocean','dn.back':'Back to map',
+  'unknown':'Unknown','lang':'Language'
+}};
+// サーバーやAIから届く決まった日本語の値を英語で表示するための対応表
+const VALUE_EN={
+  '高':'High','中':'Medium','低':'Low',
+  '地域の陸域':'Local land','河川経由':'Via rivers','海外からの漂着':'Washed in from overseas','漁業・養殖':'Fishing / aquaculture','船舶・海上活動':'Ships / at sea','レジャー・観光':'Leisure / tourism',
+  'ポイ捨て':'Littering','置き忘れ・放置':'Left behind','ごみ集積所からの散乱':'Scattered from collection points','河川・排水路経由':'Via rivers / drains','海上での投棄・流出':'Dumped or lost at sea','海流による漂着':'Carried by ocean currents','不法投棄':'Illegal dumping',
+  'ニックネームを入力してください':'Please enter a nickname','PINは4桁の数字です':'PIN must be 4 digits','このニックネームはすでに使われています':'This nickname is already taken',
+  'ニックネームまたはPINが違います':'Wrong nickname or PIN','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
+};
+let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
+  return (navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';})();
+function t(k,vars){
+  let s=(I18N[LANG]&&I18N[LANG][k])??I18N.ja[k]??k;
+  if(vars) for(const v in vars) s=s.split('{'+v+'}').join(vars[v]);
+  return s;
+}
+// データの値（MPリスクや発生源など）を表示言語に合わせる。AIの自由文はそのまま
+function tv(v){ return LANG==='en'&&v!=null&&VALUE_EN[String(v).trim()]?VALUE_EN[String(v).trim()]:v; }
+// 画面の固定文言を書き換える（data-i18n＝文字、-ph＝入力欄の例、-aria＝読み上げ名と説明）
+function applyI18nStatic(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n);});
+  document.querySelectorAll('[data-i18n-ph]').forEach(e=>{e.placeholder=t(e.dataset.i18nPh);});
+  document.querySelectorAll('[data-i18n-aria]').forEach(e=>{const v=t(e.dataset.i18nAria);e.setAttribute('aria-label',v);if(e.hasAttribute('title'))e.title=v;});
+  document.querySelectorAll('[data-i18n-alt]').forEach(e=>{e.alt=t(e.dataset.i18nAlt);});
+  document.querySelectorAll('[data-i18n-nav]').forEach(e=>{const [g,d]=e.dataset.i18nNav.split('|');e.setAttribute('aria-label',t(g)+'：'+t(d));});
+  document.querySelectorAll('.lang-seg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+}
+// 言語を切り替えて、表示中の画面をすべて描き直す
+function setLang(l){
+  if(l!==LANG){
+    LANG=l;
+    try{localStorage.setItem('umi_lang',l);}catch(e){}
+  }
+  applyI18nStatic();
+  if(typeof renderObSpecs==='function') renderObSpecs();
+  if(typeof switchTab==='function'&&document.getElementById('ob-auth-btn')) switchTab(authMode);
+  if(typeof showSpec==='function'&&document.getElementById('spec-t')) showSpec(specIdx);
+  if(typeof refreshMapTexts==='function') refreshMapTexts();
+  if(typeof updateNavInfo==='function'){updateNavInfo('mine');updateNavInfo('digest');}
+  const cv=document.getElementById('confv');
+  if(cv&&cv.classList.contains('show')&&typeof showConfirm==='function'&&analysisResult) showConfirm();
+}
+
 // ページ読み込み後すぐにバックグラウンド処理開始
 window.addEventListener('load', async ()=>{
   const waitL = setInterval(async ()=>{
@@ -603,14 +711,14 @@ function showLogin(){
 function switchTab(mode){
   authMode=mode;
   const btn=document.getElementById('ob-auth-btn');
-  if(btn) btn.textContent=mode==='new'?'新規登録':'はじめる';
+  if(btn) btn.textContent=mode==='new'?t('auth.register'):t('auth.start');
   const sub=document.getElementById('ob-sub-link');
   if(sub){
     sub.textContent='';
-    const txt=document.createTextNode(mode==='new'?'アカウントあり？ ':'はじめて？ ');
+    const txt=document.createTextNode(mode==='new'?t('auth.have'):t('auth.first'));
     const a=document.createElement('a');
     a.href='#';
-    a.textContent=mode==='new'?'ログイン':'新規登録';
+    a.textContent=mode==='new'?t('auth.login'):t('auth.register');
     a.style.color='rgba(170,221,238,.5)';
     a.onclick=function(e){e.preventDefault();switchTab(mode==='new'?'login':'new');};
     sub.appendChild(txt);
@@ -625,23 +733,23 @@ async function doAuth(){
   const errEl=document.getElementById('ob-auth-err');
   errEl.style.display='none';
   const pinClean=pin.replace(/\D/g,''); // 数字以外を除去
-  if(!nick){errEl.textContent='ニックネームを入力してください';errEl.style.display='block';return;}
-  if(pinClean.length!==4){errEl.textContent='PINは4桁の数字です';errEl.style.display='block';return;}
-  document.getElementById('ob-auth-btn').textContent='確認中...';
+  if(!nick){errEl.textContent=t('auth.needNick');errEl.style.display='block';return;}
+  if(pinClean.length!==4){errEl.textContent=t('auth.pin4');errEl.style.display='block';return;}
+  document.getElementById('ob-auth-btn').textContent=t('auth.checking');
   try{
     const res=await api(authMode==='new'?'register':'login',{nickname:nick,pin:pinClean});
     if(res.error){
-      errEl.textContent=res.error;errEl.style.display='block';
-      document.getElementById('ob-auth-btn').textContent=authMode==='new'?'新規登録':'はじめる';return;
+      errEl.textContent=tv(res.error);errEl.style.display='block';
+      document.getElementById('ob-auth-btn').textContent=authMode==='new'?t('auth.register'):t('auth.start');return;
     }
     currentUserId=res.user.id;currentNickname=res.user.nickname;
     saveSession(res.token,currentNickname);
     needReload=true; // ログイン前に読み込んだ地図（全件ぼかし）を、自分の記録つきで読み直す
     startApp();
   }catch(e){
-    errEl.textContent='エラーが発生しました。もう一度お試しください。';
+    errEl.textContent=t('auth.error');
     errEl.style.display='block';
-    document.getElementById('ob-auth-btn').textContent=authMode==='new'?'新規登録':'はじめる';
+    document.getElementById('ob-auth-btn').textContent=authMode==='new'?t('auth.register'):t('auth.start');
     console.error(e);
   }
 }
@@ -694,8 +802,8 @@ async function api(action, payload={}){
   const r=await fetch(API_URL,{method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY,'apikey':SB_KEY},
     body:JSON.stringify({action,token:sessionToken,...payload})});
-  const data=await r.json().catch(()=>({error:'通信エラー'}));
-  if(!r.ok&&!data.error) data.error='通信エラー（'+r.status+'）';
+  const data=await r.json().catch(()=>({error:t('net.error')}));
+  if(!r.ok&&!data.error) data.error=t('net.errorCode',{n:r.status});
   return data;
 }
 
@@ -749,30 +857,30 @@ const SPEC_ICONS={
 };
 // アプリの目的（ログイン画面と左上の案内で共通）
 const PURPOSES=[
-  {ic:'wave',  col:'var(--sea)', cats:'SEA',
-   t:'海のごみ：流出の実態を知る',
-   d:'すでに海に出た、または出る寸前のごみ。出どころが分かりにくいからこそ、実態を記録します'},
-  {ic:'share', col:'var(--city)', cats:'RIVER・CITY・GROUND',
-   t:'海に出る前のごみ：出どころを共有',
-   d:'川・街・自然地のごみ。誰かを責めるためではなく、出どころを知り、みんなで共有するために記録します'},
+  {ic:'wave',  col:'var(--sea)', cats:['SEA'],
+   k:'p1'},
+  {ic:'share', col:'var(--city)', cats:['RIVER','CITY','GROUND'],
+   k:'p2'},
 ];
 const SPECS=[
-  {ic:'pin',  t:'写真の位置情報だけを使います', d:'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください'},
-  {ic:'lock', t:'正確な位置は、あなたにだけ',   d:'ほかの人には約300m単位でぼかして表示します'},
-  {ic:'photo',t:'写真はみんなに公開されます',   d:'人の顔や家、車のナンバーが写らないように'},
-  {ic:'spark',t:'AIがごみを解析',               d:'素材や発生源を推定し、根拠と確信度を添えて記録します'},
+  {ic:'pin',  k:'s1'},
+  {ic:'lock', k:'s2'},
+  {ic:'photo',k:'s3'},
+  {ic:'spark',k:'s4'},
 ];
 const specSvg=(k,w)=>'<svg viewBox="0 0 24 24" width="'+w+'" height="'+w+'" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+SPEC_ICONS[k]+'</svg>';
-// ログイン画面の仕様欄を作る
-(function(){
+// ログイン画面の仕様欄を作る（言語を切り替えたら作り直す）
+function renderObSpecs(){
   const box=document.getElementById('ob-specs'); if(!box) return;
-  const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+x.t+'</strong><br>'+x.d+'</div></div>';
+  const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+t(x.k+'.t')+'</strong><br>'+t(x.k+'.d')+'</div></div>';
   box.innerHTML=
-    '<div class="ob-h">このアプリの目的</div>'+
-    PURPOSES.map(x=>row(x,'<span class="ob-cat" style="color:'+x.col+'">'+x.cats+'</span>')).join('')+
-    '<div class="ob-h">大切な約束</div>'+
-    '<div class="ob-mini">'+SPECS.map(x=>'<div class="ob-mini-row"><span class="ob-mini-ic">'+specSvg(x.ic,14)+'</span>'+x.t+'</div>').join('')+'</div>';
-})();
+    '<div class="ob-h">'+t('h.purpose')+'</div>'+
+    PURPOSES.map(x=>row(x,'<span class="ob-cat" style="color:'+x.col+'">'+x.cats.join(LANG==='en'?' · ':'・')+'</span>')).join('')+
+    '<div class="ob-h">'+t('h.promise')+'</div>'+
+    '<div class="ob-mini">'+SPECS.map(x=>'<div class="ob-mini-row"><span class="ob-mini-ic">'+specSvg(x.ic,14)+'</span>'+t(x.k+'.t')+'</div>').join('')+'</div>';
+}
+applyI18nStatic();
+renderObSpecs();
 // メイン画面：7秒ごとに1つずつ切り替えて表示。タップで詳しい説明を開く（開いている間は止まる）
 const TIPS=[...PURPOSES,...SPECS];
 let specIdx=0, specTimer=null;
@@ -781,8 +889,8 @@ function showSpec(i){
   const ic=document.getElementById('spec-ic');
   ic.innerHTML=specSvg(x.ic,16);
   ic.style.color=x.col||'';
-  document.getElementById('spec-t').textContent=x.t;
-  document.getElementById('spec-d').textContent=x.d;
+  document.getElementById('spec-t').textContent=t(x.k+'.t');
+  document.getElementById('spec-d').textContent=t(x.k+'.d');
 }
 function nextSpec(){
   const el=document.getElementById('spec-tip');
@@ -858,12 +966,12 @@ function onWallpaperFile(input){
       try{
         localStorage.setItem(WP_KEY,url);
       }catch(e){
-        alert('壁紙を保存できませんでした。別の写真をお試しください。');return;
+        alert(t('wp.saveFail'));return;
       }
       applyWallpaper();
       document.getElementById('wp-menu').classList.remove('show');
     };
-    img.onerror=()=>alert('この写真は読み込めませんでした。');
+    img.onerror=()=>alert(t('wp.loadFail'));
     img.src=ev.target.result;
   };
   rd.readAsDataURL(f);
@@ -878,15 +986,15 @@ function addMapTools(){
       const box=L.DomUtil.create('div','map-tools');
       const btn=(label,svg,fn)=>{
         const b=L.DomUtil.create('button','map-tool',box);
-        b.type='button';b.setAttribute('aria-label',label);b.title=label;b.innerHTML=svg;
+        b.type='button';b.dataset.i18nAria=label;b.setAttribute('aria-label',t(label));b.title=t(label);b.innerHTML=svg;
         L.DomEvent.on(b,'click',e=>{L.DomEvent.stop(e);fn();});
         return b;
       };
       const ic=p=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
-      btn('拡大',ic('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'),()=>lmap.zoomIn(1));
-      btn('縮小',ic('<line x1="5" y1="12" x2="19" y2="12"/>'),()=>lmap.zoomOut(1));
+      btn('map.zoomIn',ic('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'),()=>lmap.zoomIn(1));
+      btn('map.zoomOut',ic('<line x1="5" y1="12" x2="19" y2="12"/>'),()=>lmap.zoomOut(1));
       L.DomUtil.create('div','map-tool-sep',box);
-      btn('すべての記録を表示',ic('<polyline points="4 9 4 4 9 4"/><polyline points="20 9 20 4 15 4"/><polyline points="4 15 4 20 9 20"/><polyline points="20 15 20 20 15 20"/><circle cx="12" cy="12" r="2.5"/>'),fitAll);
+      btn('map.fit',ic('<polyline points="4 9 4 4 9 4"/><polyline points="20 9 20 4 15 4"/><polyline points="4 15 4 20 9 20"/><polyline points="20 15 20 20 15 20"/><circle cx="12" cy="12" r="2.5"/>'),fitAll);
       L.DomEvent.disableClickPropagation(box);
       L.DomEvent.disableScrollPropagation(box);
       return box;
@@ -960,6 +1068,18 @@ function normCat(c){
   if(u==='LIFE') return 'GROUND'; // 旧カテゴリ名
   return catCol[u]?u:'SEA';
 }
+// 言語を切り替えたとき、地図のピン（ポップアップの文言）を作り直す
+function refreshMapTexts(){
+  if(!lmap||!window.allRecords) return;
+  const open=Object.values(markerMap).find(m=>m&&m.isPopupOpen&&m.isPopupOpen());
+  const openId=open&&open._umiRecord?open._umiRecord.id:null;
+  if(window._pins) window._pins.forEach(m=>lmap.removeLayer(m));
+  window._pins=[]; markerMap={};
+  window.allRecords.forEach(r=>addPin(r));
+  buildNavRecs();
+  if(openId&&markerMap[openId]&&lmap.hasLayer(markerMap[openId])) markerMap[openId].openPopup();
+}
+
 // カテゴリの表示切り替え（凡例をタップ）
 const hiddenCats=new Set();
 function toggleCat(cat){
@@ -1052,8 +1172,8 @@ function addPin(r){
   });
   const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
   const img=r.image_url?`<div class="umi-pop-photo" onclick="openPhoto(this.querySelector('img').src)">
-      <img src="${r.image_url}" alt="記録写真" onerror="this.parentNode.style.display='none'">
-      <span class="umi-pop-zoom">タップで拡大</span>
+      <img src="${r.image_url}" alt="${t('photo.alt')}" onerror="this.parentNode.style.display='none'">
+      <span class="umi-pop-zoom">${t('photo.tap')}</span>
     </div>`:'';
   const items=(r.items||'').split('\n').filter(Boolean).slice(0,4).map(esc).join('<br>');
   const dt=fmtDate(r.photo_taken_at||r.created_at);
@@ -1062,7 +1182,7 @@ function addPin(r){
 
   // 数値情報
   const mpYears=shown(r.mp_years_est)?esc(r.mp_years_est):'—';
-  const weight=r.estimated_weight_g?`約${esc(r.estimated_weight_g)}g`:'—';
+  const weight=r.estimated_weight_g?t('pop.weightVal',{n:esc(r.estimated_weight_g)}):'—';
 
   // 改善に取り組める主体
   const stakeholders=[];
@@ -1071,14 +1191,14 @@ function addPin(r){
   if(shown(r.source_category)) stakeholders.push(r.source_category);
   const stakeholderHtml=stakeholders.length>0?`
     <div class="umi-pop-stakeholder">
-      <div class="umi-pop-label">改善に取り組める主体</div>
-      <div class="umi-pop-stakeholder-val">${stakeholders.map(esc).join('・')}</div>
+      <div class="umi-pop-label">${t('pop.stake')}</div>
+      <div class="umi-pop-stakeholder-val">${stakeholders.map(x=>esc(tv(x))).join(LANG==='en'?' / ':'・')}</div>
     </div>`:'';
 
   // 排出経路
   const routeHtml=shown(r.discharge_route)?`
-    <div class="umi-pop-label">推定排出経路</div>
-    <div class="umi-pop-route">${esc(r.discharge_route)}</div>`:'';
+    <div class="umi-pop-label">${t('pop.route')}</div>
+    <div class="umi-pop-route">${esc(tv(r.discharge_route))}</div>`:'';
 
   const marker = L.marker([r.lat,r.lng],{icon}).addTo(lmap);
   (window._pins=window._pins||[]).push(marker);
@@ -1095,20 +1215,20 @@ function addPin(r){
           <span class="umi-pop-date">${dt}</span>
         </div>
         <div class="umi-pop-div"></div>
-        <div class="umi-pop-label">見つかったごみ</div>
+        <div class="umi-pop-label">${t('pop.items')}</div>
         <div class="umi-pop-items">${items||'—'}</div>
-        ${summary?`<div class="umi-pop-label">AIのコメント</div><div class="umi-pop-comment">${summary}</div>`:''}
+        ${summary?`<div class="umi-pop-label">${t('pop.comment')}</div><div class="umi-pop-comment">${summary}</div>`:''}
         <div class="umi-pop-nums">
           <div class="umi-pop-num">
-            <div class="umi-pop-num-label">MPリスク</div>
-            <div class="umi-pop-num-val" style="color:${rc}">${esc(r.mp_risk||'—')}</div>
+            <div class="umi-pop-num-label">${t('pop.mp')}</div>
+            <div class="umi-pop-num-val" style="color:${rc}">${esc(tv(r.mp_risk)||'—')}</div>
           </div>
           <div class="umi-pop-num">
-            <div class="umi-pop-num-label">粒子化まで</div>
+            <div class="umi-pop-num-label">${t('pop.years')}</div>
             <div class="umi-pop-num-val">${mpYears}</div>
           </div>
           <div class="umi-pop-num">
-            <div class="umi-pop-num-label">推定質量</div>
+            <div class="umi-pop-num-label">${t('pop.weight')}</div>
             <div class="umi-pop-num-val">${weight}</div>
           </div>
         </div>
@@ -1116,7 +1236,7 @@ function addPin(r){
         ${routeHtml}
       </div>
     </div>`,
-    {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,140],autoPanPaddingBottomRight:[10,150]}
+    {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,50],autoPanPaddingBottomRight:[10,150]}
   );
   return marker;
 }
@@ -1185,7 +1305,7 @@ function updateNavInfo(type){
   const started=type==='mine'?mineStarted:digestStarted;
   const pairEl=document.getElementById('nav-'+type);
   if(pairEl) pairEl.classList.toggle('empty',recs.length===0);
-  if(!started||recs.length===0){ el.innerHTML='<span class="tot">'+recs.length+'件</span>'; return; }
+  if(!started||recs.length===0){ el.innerHTML='<span class="tot">'+t('count',{n:recs.length})+'</span>'; return; }
   el.innerHTML=(idx+1)+'<span class="tot">/'+recs.length+'</span>';
   el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
 }
@@ -1499,8 +1619,8 @@ async function compressForStorage(dataUrl){
 
 // ── ANALYZE ──
 async function analyze(){
-  if(userLat==null||userLng==null){alert('この写真には位置情報が含まれていません。\n\nスマホのカメラの位置情報をオンにして撮影した写真を選んでください。\n（このアプリはスマホの現在地を使わず、写真の位置情報だけを使います）');return;}
-  showLoad('AI解析中...');
+  if(userLat==null||userLng==null){alert(t('an.noGps'));return;}
+  showLoad(t('an.loading'));
   try{
     // 10MB制限対策：送信前に圧縮
     const compressed=await compressForAnalysis(capturedUrl);
@@ -1511,18 +1631,18 @@ async function analyze(){
     hideLoad();
     // ごみ判定
     if(analysisResult.is_trash === false){
-      alert('ごみが見つかりませんでした。\n海岸・街中などで見つけたごみを撮影してください。');
+      alert(t('an.noTrash'));
       return;
     }
     showConfirm();
-  }catch(e){hideLoad();alert('解析に失敗しました。もう一度お試しください。');console.error(e);}
+  }catch(e){hideLoad();alert(t('an.fail'));console.error(e);}
 }
 
 // ── CONFIRM ──
 function showConfirm(){
   const r=analysisResult;
   document.getElementById('confpre').src=capturedUrl;
-  document.getElementById('jtxt').textContent='AI解析完了 — '+(r.category||'SEA');
+  document.getElementById('jtxt').textContent=t('an.doneCat',{c:r.category||'SEA'});
 
   // カテゴリ色（共通の catCol を使う）
   const cat=r.category||'SEA';
@@ -1531,12 +1651,12 @@ function showConfirm(){
   // GPS情報
   const gpsHtml=userLat?
     `${userLat.toFixed(5)}, ${userLng.toFixed(5)}`:
-    `<span class="cs-warn">GPS情報なし ⚠</span>`;
+    `<span class="cs-warn">${t('an.noGpsShort')} ⚠</span>`;
 
   // 撮影日
   const dtHtml=photoTakenAt?
     fmtDate(photoTakenAt):
-    `<span class="cs-warn">撮影日不明</span>`;
+    `<span class="cs-warn">${t('an.noDate')}</span>`;
 
   // カテゴリ選択ボタン
   const catBtns=['SEA','RIVER','CITY','GROUND'].map(c=>{
@@ -1552,51 +1672,51 @@ function showConfirm(){
 
   document.getElementById('conf-summary').innerHTML=`
     <div class="cs-row">
-      <div class="cs-label">カテゴリ</div>
+      <div class="cs-label">${t('cf.cat')}</div>
       <div class="cs-val">
         <div style="color:${col};font-weight:500;margin-bottom:4px">${cat}</div>
         <div class="cs-cat-btns">${catBtns}</div>
       </div>
     </div>
     <div class="cs-row">
-      <div class="cs-label">場所</div>
-      <div class="cs-val" id="cs-loc-val">${r.location_name||'不明'}</div>
-      <span class="cs-edit" onclick="editField('location')">編集</span>
+      <div class="cs-label">${t('cf.place')}</div>
+      <div class="cs-val" id="cs-loc-val">${esc(r.location_name||t('unknown'))}</div>
+      <span class="cs-edit" onclick="editField('location')">${t('cf.edit')}</span>
     </div>
     <div class="cs-row">
       <div class="cs-label">GPS</div>
       <div class="cs-val">${gpsHtml}</div>
     </div>
     <div class="cs-row">
-      <div class="cs-label">撮影日</div>
+      <div class="cs-label">${t('cf.date')}</div>
       <div class="cs-val" id="cs-date-val">${dtHtml}</div>
-      <span class="cs-edit" onclick="editField('date')">編集</span>
+      <span class="cs-edit" onclick="editField('date')">${t('cf.edit')}</span>
     </div>
     <div class="cs-row">
-      <div class="cs-label">ごみ品目</div>
-      <div class="cs-val">${(r.items||'不明').replace(/\n/g,'<br>')}</div>
+      <div class="cs-label">${t('cf.items')}</div>
+      <div class="cs-val">${esc(r.items||t('unknown')).replace(/\n/g,'<br>')}</div>
     </div>
     <div class="cs-row">
-      <div class="cs-label">MPリスク</div>
-      <div class="cs-val" style="color:${rc};font-weight:500">${r.mp_risk||'不明'}</div>
+      <div class="cs-label">${t('pop.mp')}</div>
+      <div class="cs-val" style="color:${rc};font-weight:500">${esc(tv(r.mp_risk)||t('unknown'))}</div>
     </div>
     <div class="cs-row">
-      <div class="cs-label">粒子化まで</div>
-      <div class="cs-val">${r.mp_years_est||'不明'}</div>
+      <div class="cs-label">${t('pop.years')}</div>
+      <div class="cs-val">${esc(r.mp_years_est||t('unknown'))}</div>
     </div>
     ${r.manufacturer&&r.manufacturer!=='不明'?`
     <div class="cs-row">
-      <div class="cs-label">メーカー</div>
+      <div class="cs-label">${t('cf.maker')}</div>
       <div class="cs-val">${r.manufacturer}</div>
     </div>`:''}
     ${r.brand_name&&r.brand_name!=='不明'?`
     <div class="cs-row">
-      <div class="cs-label">ブランド</div>
+      <div class="cs-label">${t('cf.brand')}</div>
       <div class="cs-val">${r.brand_name}</div>
     </div>`:''}
     <div class="cs-row">
-      <div class="cs-label">要約</div>
-      <div class="cs-val" style="color:rgba(255,255,255,.6);font-size:11px">${r.summary||''}</div>
+      <div class="cs-label">${t('cf.summary')}</div>
+      <div class="cs-val" style="color:rgba(255,255,255,.6);font-size:11px">${esc(r.summary||'')}</div>
     </div>
   `;
 
@@ -1606,14 +1726,14 @@ function showConfirm(){
 function editField(field){
   if(field==='location'){
     const cur=analysisResult.location_name||'';
-    const val=prompt('場所名を入力してください', cur);
+    const val=prompt(t('cf.askPlace'), cur);
     if(val!==null){
       analysisResult.location_name=val;
-      document.getElementById('cs-loc-val').textContent=val||'不明';
+      document.getElementById('cs-loc-val').textContent=val||t('unknown');
     }
   } else if(field==='date'){
     const cur=photoTakenAt?fmtDate(photoTakenAt):'';
-    const val=prompt('撮影日を入力してください（例: 2026-09-27）', cur);
+    const val=prompt(t('cf.askDate'), cur);
     if(val!==null){
       // ISO形式に変換して保存
       const mm=String(val).trim().match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
@@ -1622,7 +1742,7 @@ function editField(field){
         photoTakenAt=d.toISOString();
         document.getElementById('cs-date-val').textContent=val;
       } else {
-        alert('日付の形式が正しくありません（例: 2026-09-27）');
+        alert(t('cf.badDate'));
       }
     }
   }
@@ -1635,7 +1755,7 @@ function changeCategory(cat){
     b.classList.toggle('active', b.textContent===cat);
   });
   // バッジも更新
-  document.getElementById('jtxt').textContent='AI解析完了 — '+cat;
+  document.getElementById('jtxt').textContent=t('an.doneCat',{c:cat});
   // カテゴリ表示色も更新（共通の catCol を使う）
   const col=catCol[cat]||'#22CCEE';
   document.querySelector('#conf-summary .cs-cat-btns').previousElementSibling.style.color=col;
@@ -1643,7 +1763,7 @@ function changeCategory(cat){
 function retake(){document.getElementById('confv').classList.remove('show');openCam();}
 async function send(){
   document.getElementById('confv').classList.remove('show');
-  showLoad('保存中...');
+  showLoad(t('sv.saving'));
   try{
     // ストレージ保存用に圧縮（長辺800px・約150KB）
     const compressedForUpload=await compressForStorage(capturedUrl);
@@ -1669,17 +1789,22 @@ async function send(){
     window.allRecords.unshift(savedRec);
     updateStats();
     document.getElementById('done-num').textContent=total;
-    document.getElementById('imp-txt').textContent=r.summary||'記録されました';
+    document.getElementById('imp-txt').textContent=r.summary||t('dn.saved');
     addPin(savedRec);
     buildNavRecs();
     document.getElementById('donev').classList.add('show');
-  }catch(e){hideLoad();alert('保存に失敗しました: '+e.message);console.error(e);}
+  }catch(e){hideLoad();alert(t('sv.fail')+tv(e.message));console.error(e);}
 }
 function backToMap(){document.getElementById('donev').classList.remove('show');}
 
 // ── LOADING ──
 function showLoad(t){document.getElementById('ldgtxt').textContent=t;document.getElementById('ldg').classList.add('show');}
 function hideLoad(){document.getElementById('ldg').classList.remove('show');}
+
+// 起動時に、選ばれている言語で画面の文言をそろえる
+applyI18nStatic();
+renderObSpecs();
+switchTab(authMode);
 </script>
 </body>
 </html>
