@@ -18,10 +18,11 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 /* ONBOARDING */
 #ob{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;z-index:1000;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
-#ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:36px}
-.ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:24px}
-.ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.2);border:1px solid rgba(26,122,154,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
-.ob-tx{font-size:13px;color:var(--foam);line-height:1.6}
+#ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:28px}
+.ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:16px}
+.ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.25);border:1px solid rgba(170,221,238,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--foam)}
+.ob-tx{font-size:12px;color:var(--foam);line-height:1.6}
+.ob-tx strong{font-size:14px;font-weight:500}
 .ob-tx strong{color:var(--white)}
 #inp-nick:focus,#inp-pin:focus{border-color:rgba(26,122,154,.6)!important}
 #ob-btn{width:100%;max-width:320px;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif}
@@ -344,11 +345,12 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 <div id="ob">
   <div id="ob-logo">umi</div>
 
-  <!-- 説明3項目 -->
-  <div style="width:100%;max-width:320px;margin-bottom:24px">
-    <div class="ob-row"><div class="ob-ic">📍</div><div class="ob-tx"><strong>写真のGPS情報を使います</strong><br>撮影時の位置情報が自動で記録されます</div></div>
-    <div class="ob-row"><div class="ob-ic">🔒</div><div class="ob-tx"><strong>ブラウザのGPSは使いません</strong><br>デバイスの現在地には一切アクセスしません</div></div>
-    <div class="ob-row"><div class="ob-ic">📷</div><div class="ob-tx"><strong>位置情報オンで撮影した写真を</strong><br>GPS情報のない写真は受け付けられません</div></div>
+  <!-- アプリの大事な仕様 -->
+  <div style="width:100%;max-width:320px;margin-bottom:20px">
+    <div class="ob-row"><div class="ob-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><div class="ob-tx"><strong>写真の位置情報だけを使います</strong><br>スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください</div></div>
+    <div class="ob-row"><div class="ob-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><div class="ob-tx"><strong>正確な位置は、あなたにだけ</strong><br>ほかの人には約300m単位でぼかして表示します</div></div>
+    <div class="ob-row"><div class="ob-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg></div><div class="ob-tx"><strong>写真はみんなに公開されます</strong><br>人の顔や家、車のナンバーが写らないように</div></div>
+    <div class="ob-row"><div class="ob-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/></svg></div><div class="ob-tx"><strong>AIがごみを解析</strong><br>素材や発生源を推定し、根拠と確信度を添えて記録します</div></div>
   </div>
 
   <!-- ログイン・新規画面 -->
@@ -362,6 +364,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
       <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px">PIN（4桁）</div>
       <input id="inp-pin" type="password" placeholder="0000" maxlength="4" inputmode="numeric"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:18px;letter-spacing:.3em;font-family:'Inter',sans-serif;outline:none">
+      <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)">PINは暗号化して保存します。忘れると再発行できません</div>
     </div>
     <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px">はじめる</button>
     <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-bottom:10px;display:none"></div>
@@ -937,55 +940,18 @@ function startApp(){
 }
 
 // ── CAMERA ──
-// 現在地を取得（取れなければnull）
-let camPosPromise=null;
-function getCurrentPosition(){
-  return new Promise(resolve=>{
-    if(!navigator.geolocation){resolve(null);return;}
-    navigator.geolocation.getCurrentPosition(
-      p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),
-      ()=>resolve(null),
-      {enableHighAccuracy:true,timeout:15000,maximumAge:60000}
-    );
-  });
+// 位置はブラウザのGPS（現在地）を使わず、写真に記録された位置情報だけを使う。
+// アプリ内カメラで撮った写真には位置情報が付かないため、
+// スマホのカメラアプリ（位置情報オン）で撮った写真を選んでもらう。
+function openCam(){
+  document.getElementById('filein').click();
 }
-async function openCam(){
-  camPosPromise=getCurrentPosition(); // カメラ起動と同時に位置の取得を始める
-  try{
-    videoStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'}},audio:false
-    });
-    document.getElementById('camvid').srcObject=videoStream;
-    document.getElementById('camv').classList.add('show');
-  }catch(e){
-    document.getElementById('filein').click();
-  }
-}
-
 function closeCam(){
   if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}
-  document.getElementById('camvid').srcObject=null;
-  document.getElementById('camv').classList.remove('show');
+  const v=document.getElementById('camvid'); if(v) v.srcObject=null;
+  const cv=document.getElementById('camv'); if(cv) cv.classList.remove('show');
 }
-function takePhoto(){
-  const v=document.getElementById('camvid');
-  const c=document.getElementById('camcanvas');
-  if(v.videoWidth){
-    c.width=v.videoWidth;c.height=v.videoHeight;
-    c.getContext('2d').drawImage(v,0,0);
-    c.toBlob(async b=>{
-      capturedBlob=b;capturedUrl=c.toDataURL('image/jpeg',.85);closeCam();
-      // 前の写真の位置・日時を使い回さないよう、撮影ごとにリセット
-      userLat=null;userLng=null;photoTakenAt=new Date().toISOString();
-      showLoad('位置情報を取得中...');
-      const loc=await (camPosPromise||getCurrentPosition());
-      camPosPromise=null;
-      hideLoad();
-      if(loc){userLat=loc.lat;userLng=loc.lng;}
-      analyze();
-    },'image/jpeg',.85);
-  } else alert('カメラが起動していません。ギャラリーから選んでください。');
-}
+function takePhoto(){ openCam(); }
 let photoTakenAt=null;
 
 function onFile(input){
@@ -1166,7 +1132,7 @@ async function compressForStorage(dataUrl){
 
 // ── ANALYZE ──
 async function analyze(){
-  if(userLat==null||userLng==null){alert('位置情報を取得できませんでした。\nカメラで撮る場合はブラウザの位置情報の許可を、ギャラリーから選ぶ場合は位置情報つきで撮影した写真かを確認してください。');return;}
+  if(userLat==null||userLng==null){alert('この写真には位置情報が含まれていません。\n\nスマホのカメラの位置情報をオンにして撮影した写真を選んでください。\n（このアプリはスマホの現在地を使わず、写真の位置情報だけを使います）');return;}
   showLoad('AI解析中...');
   try{
     // 10MB制限対策：送信前に圧縮
