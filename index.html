@@ -33,6 +33,11 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #map{flex:1;position:relative;z-index:1}
 .leaflet-container{z-index:1}
 #leafmap{position:absolute;inset:0}
+/* 地図のクレジット（右上） */
+.leaflet-top.leaflet-right .leaflet-control-attribution{
+  margin:10px 10px 0 0;padding:2px 8px;border-radius:10px;
+  background:rgba(255,255,255,.75);font-size:10px;line-height:1.6;
+}
 .leaflet-tile{filter:brightness(.85) saturate(.7)}
 
 /* HEADER */
@@ -623,7 +628,9 @@ async function upload(blob){
 // ── MAP ──
 function initMap(clat, clng, zoom){
   if(lmap) return; // すでに初期化済みなら何もしない
-  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,minZoom:2,maxZoom:19,zoomControl:true,attributionControl:true,scrollWheelZoom:false});
+  lmap = L.map('leafmap',{center:[clat,clng],zoom:zoom||13,minZoom:2,maxZoom:19,zoomControl:true,attributionControl:false,scrollWheelZoom:false});
+  // OpenStreetMapのクレジットは右上に表示
+  L.control.attribution({position:'topright'}).addTo(lmap);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom:19,
