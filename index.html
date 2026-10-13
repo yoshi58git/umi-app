@@ -120,12 +120,12 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 }
 .leaflet-popup-content{
   margin:0!important;
-  width:260px!important;
+  width:300px!important;
   overflow:hidden!important;
 }
 .umi-pop{
   overflow:hidden;
-  width:260px;
+  width:300px;
 }
 .leaflet-popup-tip-container{display:none!important}
 .leaflet-popup-close-button{
@@ -136,48 +136,87 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 }
 .leaflet-popup-close-button:hover{color:var(--white)!important}
 
-/* 写真 - 完全固定 */
-.umi-pop img{
+/* 写真：大きめ表示、タップで全画面 */
+.umi-pop-photo{position:relative;cursor:zoom-in;background:#04111C}
+.umi-pop-photo img{
   width:100%;
-  height:150px !important;
-  min-height:150px !important;
-  max-height:150px !important;
-  object-fit:cover;
+  height:200px !important;
+  object-fit:contain; /* 縦長・横長どちらの写真も切らずに全体を表示 */
   display:block;
-  flex-shrink:0;
+}
+.umi-pop-zoom{
+  position:absolute;right:8px;bottom:8px;
+  padding:4px 10px;border-radius:20px;
+  background:rgba(4,17,28,.7);color:rgba(255,255,255,.85);
+  font-size:10px;letter-spacing:.04em;pointer-events:none;
+}
+
+/* 全画面ビューア */
+#photo-viewer{
+  position:fixed;inset:0;z-index:9999;display:none;
+  background:rgba(2,10,18,.96);
+}
+#photo-viewer.show{display:block}
+#pv-scroll{
+  position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;
+  display:flex;align-items:center;justify-content:center;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+}
+#pv-img{
+  max-width:100vw;max-height:100vh;object-fit:contain;display:block;
+  cursor:zoom-in;transition:none;touch-action:manipulation;
+}
+#photo-viewer.zoomed #pv-scroll{display:block}
+#photo-viewer.zoomed #pv-img{max-width:none;max-height:none;width:250vw;cursor:zoom-out}
+#pv-close{
+  position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;z-index:2;
+  width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);
+  background:rgba(4,17,28,.7);color:#fff;font-size:22px;line-height:38px;text-align:center;cursor:pointer;
+}
+#pv-hint{
+  position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:2;
+  text-align:center;font-size:12px;color:rgba(255,255,255,.55);pointer-events:none;
 }
 
 /* 本文 - スクロールなし・固定 */
 .umi-pop-body{
-  padding:10px 12px 12px;
-  overflow:hidden;
+  padding:14px 16px 16px;
+  /* 画面に収まらないときは本文だけスクロール */
+  max-height:min(330px, calc(100vh - 520px));
+  min-height:160px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
 }
 
 /* ヘッダー */
-.umi-pop-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-.umi-pop-badge{padding:2px 8px;border-radius:20px;font-size:10px;letter-spacing:.06em;font-weight:600;background:rgba(255,255,255,.1)}
-.umi-pop-loc{font-size:10px;color:rgba(255,255,255,.45);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:120px}
-.umi-pop-date{font-size:10px;color:rgba(255,255,255,.3);margin-left:auto}
+.umi-pop-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.umi-pop-badge{padding:3px 10px;border-radius:20px;font-size:11px;letter-spacing:.06em;font-weight:600;background:rgba(255,255,255,.1)}
+.umi-pop-loc{font-size:13px;color:rgba(255,255,255,.8);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:150px}
+.umi-pop-date{font-size:12px;color:rgba(255,255,255,.6);margin-left:auto}
 
 /* 区切り */
-.umi-pop-div{height:1px;background:rgba(255,255,255,.06);margin:7px 0}
+.umi-pop-div{height:1px;background:rgba(255,255,255,.1);margin:10px 0}
 
-/* ごみ品目 */
-.umi-pop-items{font-size:11px;color:rgba(255,255,255,.82);line-height:1.6;margin-bottom:8px}
+/* 見出しラベル（共通） */
+.umi-pop-label{font-size:11px;color:rgba(170,221,238,.75);letter-spacing:.04em;margin-bottom:4px}
 
-/* 数値カード */
-.umi-pop-nums{display:flex;gap:5px;margin-bottom:8px}
-.umi-pop-num{flex:1;padding:5px 6px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
-.umi-pop-num-label{font-size:9px;color:rgba(255,255,255,.35);margin-bottom:2px}
-.umi-pop-num-val{font-size:11px;font-weight:500;color:rgba(255,255,255,.88)}
+/* ごみの一覧 */
+.umi-pop-items{font-size:14px;color:rgba(255,255,255,.95);line-height:1.6;margin-bottom:12px}
 
-/* 推定関与者 */
-.umi-pop-stakeholder{padding:6px 9px;border-radius:8px;background:rgba(26,122,154,.12);border:1px solid rgba(26,122,154,.2);margin-bottom:6px}
-.umi-pop-stakeholder-label{font-size:9px;color:rgba(170,221,238,.5);margin-bottom:2px}
-.umi-pop-stakeholder-val{font-size:11px;color:rgba(255,255,255,.8)}
+/* AIのコメント */
+.umi-pop-comment{font-size:13px;color:rgba(255,255,255,.88);line-height:1.7;padding:8px 12px;border-left:3px solid rgba(95,211,230,.7);background:rgba(255,255,255,.04);border-radius:0 8px 8px 0;margin-bottom:12px}
 
-/* 排出経路 */
-.umi-pop-route{font-size:10px;color:rgba(255,255,255,.4);line-height:1.5}
+/* 数値 */
+.umi-pop-nums{display:flex;gap:6px;margin-bottom:10px}
+.umi-pop-num{flex:1;padding:8px 8px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.umi-pop-num-label{font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px}
+.umi-pop-num-val{font-size:15px;font-weight:500;color:#fff}
+
+/* 改善に取り組める主体・排出経路 */
+.umi-pop-stakeholder{padding:8px 12px;border-radius:8px;background:rgba(26,122,154,.18);border:1px solid rgba(26,122,154,.35);margin-bottom:8px}
+.umi-pop-stakeholder-val{font-size:13px;color:#fff;line-height:1.5}
+.umi-pop-route{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5}
 
 #camcanvas{display:none}
 #filein{display:none}
@@ -286,6 +325,11 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 </style>
 </head>
 <body>
+<div id="photo-viewer" onclick="if(event.target===this||event.target.id==='pv-scroll')closePhoto()">
+  <div id="pv-scroll"><img id="pv-img" src="" alt="記録写真（拡大）" onclick="togglePhotoZoom(event)"></div>
+  <button id="pv-close" onclick="closePhoto()" aria-label="閉じる">&times;</button>
+  <div id="pv-hint">写真をタップで拡大・縮小</div>
+</div>
 
 <!-- ONBOARDING -->
 <div id="ob">
@@ -483,26 +527,14 @@ async function doAuth(){
   if(pinClean.length!==4){errEl.textContent='PINは4桁の数字です';errEl.style.display='block';return;}
   document.getElementById('ob-auth-btn').textContent='確認中...';
   try{
-    if(authMode==='new'){
-      const existing=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&select=id');
-      if(Array.isArray(existing)&&existing.length>0){
-        errEl.textContent='このニックネームはすでに使われています';errEl.style.display='block';
-        document.getElementById('ob-auth-btn').textContent='はじめる';return;
-      }
-      const result=await sb('users','POST',{nickname:nick,pin:pinClean,total_records:0});
-      const user=Array.isArray(result)?result[0]:result;
-      currentUserId=user.id;currentNickname=nick;
-    } else {
-      const result=await sb('users?nickname=eq.'+encodeURIComponent(nick)+'&pin=eq.'+encodeURIComponent(pinClean)+'&select=id,nickname');
-      if(!Array.isArray(result)||result.length===0){
-        errEl.textContent='ニックネームまたはPINが違います';errEl.style.display='block';
-        document.getElementById('ob-auth-btn').textContent='はじめる';return;
-      }
-      currentUserId=result[0].id;currentNickname=result[0].nickname;
+    const res=await api(authMode==='new'?'register':'login',{nickname:nick,pin:pinClean});
+    if(res.error){
+      errEl.textContent=res.error;errEl.style.display='block';
+      document.getElementById('ob-auth-btn').textContent=authMode==='new'?'新規登録':'はじめる';return;
     }
-    setCookie('umi_uid',currentUserId);
-    setCookie('umi_nick',currentNickname);
-    try{localStorage.setItem('umi_uid',currentUserId);localStorage.setItem('umi_nick',currentNickname);}catch(e){}
+    currentUserId=res.user.id;currentNickname=res.user.nickname;
+    saveSession(res.token,currentNickname);
+    needReload=true; // ログイン前に読み込んだ地図（全件ぼかし）を、自分の記録つきで読み直す
     startApp();
   }catch(e){
     errEl.textContent='エラーが発生しました。もう一度お試しください。';
@@ -512,18 +544,27 @@ async function doAuth(){
   }
 }
 
+// ログイン状態（署名つきトークン）の保存と読み出し
+let sessionToken=null;
+let needReload=false;
+function saveSession(token,nick){
+  sessionToken=token;
+  setCookie('umi_token',token);
+  setCookie('umi_nick',nick);
+  try{localStorage.setItem('umi_token',token);localStorage.setItem('umi_nick',nick);
+      localStorage.removeItem('umi_uid');}catch(e){}
+  setCookie('umi_uid','',-1); // 旧方式の情報は消す
+}
 async function restoreSession(){
-  let uid=getCookie('umi_uid');
-  let nick=getCookie('umi_nick');
-  try{if(!uid)uid=localStorage.getItem('umi_uid');if(!nick)nick=localStorage.getItem('umi_nick');}catch(e){}
-  if(uid&&nick){
-    try{
-      const result=await sb('users?id=eq.'+uid+'&select=id,nickname');
-      if(Array.isArray(result)&&result.length>0){
-        currentUserId=uid;currentNickname=nick;return true;
-      }
-    }catch(e){}
-  }
+  let token=getCookie('umi_token');
+  try{if(!token)token=localStorage.getItem('umi_token');}catch(e){}
+  if(!token) return false; // 旧方式でログインしていた人は、一度だけログインし直しになる
+  try{
+    sessionToken=token;
+    const res=await api('session');
+    if(res.user){currentUserId=res.user.id;currentNickname=res.user.nickname;return true;}
+  }catch(e){}
+  sessionToken=null;
   return false;
 }
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcWdwemdweXR3dmZrZ3NjZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODM3MDksImV4cCI6MjEwNjI1OTcwOX0.Wso1DnlSPDJfjH-4AWKOCGke-6vPau5V6cBeFZ_npZ4';
@@ -546,12 +587,14 @@ function fmtDate(iso){
 }
 
 // ── SUPABASE ──
-async function sb(path, method='GET', body=null){
-  const h = {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
-  if(method==='POST') h['Prefer']='return=representation';
-  const r = await fetch(SB_URL+'/rest/v1/'+path,{method,headers:h,body:body?JSON.stringify(body):null});
-  if(!r.ok) throw new Error(await r.text());
-  return r.json().catch(()=>({}));
+const API_URL = SB_URL + '/functions/v1/umi-api';
+async function api(action, payload={}){
+  const r=await fetch(API_URL,{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY,'apikey':SB_KEY},
+    body:JSON.stringify({action,token:sessionToken,...payload})});
+  const data=await r.json().catch(()=>({error:'通信エラー'}));
+  if(!r.ok&&!data.error) data.error='通信エラー（'+r.status+'）';
+  return data;
 }
 
 async function upload(blob){
@@ -594,6 +637,44 @@ function updateStats(){
   document.getElementById('s-city').textContent=n.CITY;
   document.getElementById('s-ground').textContent=n.GROUND;
 }
+// 画面に表示する文字を安全にする
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// 表示する価値のある値か（不明・推定不能などは出さない）
+function shown(v){
+  return v!=null&&v!==''&&!['不明','推定不能','読取不可','その他'].includes(String(v).trim());
+}
+
+// ── 写真の全画面表示 ──
+function openPhoto(src){
+  const v=document.getElementById('photo-viewer');
+  v.classList.remove('zoomed');
+  document.getElementById('pv-img').src=src;
+  v.classList.add('show');
+}
+function closePhoto(){
+  const v=document.getElementById('photo-viewer');
+  v.classList.remove('show','zoomed');
+  document.getElementById('pv-img').src='';
+}
+function togglePhotoZoom(e){
+  e.stopPropagation();
+  const v=document.getElementById('photo-viewer');
+  const sc=document.getElementById('pv-scroll');
+  const img=document.getElementById('pv-img');
+  if(v.classList.contains('zoomed')){v.classList.remove('zoomed');return;}
+  // タップした位置を中心に拡大
+  const r=img.getBoundingClientRect();
+  const fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height;
+  v.classList.add('zoomed');
+  requestAnimationFrame(()=>{
+    sc.scrollLeft=img.offsetWidth*fx-sc.clientWidth/2;
+    sc.scrollTop=img.offsetHeight*fy-sc.clientHeight/2;
+  });
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePhoto();});
+
 function addPin(r){
   if(!lmap||!r.lat||!r.lng) return;
   const cat=normCat(r.category);
@@ -605,32 +686,37 @@ function addPin(r){
     iconSize:[12,12],iconAnchor:[6,6],popupAnchor:[0,-10]
   });
   const rc=r.mp_risk==='高'?'#FF7766':r.mp_risk==='中'?'#FFAA44':'#44BB88';
-  const img=r.image_url?`<img src="${r.image_url}" alt="" onerror="this.style.display='none'">`:'';
-  const items=(r.items||'').split('\n').slice(0,4).join('<br>');
+  const img=r.image_url?`<div class="umi-pop-photo" onclick="openPhoto(this.querySelector('img').src)">
+      <img src="${r.image_url}" alt="記録写真" onerror="this.parentNode.style.display='none'">
+      <span class="umi-pop-zoom">タップで拡大</span>
+    </div>`:'';
+  const items=(r.items||'').split('\n').filter(Boolean).slice(0,4).map(esc).join('<br>');
   const dt=fmtDate(r.photo_taken_at||r.created_at);
-  const loc=r.location_name&&r.location_name!=='不明'?r.location_name:'';
+  const loc=shown(r.location_name)?esc(r.location_name):'';
+  const summary=r.analysis_json&&shown(r.analysis_json.summary)?esc(r.analysis_json.summary):'';
 
   // 数値情報
-  const mpYears=r.mp_years_est&&r.mp_years_est!=='不明'?r.mp_years_est:'—';
-  const weight=r.estimated_weight_g?`約${r.estimated_weight_g}g`:'—';
-  const degrade=r.degradation_level?`劣化 ${r.degradation_level}/5`:'—';
+  const mpYears=shown(r.mp_years_est)?esc(r.mp_years_est):'—';
+  const weight=r.estimated_weight_g?`約${esc(r.estimated_weight_g)}g`:'—';
 
-  // 推定関与者（柔らかく表現）
+  // 改善に取り組める主体
   const stakeholders=[];
-  if(r.manufacturer&&r.manufacturer!=='不明') stakeholders.push(r.manufacturer);
-  if(r.brand_name&&r.brand_name!=='不明'&&r.brand_name!==r.manufacturer) stakeholders.push(r.brand_name);
-  if(r.source_category&&r.source_category!=='不明') stakeholders.push(r.source_category);
+  if(shown(r.manufacturer)) stakeholders.push(r.manufacturer);
+  if(shown(r.brand_name)&&r.brand_name!==r.manufacturer) stakeholders.push(r.brand_name);
+  if(shown(r.source_category)) stakeholders.push(r.source_category);
   const stakeholderHtml=stakeholders.length>0?`
     <div class="umi-pop-stakeholder">
-      <div class="umi-pop-stakeholder-label">改善に取り組める主体</div>
-      <div class="umi-pop-stakeholder-val">${stakeholders.join('・')}</div>
+      <div class="umi-pop-label">改善に取り組める主体</div>
+      <div class="umi-pop-stakeholder-val">${stakeholders.map(esc).join('・')}</div>
     </div>`:'';
 
   // 排出経路
-  const routeHtml=r.discharge_route&&r.discharge_route!=='不明'?`
-    <div class="umi-pop-route">${r.discharge_route}</div>`:'';
+  const routeHtml=shown(r.discharge_route)?`
+    <div class="umi-pop-label">推定排出経路</div>
+    <div class="umi-pop-route">${esc(r.discharge_route)}</div>`:'';
 
   const marker = L.marker([r.lat,r.lng],{icon}).addTo(lmap);
+  (window._pins=window._pins||[]).push(marker);
   marker._umiRecord = r;
   if(r.id) markerMap[r.id] = marker;
   marker.bindPopup(
@@ -638,16 +724,18 @@ function addPin(r){
       ${img}
       <div class="umi-pop-body">
         <div class="umi-pop-hdr">
-          <span class="umi-pop-badge" style="color:${col}">${cat}</span>
+          <span class="umi-pop-badge" style="color:${col}">${esc(cat)}</span>
           <span class="umi-pop-loc">${loc}</span>
           <span class="umi-pop-date">${dt}</span>
         </div>
         <div class="umi-pop-div"></div>
-        <div class="umi-pop-items">${items}</div>
+        <div class="umi-pop-label">見つかったごみ</div>
+        <div class="umi-pop-items">${items||'—'}</div>
+        ${summary?`<div class="umi-pop-label">AIのコメント</div><div class="umi-pop-comment">${summary}</div>`:''}
         <div class="umi-pop-nums">
           <div class="umi-pop-num">
             <div class="umi-pop-num-label">MPリスク</div>
-            <div class="umi-pop-num-val" style="color:${rc}">${r.mp_risk||'—'}</div>
+            <div class="umi-pop-num-val" style="color:${rc}">${esc(r.mp_risk||'—')}</div>
           </div>
           <div class="umi-pop-num">
             <div class="umi-pop-num-label">粒子化まで</div>
@@ -662,15 +750,20 @@ function addPin(r){
         ${routeHtml}
       </div>
     </div>`,
-    {maxWidth:290,closeButton:true}
+    {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,90],autoPanPaddingBottomRight:[10,190]}
   );
   return marker;
 }
 
 async function loadRecords(){
+  // 前に置いたピンを消してから置き直す
+  if(window._pins&&lmap) window._pins.forEach(m=>lmap.removeLayer(m));
+  window._pins=[];
   markerMap = {}; // リセット
   try{
-    const data = await sb('records?select=*&order=created_at.desc&limit=500');
+    const res = await api('list');
+    if(res.error) throw new Error(res.error);
+    const data = res.records;
     preloaded = true;
     let slat=0,slng=0,cnt=0;
     if(Array.isArray(data)){
@@ -700,10 +793,10 @@ let mineRecs=[], digestRecs=[];
 function buildNavRecs(){
   if(!window.allRecords) return;
   mineRecs = window.allRecords
-    .filter(r=>r.user_id===currentUserId&&r.lat&&r.lng)
+    .filter(r=>r.is_mine&&r.lat&&r.lng)
     .sort((a,b)=>new Date(a.photo_taken_at||a.created_at)-new Date(b.photo_taken_at||b.created_at));
   digestRecs = window.allRecords
-    .filter(r=>r.user_id!==currentUserId&&r.lat&&r.lng)
+    .filter(r=>!r.is_mine&&r.lat&&r.lng)
     .sort((a,b)=>{
       const sc={高:3,中:2,低:1};
       const d=(sc[b.mp_risk]||0)-(sc[a.mp_risk]||0);
@@ -810,7 +903,11 @@ function startApp(){
     document.getElementById('cnt-lbl').textContent=currentNickname;
   }
   initNav();
-  if(preloaded){
+  if(preloaded&&needReload){
+    needReload=false;
+    if(lmap) lmap.invalidateSize();
+    loadRecords().then(()=>buildNavRecs());
+  } else if(preloaded){
     if(lmap) lmap.invalidateSize();
     buildNavRecs(); // セッション復元後にナビをビルド
   } else {
@@ -1200,7 +1297,7 @@ async function send(){
     const imgUrl=await upload(compBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
-      user_id:currentUserId,category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
+      category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
       estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
       mp_risk:r.mp_risk,drift_days_est:r.drift_days_est,beach_days_est:r.beach_days_est,
@@ -1210,8 +1307,9 @@ async function send(){
       recyclable:r.recyclable,design_issue:r.design_issue,affected_species:r.affected_species,
       human_route:r.human_route,discharge_route:r.discharge_route,source_category:r.source_category,
       runoff_risk:r.runoff_risk,analysis_json:r};
-    const saved=await sb('records','POST',rec);
-    const savedRec={...rec,created_at:new Date().toISOString(),...(Array.isArray(saved)?saved[0]:saved)};
+    const res=await api('save',{record:rec});
+    if(res.error) throw new Error(res.error);
+    const savedRec={...rec,created_at:new Date().toISOString(),...res.record,is_mine:true};
     hideLoad();
     if(!window.allRecords) window.allRecords=[];
     window.allRecords.unshift(savedRec);
