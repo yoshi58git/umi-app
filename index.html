@@ -64,8 +64,9 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #cnt-lbl{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 
 /* BOTTOM */
-#btm{position:relative;z-index:20;padding:0 20px env(safe-area-inset-bottom,20px);background:linear-gradient(0deg,rgba(4,17,28,.98) 60%,transparent 100%);padding-top:28px}
-#cam-btn{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:var(--wave);border:none;cursor:pointer;margin:0 auto 18px;animation:glow 3s infinite}
+/* 下部は地図の上に重ねる（地図を画面いっぱいに） */
+#btm{position:absolute;left:0;right:0;bottom:0;z-index:20;padding:0 0 calc(env(safe-area-inset-bottom,0px) + 45px);background:none;pointer-events:none}
+#cam-btn{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(26,122,154,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(170,221,238,.5);cursor:pointer;margin:0 auto;pointer-events:auto;animation:glow 3s infinite}
 #cam-btn:active{transform:scale(.92)}
 #cam-btn svg{width:28px;height:28px;fill:none;stroke:var(--white);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @keyframes glow{0%{box-shadow:0 0 0 0 rgba(26,122,154,.5)}70%{box-shadow:0 0 0 16px rgba(26,122,154,0)}100%{box-shadow:0 0 0 0 rgba(26,122,154,0)}}
