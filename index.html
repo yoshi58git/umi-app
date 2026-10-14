@@ -557,8 +557,8 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none">
     </div>
     <div style="margin-bottom:20px">
-      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px" data-i18n="auth.pin">PIN（4桁）</div>
-      <input id="inp-pin" type="password" placeholder="0000" maxlength="4" inputmode="numeric"
+      <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px" data-i18n="auth.pin">PIN（数字6桁）</div>
+      <input id="inp-pin" type="password" placeholder="000000" maxlength="8" inputmode="numeric"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:18px;letter-spacing:.3em;font-family:'Inter',sans-serif;outline:none">
       <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="auth.pinNote">PINは暗号化して保存します。忘れると再発行できません</div>
     </div>
@@ -607,6 +607,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');changePin()" data-i18n="pin.change">PINを変更</button>
       <div class="wp-sep"></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-in').click()" data-i18n="wp.choose">壁紙の写真を選ぶ</button>
       <div class="wp-pos" id="wp-pos">
@@ -714,7 +715,11 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 const I18N={
 ja:{
   'photo.alt':'記録写真','photo.altZoom':'記録写真（拡大）','close':'閉じる','photo.hint':'写真をタップで拡大・縮小','photo.tap':'タップで拡大',
-  'auth.nick':'ニックネーム','auth.nickPh':'例: umi','auth.pin':'PIN（4桁）','auth.pinNote':'PINは暗号化して保存します。忘れると再発行できません',
+  'auth.pin6':'PINは6桁の数字にしてください','auth.pinLen':'PINを数字で入力してください','auth.locked':'ログインの失敗が続いたため、{m}分後にもう一度お試しください',
+  'pin.change':'PINを変更','pin.askCur':'今のPINを入力してください','pin.askNew':'新しいPIN（数字6桁）を入力してください','pin.askNewAgain':'数字6桁で入力してください',
+  'pin.askConfirm':'確認のため、新しいPINをもう一度入力してください','pin.mismatch':'2回の入力が一致しませんでした','pin.changed':'PINを変更しました',
+  'pin.suggest':'安全のため、メニューからPINを6桁に変更してください',
+  'auth.nick':'ニックネーム','auth.nickPh':'例: umi','auth.pin':'PIN（数字6桁）','auth.pinNote':'PINは暗号化して保存します。忘れると再発行できません',
   'auth.start':'はじめる','auth.register':'新規登録','auth.login':'ログイン','auth.first':'はじめて？ ','auth.have':'アカウントあり？ ',
   'auth.needNick':'ニックネームを入力してください','auth.pin4':'PINは4桁の数字です','auth.checking':'確認中...','auth.error':'エラーが発生しました。もう一度お試しください。',
   'net.error':'通信エラー','net.errorCode':'通信エラー（{n}）',
@@ -798,7 +803,11 @@ ja:{
 },
 en:{
   'photo.alt':'Record photo','photo.altZoom':'Record photo (zoomed)','close':'Close','photo.hint':'Tap the photo to zoom in or out','photo.tap':'Tap to enlarge',
-  'auth.nick':'Nickname','auth.nickPh':'e.g. umi','auth.pin':'PIN (4 digits)','auth.pinNote':'Your PIN is stored encrypted. It cannot be reissued if you forget it',
+  'auth.pin6':'Please use a 6-digit PIN','auth.pinLen':'Please enter your PIN in digits','auth.locked':'Too many failed attempts. Please try again in {m} minutes',
+  'pin.change':'Change PIN','pin.askCur':'Enter your current PIN','pin.askNew':'Enter a new 6-digit PIN','pin.askNewAgain':'Please enter 6 digits',
+  'pin.askConfirm':'Enter the new PIN again to confirm','pin.mismatch':'The two entries did not match','pin.changed':'PIN changed',
+  'pin.suggest':'For safety, please change your PIN to 6 digits from the menu',
+  'auth.nick':'Nickname','auth.nickPh':'e.g. umi','auth.pin':'PIN (6 digits)','auth.pinNote':'Your PIN is stored encrypted. It cannot be reissued if you forget it',
   'auth.start':'Start','auth.register':'Sign up','auth.login':'Log in','auth.first':'New here? ','auth.have':'Have an account? ',
   'auth.needNick':'Please enter a nickname','auth.pin4':'PIN must be 4 digits','auth.checking':'Checking...','auth.error':'Something went wrong. Please try again.',
   'net.error':'Connection error','net.errorCode':'Connection error ({n})',
@@ -885,7 +894,8 @@ const VALUE_EN={
   '地域の陸域':'Local land','河川経由':'Via rivers','海外からの漂着':'Washed in from overseas','漁業・養殖':'Fishing / aquaculture','船舶・海上活動':'Ships / at sea','レジャー・観光':'Leisure / tourism',
   'ポイ捨て':'Littering','置き忘れ・放置':'Left behind','ごみ集積所からの散乱':'Scattered from collection points','河川・排水路経由':'Via rivers / drains','海上での投棄・流出':'Dumped or lost at sea','海流による漂着':'Carried by ocean currents','不法投棄':'Illegal dumping',
   'ニックネームを入力してください':'Please enter a nickname','PINは4桁の数字です':'PIN must be 4 digits','このニックネームはすでに使われています':'This nickname is already taken',
-  'ニックネームまたはPINが違います':'Wrong nickname or PIN','コードが見つかりません':'Code not found','この団体のメンバーではありません':'You are not a member of this team',
+  'ニックネームまたはPINが違います':'Wrong nickname or PIN','コードが見つかりません':'Code not found','PINは6桁の数字です':'PIN must be 6 digits','今のPINが違います':'Your current PIN is incorrect','しばらくしてからもう一度お試しください':'Please try again later',
+  '写真が大きすぎるか、空です':'The photo is too large or empty','JPEG形式の写真ではありません':'The photo is not a JPEG','写真を読み込めませんでした':'Could not read the photo','この団体のメンバーではありません':'You are not a member of this team',
   'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
 };
 let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
@@ -1000,18 +1010,21 @@ async function doAuth(){
   errEl.style.display='none';
   const pinClean=pin.replace(/\D/g,''); // 数字以外を除去
   if(!nick){errEl.textContent=t('auth.needNick');errEl.style.display='block';return;}
-  if(pinClean.length!==4){errEl.textContent=t('auth.pin4');errEl.style.display='block';return;}
+  // 新規登録は6桁。ログインは、以前の4桁の人も入れるよう4〜8桁を受け付ける
+  if(authMode==='new'?pinClean.length!==6:(pinClean.length<4||pinClean.length>8)){errEl.textContent=t(authMode==='new'?'auth.pin6':'auth.pinLen');errEl.style.display='block';return;}
   document.getElementById('ob-auth-btn').textContent=t('auth.checking');
   try{
     const res=await api(authMode==='new'?'register':'login',{nickname:nick,pin:pinClean});
     if(res.error){
-      errEl.textContent=tv(res.error);errEl.style.display='block';
+      const mins=(String(res.error).match(/(\d+)分後/)||[])[1];
+      errEl.textContent=mins?t('auth.locked',{m:mins}):tv(res.error);errEl.style.display='block';
       document.getElementById('ob-auth-btn').textContent=authMode==='new'?t('auth.register'):t('auth.start');return;
     }
     currentUserId=res.user.id;currentNickname=res.user.nickname;
     saveSession(res.token,currentNickname);
     needReload=true; // ログイン前に読み込んだ地図（全件ぼかし）を、自分の記録つきで読み直す
     startApp();
+    if(res.short_pin) setTimeout(()=>toast(t('pin.suggest')),1500); // 4桁の人には6桁への変更を勧める
   }catch(e){
     errEl.textContent=t('auth.error');
     errEl.style.display='block';
@@ -1074,14 +1087,10 @@ async function api(action, payload={}){
 }
 
 async function upload(blob){
-  const name='record_'+Date.now()+'.jpg';
-  const r = await fetch(SB_URL+'/storage/v1/object/images/'+name,{
-    method:'POST',
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'image/jpeg'},
-    body:blob
-  });
-  if(!r.ok) throw new Error('upload failed');
-  return SB_URL+'/storage/v1/object/public/images/'+name;
+  const b64=await new Promise((res,rej)=>{const rd=new FileReader();rd.onload=()=>res(String(rd.result).split(',')[1]);rd.onerror=rej;rd.readAsDataURL(blob);});
+  const r=await api('upload',{image_base64:b64});
+  if(r.error||!r.url) throw new Error(r.error||'upload failed');
+  return r.url;
 }
 
 // ── MAP ──
@@ -1590,6 +1599,19 @@ async function finishActivity(id){
   if(res.error){alert(tv(res.error));return;}
   await refreshMine();
 }
+// PINの変更（今のPIN → 新しい6桁 → 確認）
+async function changePin(){
+  const cur=prompt(t('pin.askCur')); if(cur===null) return;
+  let next=prompt(t('pin.askNew'));
+  while(next!==null&&!/^\d{6}$/.test(next.trim())) next=prompt(t('pin.askNewAgain'));
+  if(next===null) return;
+  const again=prompt(t('pin.askConfirm')); if(again===null) return;
+  if(again.trim()!==next.trim()){alert(t('pin.mismatch'));return;}
+  const r=await api('change_pin',{current:cur.trim(),next:next.trim()});
+  if(r.error){const mins=(String(r.error).match(/(\d+)分後/)||[])[1];alert(mins?t('auth.locked',{m:mins}):tv(r.error));return;}
+  toast(t('pin.changed'));
+}
+
 // 取り組み（陸側でした対策）を記録
 async function addMeasure(orgId){
   const title=prompt(t('ms.askTitle')); if(!title) return;
