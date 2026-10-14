@@ -919,6 +919,7 @@ function setLang(l){
   if(typeof showSpec==='function'&&document.getElementById('spec-t')) showSpec(specIdx);
   if(typeof refreshMapTexts==='function') refreshMapTexts();
   if(typeof updateNavInfo==='function'){updateNavInfo('mine');updateNavInfo('digest');}
+  if(typeof translateMissing==='function') translateMissing();
   if(document.getElementById('sumv').classList.contains('show')) renderSummary();
   if(document.getElementById('guidev').classList.contains('show')) renderGuide();
   if(document.getElementById('actv').classList.contains('show')) renderActivity();
@@ -1285,7 +1286,7 @@ function aggregate(recs){
       if(x.estimated) a.estimated=true;
       if(x.weight_g_each!=null){a.weight+=n*x.weight_g_each;a.weightKnown=true;}
       const name=canonName(x.name);
-      if(name){a.items[name]=a.items[name]||{n:0,origin:x.origin};a.items[name].n+=n;}
+      if(name){a.items[name]=a.items[name]||{n:0,origin:x.origin,en:''};a.items[name].n+=n;if(!a.items[name].en&&x.name_en)a.items[name].en=x.name_en;}
     });
   });
   return a;
@@ -1298,8 +1299,8 @@ function scopeMeta(recs){
   let title,sub;
   if(s.type==='activity'&&acts[0]){ const a=acts[0]; title=a.name; sub=[a.org_name,a.place_name].filter(Boolean).join(' ・ ');
     const when=fmtDate(a.starts_at)+(fmtTime(a.starts_at)?' '+fmtTime(a.starts_at):'')+(a.ends_at?'–'+fmtTime(a.ends_at):'');
-    return {kind:t('act.reportKind'),title,sub,when,people:hasPeople?people:null,count:acts.length}; }
-  title=s.orgName||''; sub=t('act.orgActs',{n:acts.length});
+    return {kind:t('act.reportKind'),title:aiText(title),sub:sub.split(' ・ ').map(x=>aiText(x)).join(LANG==='en'?' · ':' ・ '),when,people:hasPeople?people:null,count:acts.length}; }
+  title=aiText(s.orgName||''); sub=t('act.orgActs',{n:acts.length});
   const ds=acts.map(a=>fmtDate(a.starts_at)).filter(Boolean).sort();
   return {kind:t('act.orgReport'),title,sub,when:ds.length?(ds[0]===ds[ds.length-1]?ds[0]:ds[0]+' – '+ds[ds.length-1]):'',people:hasPeople?people:null,count:acts.length};
 }
@@ -1334,7 +1335,7 @@ function renderSummary(){
     '</div>'+
     '<div class="sum-sec"><div class="sum-h">'+t('sum.bySide')+'</div><div class="sum-side">'+side(t('sum.sideSea'),a.seaSide)+side(t('sum.sideLand'),a.landSide)+'</div></div>'+
     trendHtml(recs)+measuresHtml(recs)+
-    '<div class="sum-sec"><div class="sum-h">'+t('sum.top')+'</div><div class="cnt-list">'+top.map(([name,v])=>'<div class="cnt-row"><span class="cnt-dot" style="background:'+(ORIGIN_COL[v.origin]||ORIGIN_COL['判別できない'])+'"></span><span class="cnt-name">'+esc(name)+'</span><span class="cnt-n">×'+v.n+'</span></div>').join('')+'</div></div>'+
+    '<div class="sum-sec"><div class="sum-h">'+t('sum.top')+'</div><div class="cnt-list">'+top.map(([name,v])=>'<div class="cnt-row"><span class="cnt-dot" style="background:'+(ORIGIN_COL[v.origin]||ORIGIN_COL['判別できない'])+'"></span><span class="cnt-name">'+esc(itemLabel(name,v.en))+'</span><span class="cnt-n">×'+v.n+'</span></div>').join('')+'</div></div>'+
     '<div class="sum-note">'+
       (a.overseas?t('sum.overseas',{n:a.overseas})+'<br>':'')+
       (a.weightKnown?t('sum.weight',{kg:(a.weight/1000).toFixed(a.weight<10000?2:1)})+'<br>':'')+
@@ -1446,7 +1447,7 @@ async function shareSummaryImage(){
   text(t('sum.top'),90,820+oy,30,'rgba(170,221,238,.9)',500);
   const top=Object.entries(a.items).sort((p,q)=>q[1].n-p[1].n).slice(0,4);
   top.forEach(([name,v],i)=>{const y=880+oy+i*62;g.fillStyle=ORIGIN_COL[v.origin]||'rgba(255,255,255,.5)';g.beginPath();g.arc(100,y-12,10,0,7);g.fill();
-    text(name,128,y,36,'#fff');text('×'+v.n,W-90,y,36,'rgba(255,255,255,.75)',400,'right');});
+    text(itemLabel(name,v.en),128,y,36,'#fff');text('×'+v.n,W-90,y,36,'rgba(255,255,255,.75)',400,'right');});
   // 軸
   g.fillStyle='rgba(255,210,122,.35)';g.fillRect(90,1180,W-180,2);
   text(t('axis.t'),W/2,1250,40,'#FFE3A8',500,'center');
@@ -1626,6 +1627,7 @@ async function openReport(type,id){
   sumScope=sc;
   closeActivity();
   openSummary();
+  translateMissing();
 }
 // 経営者などに送るレポートのリンク（ログインなしで、読むだけの画面が開く）
 function reportUrl(){ return location.origin+location.pathname+'?report='+(sumScope.type==='org'?'o':'a')+'.'+sumScope.id+'&lang='+LANG; }
@@ -1945,7 +1947,64 @@ function countsSummaryHtml(a){
 function countsListHtml(a,max){
   const list=(a.item_counts||[]).slice(0,max||99);
   const more=(a.item_counts||[]).length-list.length;
-  return '<div class="cnt-list">'+list.map(x=>`<div class="cnt-row"><span class="cnt-dot" style="background:${ORIGIN_COL[x.origin]||ORIGIN_COL['判別できない']}" title="${esc(t('origin.'+(x.origin||'判別できない')))}"></span><span class="cnt-name">${esc(x.name)}${x.overseas?` <span class="cnt-os">${t('cnt.overseas')}</span>`:''}</span><span class="cnt-n">×${x.count}${x.estimated?'~':''}</span></div>`).join('')+(more>0?`<div class="cnt-more">${t('cnt.more',{n:more})}</div>`:'')+'</div>';
+  return '<div class="cnt-list">'+list.map(x=>`<div class="cnt-row"><span class="cnt-dot" style="background:${ORIGIN_COL[x.origin]||ORIGIN_COL['判別できない']}" title="${esc(t('origin.'+(x.origin||'判別できない')))}"></span><span class="cnt-name">${esc(itemLabel(x.name,x.name_en))}${x.overseas?` <span class="cnt-os">${t('cnt.overseas')}</span>`:''}</span><span class="cnt-n">×${x.count}${x.estimated?'~':''}</span></div>`).join('')+(more>0?`<div class="cnt-more">${t('cnt.more',{n:more})}</div>`:'')+'</div>';
+}
+
+
+// ── AIが書いた文章の英語表示 ──
+// 標準のごみの名前は辞書で、コメントやメーカー名はAIが書いた英語版で。英語版がない過去の文章は、まとめて翻訳して端末に覚える
+const ITEM_EN={'PETボトル':'PET bottle','ペットボトルのキャップ':'Bottle cap','飲料缶':'Beverage can','ガラス瓶':'Glass bottle','食品の包装・袋':'Food wrapper / bag',
+  'レジ袋':'Plastic shopping bag','プラスチックカップ':'Plastic cup','ストロー':'Straw','食品容器・トレー':'Food container / tray','たばこの吸い殻':'Cigarette butt',
+  'ライター':'Lighter','花火':'Fireworks','風船':'Balloon','おもちゃ':'Toy','衣類・布':'Clothing / fabric','靴・サンダル':'Shoe / sandal','マスク':'Face mask',
+  '衛生用品':'Hygiene product','紙くず':'Paper scrap','漁網':'Fishing net','ロープ・ひも':'Rope / string','ブイ・浮き':'Buoy / float','釣り糸':'Fishing line',
+  '釣り具・ルアー':'Fishing gear / lure','養殖用資材':'Aquaculture material','プラスチック破片':'Plastic fragment','発泡スチロール片':'Foam fragment',
+  'フィルム片':'Film fragment','ゴム片':'Rubber fragment','金属片':'Metal fragment','木材（加工品）':'Processed wood'};
+const hasJa=v=>/[\u3040-\u30ff\u4e00-\u9fff]/.test(String(v||''));
+let TR={}; try{TR=JSON.parse(localStorage.getItem('umi_tr')||'{}')||{};}catch(e){TR={};}
+// 文章を表示言語に合わせる（ja：そのまま／en：英語版→翻訳済み→元の文）
+function aiText(ja,en){
+  if(LANG!=='en'||!ja) return ja||'';
+  if(en) return en;
+  return TR[ja]||ja;
+}
+// ごみの名前を表示言語に合わせる
+function itemLabel(name,nameEn){
+  if(LANG!=='en') return name;
+  return ITEM_EN[canonName(name)]||ITEM_EN[name]||nameEn||TR[name]||name;
+}
+// 英語版のない日本語の文章を集めて、まとめて翻訳（ログインしている時だけ。1回の表示で最大150件）
+let trRunning=false;
+async function translateMissing(){
+  if(LANG!=='en'||trRunning||!sessionToken) return;
+  const need=new Set();
+  (window.allRecords||[]).forEach(r=>{
+    const aj=r.analysis_json||{};
+    if(hasJa(aj.summary)&&!aj.summary_en&&!TR[aj.summary]) need.add(aj.summary);
+    if(hasJa(r.manufacturer)&&!(aj.manufacturer_en)&&!TR[r.manufacturer]&&shown(r.manufacturer)) need.add(r.manufacturer);
+    if(hasJa(r.location_name)&&!TR[r.location_name]) need.add(r.location_name);
+    (aj.item_counts||[]).forEach(x=>{ if(hasJa(x.name)&&!x.name_en&&!ITEM_EN[canonName(x.name)]&&!TR[x.name]) need.add(x.name); });
+  });
+  if(typeof sumScope!=='undefined'&&sumScope){
+    [sumScope.orgName,...(sumScope.acts||[]).flatMap(a=>[a.name,a.place_name,a.org_name])].forEach(v=>{ if(hasJa(v)&&!TR[v]) need.add(v); });
+  }
+  const list=[...need].slice(0,150); if(!list.length) return;
+  trRunning=true;
+  try{
+    for(let i=0;i<list.length;i+=50){
+      const part=list.slice(i,i+50);
+      const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY,'apikey':SB_KEY},body:JSON.stringify({mode:'translate',texts:part,token:sessionToken})});
+      if(!r.ok) break;
+      const d=await r.json();
+      (d.translations||[]).forEach((tx,j)=>{ if(tx&&tx!==part[j]) TR[part[j]]=tx; });
+    }
+    // 覚えすぎないよう、新しい順に600件まで
+    const keys=Object.keys(TR); if(keys.length>600) keys.slice(0,keys.length-600).forEach(k=>delete TR[k]);
+    try{localStorage.setItem('umi_tr',JSON.stringify(TR));}catch(e){}
+    if(LANG==='en'){
+      if(typeof refreshMapTexts==='function') refreshMapTexts();
+      if(document.getElementById('sumv').classList.contains('show')) renderSummary();
+    }
+  }catch(e){} finally{ trRunning=false; }
 }
 
 // ── 写真の全画面表示 ──
@@ -2002,8 +2061,9 @@ function addPin(r){
     </div>`:'';
   const items=(r.items||'').split('\n').filter(Boolean).slice(0,4).map(esc).join('<br>');
   const dt=fmtDate(r.photo_taken_at||r.created_at);
-  const loc=shown(r.location_name)?esc(r.location_name):'';
-  const summary=r.analysis_json&&shown(r.analysis_json.summary)?esc(r.analysis_json.summary):'';
+  const loc=shown(r.location_name)?esc(aiText(r.location_name)):'';
+  const aj=r.analysis_json||{};
+  const summary=shown(aj.summary)?esc(aiText(aj.summary,aj.summary_en)):'';
 
   // 数値情報
   const mpYears=shown(r.mp_years_est)?esc(r.mp_years_est):'—';
@@ -2011,7 +2071,7 @@ function addPin(r){
 
   // 改善に取り組める主体
   const stakeholders=[];
-  if(shown(r.manufacturer)) stakeholders.push(r.manufacturer);
+  if(shown(r.manufacturer)) stakeholders.push(aiText(r.manufacturer,aj.manufacturer_en));
   if(shown(r.brand_name)&&r.brand_name!==r.manufacturer) stakeholders.push(r.brand_name);
   if(shown(r.source_category)) stakeholders.push(r.source_category);
   const stakeholderHtml=stakeholders.length>0?`
@@ -2083,6 +2143,7 @@ async function loadRecords(){
       });
       window.allRecords=data;
       setTimeout(buildNavRecs, 100);
+      setTimeout(translateMissing, 500); // 英語表示なら、英語のない過去の文章を補う
       updateStats();
       const clat=cnt>0?slat/cnt:35.316;
       const clng=cnt>0?slng/cnt:139.473;
@@ -2504,7 +2565,7 @@ function showConfirm(){
     </div>
     <div class="cs-row">
       <div class="cs-label">${t('cf.place')}</div>
-      <div class="cs-val" id="cs-loc-val">${esc(r.location_name||t('unknown'))}</div>
+      <div class="cs-val" id="cs-loc-val">${esc(r.location_name?aiText(r.location_name):t('unknown'))}</div>
       <span class="cs-edit" onclick="editField('location')">${t('cf.edit')}</span>
     </div>
     <div class="cs-row">
@@ -2531,16 +2592,16 @@ function showConfirm(){
     ${r.manufacturer&&r.manufacturer!=='不明'?`
     <div class="cs-row">
       <div class="cs-label">${t('cf.maker')}</div>
-      <div class="cs-val">${r.manufacturer}</div>
+      <div class="cs-val">${esc(aiText(r.manufacturer,r.manufacturer_en))}</div>
     </div>`:''}
     ${r.brand_name&&r.brand_name!=='不明'?`
     <div class="cs-row">
       <div class="cs-label">${t('cf.brand')}</div>
-      <div class="cs-val">${r.brand_name}</div>
+      <div class="cs-val">${esc(r.brand_name)}</div>
     </div>`:''}
     <div class="cs-row">
       <div class="cs-label">${t('cf.summary')}</div>
-      <div class="cs-val" style="color:rgba(255,255,255,.6);font-size:11px">${esc(r.summary||'')}</div>
+      <div class="cs-val" style="color:rgba(255,255,255,.6);font-size:11px">${esc(aiText(r.summary,r.summary_en))}</div>
     </div>
   `;
 
@@ -2614,7 +2675,7 @@ async function send(){
     window.allRecords.unshift(savedRec);
     updateStats();
     document.getElementById('done-num').textContent=total;
-    document.getElementById('imp-txt').textContent=r.summary||t('dn.saved');
+    document.getElementById('imp-txt').textContent=aiText(r.summary,r.summary_en)||t('dn.saved');
     addPin(savedRec);
     buildNavRecs();
     document.getElementById('donev').classList.add('show');
