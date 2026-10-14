@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -23,6 +24,9 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:16px}
 .ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.25);border:1px solid rgba(170,221,238,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--foam)}
 .ob-tx{font-size:12px;color:var(--foam);line-height:1.6}
+.ob-axis{margin:0 0 18px;padding:12px 14px;border-radius:12px;background:rgba(4,17,28,.35);border:1px solid rgba(255,210,122,.35)}
+.ob-axis-t{font-size:15px;font-weight:500;color:#FFE3A8;line-height:1.5}
+.ob-axis-d{font-size:12px;color:var(--foam);line-height:1.6;margin-top:4px}
 .ob-h{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6);margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.12)}
 .ob-row+.ob-h{margin-top:6px}
 .ob-cat{display:block;font-size:10px;letter-spacing:.08em;font-weight:600;line-height:1.4}
@@ -60,6 +64,100 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #spec-tip.open .st-t{white-space:normal}
 #spec-tip.open .st-d{display:block}
 
+/* 集計画面・撮り方（全画面シート） */
+.sheet{position:fixed;inset:0;z-index:5000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:linear-gradient(180deg,#06192A 0%,#04111C 100%);color:#fff;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 20px calc(env(safe-area-inset-bottom,0px) + 24px)}
+.sheet.show{display:block}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sheet-title{font-size:18px;font-weight:500;letter-spacing:.06em}
+.sheet-x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-size:22px;line-height:1;cursor:pointer}
+.seg-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.seg-lbl{font-size:11px;color:var(--foam);width:40px;flex-shrink:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:6px 12px;border-radius:14px;border:1px solid rgba(170,221,238,.3);background:transparent;color:rgba(255,255,255,.8);font-family:inherit;font-size:12px;cursor:pointer}
+.seg button.on{background:rgba(95,211,230,.22);border-color:#5FD3E6;color:#fff}
+.sum-hero{margin:18px 0 6px;padding:18px 16px;border-radius:16px;background:rgba(255,170,68,.08);border:1px solid rgba(255,170,68,.35)}
+.sum-hero-l{font-size:12px;color:rgba(255,255,255,.75)}
+.sum-hero-n{font-size:46px;font-weight:600;color:#FFAA44;line-height:1.1;margin:4px 0}
+.sum-hero-n small{font-size:16px;font-weight:500;margin-left:4px}
+.sum-hero-n .pre{font-size:15px;font-weight:500;margin-right:6px;color:rgba(255,255,255,.85)}
+.sum-hero-s{font-size:12px;color:rgba(255,255,255,.7);line-height:1.6}
+.sum-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:12px 0 6px;background:rgba(255,255,255,.08)}
+.sum-bar span{display:block;height:100%}
+.sum-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:rgba(255,255,255,.75)}
+.sum-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.sum-sec{margin-top:20px}
+.sum-h{font-size:11px;letter-spacing:.1em;color:rgba(170,221,238,.8);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-side{display:flex;gap:8px}
+.sum-side>div{flex:1;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.sum-side .k{font-size:11px;color:rgba(255,255,255,.65);line-height:1.4}
+.sum-side .v{font-size:18px;font-weight:600;margin-top:4px}
+.sum-side .v small{display:block;font-size:11px;font-weight:400;color:rgba(255,255,255,.6)}
+.sum-note{font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;margin-top:14px}
+.tr-mark{margin:8px 0 4px;padding-left:10px;border-left:3px solid #5FD3E6;font-size:11px;color:#9EE7F2}
+.ms-row{padding:10px 12px;border-radius:12px;background:rgba(95,211,230,.06);border:1px solid rgba(95,211,230,.25);margin-bottom:8px}
+.ms-t{font-size:14px;font-weight:500}
+.ms-d{font-size:11px;color:var(--foam);margin-top:2px}
+.ms-v{font-size:13px;margin-top:6px}
+.ms-good{color:#7EE0A8;font-weight:600;margin-left:4px}
+.ms-bad{color:#FFAA44;font-weight:600;margin-left:4px}
+.rp-lang{margin-left:auto;margin-right:10px}
+.sum-warn{margin-top:8px;font-size:12px;color:#FFD27A}
+body.report-mode #app,body.report-mode #ob{display:none!important}
+.tr-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+.tr-l{width:96px;flex-shrink:0;font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-bar{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}
+.tr-bar span{display:block;height:100%;background:#FFAA44}
+.tr-v{width:82px;flex-shrink:0;text-align:right;font-size:13px;font-weight:600;color:#FFAA44}
+.tr-v small{display:block;font-size:10px;font-weight:400;color:rgba(255,255,255,.6)}
+.tr-change{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);font-size:13px;line-height:1.7}
+.sum-acts{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.sum-act{padding:13px;border-radius:12px;border:1px solid rgba(170,221,238,.35);background:transparent;color:#fff;font-family:inherit;font-size:14px;cursor:pointer}
+.sum-act.main{background:var(--wave);border-color:var(--wave)}
+.sum-axis{margin-top:22px;text-align:center;font-size:13px;color:#FFE3A8;line-height:1.6}
+.sum-empty{margin-top:40px;text-align:center;font-size:13px;color:rgba(255,255,255,.7);line-height:1.8}
+.guide-step{display:flex;gap:14px;align-items:flex-start;margin:16px 0}
+.guide-n{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(95,211,230,.2);border:1px solid #5FD3E6;font-weight:600}
+.guide-t{font-size:15px;font-weight:500;line-height:1.5}
+.guide-d{font-size:12px;color:var(--foam);line-height:1.6;margin-top:2px}
+.guide-warn{margin-top:18px;padding:10px 12px;border-radius:12px;background:rgba(255,119,102,.08);border:1px solid rgba(255,119,102,.35);font-size:12px;line-height:1.6;color:rgba(255,255,255,.85)}
+.sheet-ok{display:block;width:100%;margin-top:22px;padding:14px;border:none;border-radius:var(--r);background:var(--wave);color:#fff;font-family:inherit;font-size:15px;cursor:pointer}
+
+/* 活動 */
+#act-chip{position:absolute;left:12px;top:calc(var(--hdr-h,96px) + 6px);z-index:26;display:none;align-items:center;gap:8px;
+  max-width:calc(100% - 190px);padding:6px 12px 6px 10px;border-radius:16px;border:1px solid rgba(255,210,122,.6);
+  background:rgba(6,22,36,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;font-family:inherit;font-size:11px;cursor:pointer}
+#act-chip span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-dot{width:8px;height:8px;border-radius:50%;background:#FFD27A;flex-shrink:0;animation:acpulse 2s infinite}
+@keyframes acpulse{0%,100%{opacity:1}50%{opacity:.35}}
+#app.in-act #act-chip{display:flex}
+#app.in-act #spec-tip{display:none}
+.act-card{padding:14px;border-radius:14px;background:rgba(255,210,122,.07);border:1px solid rgba(255,210,122,.4);margin-bottom:12px}
+.act-card.plain{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+.act-name{font-size:16px;font-weight:500;line-height:1.4}
+.act-sub{font-size:12px;color:var(--foam);margin-top:3px;line-height:1.5}
+.act-code{font-family:'Inter',monospace;font-size:28px;letter-spacing:.18em;font-weight:600;color:#FFE3A8;margin:8px 0 2px}
+.act-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.act-btn{padding:9px 14px;border-radius:12px;border:1px solid rgba(170,221,238,.35);background:transparent;color:#fff;font-family:inherit;font-size:13px;cursor:pointer}
+.act-btn.main{background:var(--wave);border-color:var(--wave)}
+.act-btn.warn{color:#FFB4A8;border-color:rgba(255,119,102,.4)}
+.act-in{display:flex;gap:8px}
+.act-in input,.act-form input,.act-form select{flex:1;min-width:0;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:15px;outline:none}
+.act-in input{text-transform:uppercase;letter-spacing:.15em;font-family:'Inter',monospace}
+.act-form{display:flex;flex-direction:column;gap:8px}
+.act-form label{font-size:11px;color:var(--foam);margin-top:4px}
+.act-form select option{color:#000}
+.act-qr{display:flex;justify-content:center;margin:12px 0 4px}
+.act-qr img,.act-qr canvas{background:#fff;padding:8px;border-radius:10px;width:180px;height:180px;image-rendering:pixelated}
+.act-err{font-size:12px;color:#FF9A8A;margin-top:6px;min-height:1em}
+.act-list .act-card{margin-bottom:8px}
+.sum-scope{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);margin-bottom:6px}
+.sum-scope .k{font-size:11px;color:var(--foam)}
+.sum-scope .n{font-size:17px;font-weight:500;margin-top:2px;line-height:1.4}
+.sum-scope .m{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:rgba(255,255,255,.75);margin-top:6px}
+#sumv.scoped .sum-filter{display:none}
+
 /* 地図操作ツール（右側） */
 .map-tools{
   display:flex;flex-direction:column;margin:8px 10px 0 0!important;
@@ -95,8 +193,14 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #app.has-wp{background-size:cover;background-repeat:no-repeat;background-position:center}
 #app.has-wp #hdr{background:linear-gradient(180deg,rgba(4,17,28,.7) 0%,rgba(4,17,28,.25) 100%)}
 #app.has-wp #leg{background:linear-gradient(180deg,rgba(4,17,28,.25),rgba(4,17,28,.1))}
-#wp-btn{
+#sum-btn{
   margin-left:8px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(170,221,238,.25);
+  background:rgba(4,17,28,.35);color:var(--foam);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;
+}
+#sum-btn svg{width:15px;height:15px}
+.wp-sep{height:1px;background:rgba(255,255,255,.1);margin:4px 8px}
+#wp-btn{
+  margin-left:6px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(170,221,238,.25);
   background:rgba(4,17,28,.35);color:var(--foam);display:flex;align-items:center;justify-content:center;
   cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;
 }
@@ -124,7 +228,8 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .lang-seg button{padding:4px 7px;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .lang-seg button.on{background:rgba(95,211,230,.28);color:#fff}
 #ob-lang{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;z-index:2}
-#cnt-lbl{max-width:80px}
+#cnt-lbl{max-width:56px}
+#hdr-counts{cursor:pointer}
 .hc{text-align:right}
 .hc-n{font-size:20px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
 .hc-l{font-size:10px;letter-spacing:.06em;color:var(--a);font-weight:600}
@@ -311,6 +416,17 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 /* ごみの一覧 */
 .umi-pop-items{font-size:14px;color:rgba(255,255,255,.95);line-height:1.6;margin-bottom:12px}
+/* 何が・何個・どこから */
+.cnt-sum{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:13px;color:#fff;margin-bottom:6px}
+.cnt-sum b{font-weight:600;font-size:14px}
+.cnt-parts{font-size:12px}
+.cnt-list{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
+.cnt-row{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.92)}
+.cnt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cnt-name{flex:1;min-width:0}
+.cnt-n{font-variant-numeric:tabular-nums;color:rgba(255,255,255,.75)}
+.cnt-os{font-size:10px;padding:1px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);margin-left:4px}
+.cnt-more{font-size:11px;color:rgba(255,255,255,.55)}
 
 /* AIのコメント */
 .umi-pop-comment{font-size:13px;color:rgba(255,255,255,.88);line-height:1.7;padding:8px 12px;border-left:3px solid rgba(95,211,230,.7);background:rgba(255,255,255,.04);border-radius:0 8px 8px 0;margin-bottom:12px}
@@ -453,16 +569,45 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 </div>
 
 <!-- APP -->
+<!-- 集計画面 -->
+<div id="sumv" class="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="sum.title">集計</div><button class="sheet-x" onclick="closeSummary()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div id="sum-scope"></div>
+  <div class="seg-row sum-filter"><span class="seg-lbl" data-i18n="sum.period">期間</span>
+    <div class="seg" id="sum-period"><button data-v="today" onclick="setSum('period','today')" data-i18n="sum.today">今日</button><button data-v="7" onclick="setSum('period','7')" data-i18n="sum.7d">7日</button><button data-v="30" onclick="setSum('period','30')" data-i18n="sum.30d">30日</button><button data-v="all" onclick="setSum('period','all')" data-i18n="sum.all">すべて</button></div></div>
+  <div class="seg-row sum-filter"><span class="seg-lbl" data-i18n="sum.area">場所</span>
+    <div class="seg" id="sum-area"><button data-v="view" onclick="setSum('area','view')" data-i18n="sum.view">地図の表示範囲</button><button data-v="all" onclick="setSum('area','all')" data-i18n="sum.everywhere">すべて</button></div></div>
+  <div id="sum-body"></div>
+</div>
+<!-- 活動（団体・参加・主催） -->
+<div id="actv" class="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="act.title">活動</div><button class="sheet-x" onclick="closeActivity()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div id="act-body"></div>
+</div>
+<!-- 撮り方の案内 -->
+<div id="guidev" class="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="guide.title">撮り方</div><button class="sheet-x" onclick="closeGuide()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div id="guide-body"></div>
+  <button class="sheet-ok" onclick="closeGuide()" data-i18n="guide.ok">わかった</button>
+</div>
+
 <div id="app">
   <div id="wp-layer" aria-hidden="true"></div>
   <div id="hdr">
     <div id="logo">umi<span id="cnt-lbl"></span>
-      <button id="wp-btn" type="button" onclick="toggleWpMenu(event)" aria-label="壁紙の設定" title="壁紙の設定" data-i18n-aria="wp.settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M21 16l-5-5-9 9"/></svg>
+      <button id="sum-btn" class="hdr-btn" type="button" onclick="openSummary()" aria-label="集計" title="集計" data-i18n-aria="sum.open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="5"/><line x1="18" y1="20" x2="18" y2="9"/></svg>
+      </button>
+      <button id="wp-btn" class="hdr-btn" type="button" onclick="toggleWpMenu(event)" aria-label="メニュー" title="メニュー" data-i18n-aria="menu">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
       </button>
     </div>
     <!-- 壁紙メニュー -->
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
+      <div class="wp-sep"></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-in').click()" data-i18n="wp.choose">壁紙の写真を選ぶ</button>
       <div class="wp-pos" id="wp-pos">
         <span data-i18n="wp.pos">表示位置</span>
@@ -475,7 +620,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     </div>
     <input type="file" id="wp-in" accept="image/*" style="display:none" onchange="onWallpaperFile(this)">
     <div id="hdr-right"><div class="lang-seg" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="setLang('ja')">JA</button><button type="button" data-lang="en" onclick="setLang('en')">EN</button></div>
-    <div id="hdr-counts">
+    <div id="hdr-counts" onclick="openSummary()" role="button" tabindex="0">
       <div class="hc" style="--a:#5FD3E6"><div class="hc-n" id="cnt-mine">0</div><div class="hc-l" data-i18n="me">自分</div></div>
       <div class="hc" style="--a:#FFD27A"><div class="hc-n" id="cnt-num">0</div><div class="hc-l" data-i18n="all">みんな</div></div>
     </div>
@@ -488,6 +633,7 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
     <button class="li" data-cat="GROUND" style="--c:var(--ground)" onclick="toggleCat('GROUND')" aria-pressed="true"><span class="ld"></span>GROUND<span class="li-n" id="s-ground">0</span></button>
   </div>
   <!-- アプリの仕様をさりげなく切り替え表示（タップで詳しく） -->
+  <button id="act-chip" type="button" onclick="openActivity()"><span class="ac-dot"></span><span id="act-chip-t"></span></button>
   <button id="spec-tip" type="button" aria-live="polite" onclick="toggleSpecTip()">
     <span class="st-ic" id="spec-ic"></span>
     <span class="st-body"><span class="st-t" id="spec-t"></span><span class="st-d" id="spec-d"></span></span>
@@ -577,8 +723,9 @@ ja:{
   'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
   'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示',
   'h.purpose':'このアプリの目的','h.promise':'大切な約束',
-  'p1.t':'海のごみ：流出の実態を知る','p1.d':'すでに海に出た、または出る寸前のごみ。出どころが分かりにくいからこそ、実態を記録します',
-  'p2.t':'海に出る前のごみ：出どころを共有','p2.d':'川・街・自然地のごみ。誰かを責めるためではなく、出どころを知り、みんなで共有するために記録します',
+  'axis.t':'便利は設計してきた。次は、管理を設計する','axis.d':'海のごみは、陸でしか止められない。リスクを知り、社会全体で陸側から管理に取り組むためのアプリです',
+  'p1.t':'海のごみ：リスクを知る','p1.d':'すでに海に出た、または出る寸前のごみ。その実態を記録します',
+  'p2.t':'海に出る前：陸の出どころを示す','p2.d':'川・街・自然地のごみ。誰かを責めるためではなく、陸のどこから来るかを知り、共有します',
   's1.t':'写真の位置情報だけを使います','s1.d':'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください',
   's2.t':'正確な位置は、あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
   's3.t':'写真はみんなに公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
@@ -586,12 +733,68 @@ ja:{
   'pop.stake':'改善に取り組める主体','pop.route':'推定排出経路','pop.items':'見つかったごみ','pop.comment':'AIのコメント',
   'pop.mp':'MPリスク','pop.years':'粒子化まで','pop.weight':'推定質量','pop.weightVal':'約{n}g',
   'an.noGps':'この写真には位置情報が含まれていません。\n\nスマホのカメラの位置情報をオンにして撮影した写真を選んでください。\n（このアプリはスマホの現在地を使わず、写真の位置情報だけを使います）',
+  'an.noExif':'この写真には撮影時の情報（位置・日時）が残っていません。\n\nスクリーンショットや、アプリで加工・保存し直した写真は使えません。スマホのカメラで撮った元の写真を選んでください。',
+  'an.zero':'この写真の位置情報は正しく記録されていません（0,0）。\n\n電波の届く場所で、カメラの位置情報をオンにして撮り直してください。',
+  'an.heic':'HEIC形式の写真には対応していません。\n\nカメラの設定で保存形式をJPEG（互換性優先）にして撮影してください。',
+  'an.notimage':'画像ファイルを選んでください。',
+  'an.needLogin':'ログインの有効期限が切れました。もう一度ログインしてください。',
+  'an.tooBig':'写真のサイズが大きすぎます。別の写真をお試しください。',
   'an.loading':'AI解析中...','an.noTrash':'ごみが見つかりませんでした。\n海岸・街中などで見つけたごみを撮影してください。','an.fail':'解析に失敗しました。もう一度お試しください。',
   'an.done':'AI解析完了','an.doneCat':'AI解析完了 — {c}','an.noGpsShort':'GPS情報なし','an.noDate':'撮影日不明',
   'cf.cat':'カテゴリ','cf.place':'場所','cf.edit':'編集','cf.date':'撮影日','cf.items':'ごみ品目','cf.maker':'メーカー','cf.brand':'ブランド','cf.summary':'要約',
   'cf.retry':'やり直す','cf.send':'記録する','cf.askPlace':'場所名を入力してください','cf.askDate':'撮影日を入力してください（例: 2026-09-27）','cf.badDate':'日付の形式が正しくありません（例: 2026-09-27）',
   'sv.saving':'保存中...','sv.fail':'保存に失敗しました: ','dn.saved':'記録されました','dn.thanks':'あなたの記録が海を守ります','dn.back':'地図に戻る',
-  'unknown':'不明','lang':'言語'
+  'unknown':'不明','lang':'言語',
+  'menu':'メニュー','sum.open':'集計','sum.title':'集計','sum.period':'期間','sum.today':'今日','sum.7d':'7日','sum.30d':'30日','sum.all':'すべて',
+  'sum.area':'場所','sum.view':'地図の表示範囲','sum.everywhere':'すべて',
+  'sum.q':'このごみのうち、陸から来たもの','sum.atLeast':'少なくとも','sum.heroSub':'合計{total}個（写真{photos}枚）',
+  'sum.upTo':'判別できない{u}%も陸由来なら、最大{max}%','sum.bySide':'見つかった場所ごとの陸由来',
+  'sum.sideSea':'海（SEA）で見つかったごみ','sum.sideLand':'海に出る前（川・街・自然）','sum.landPct':'陸由来 {n}%',
+  'sum.top':'多かったごみ','sum.overseas':'海外から来た手がかりのあるもの {n}個（陸由来に含む）','sum.weight':'推定重量 約{kg}kg',
+  'sum.estimated':'数の一部は、細かい破片などの概数です','sum.noCount':'個数の記録がない{n}件は集計に含めていません',
+  'sum.method':'AIが写真から数え、由来を「陸由来・海上由来（漁具・船など）・判別できない」に分けています。判別できないものは陸由来に数えていないため、陸由来の割合は控えめな値です',
+  'sum.empty':'この期間・場所には、まだ集計できる記録がありません。<br>地図を動かすか、期間を広げてください',
+  'sum.shareImg':'この集計を画像で保存・共有','sum.exportCsv':'答え合わせ用の表を書き出す（CSV）','sum.imgNote':'AIが写真から数えた値。判別できないものは陸由来に含めていません',
+  'ck.date':'撮影日','ck.cat':'カテゴリ','ck.place':'場所','ck.photo':'写真','ck.id':'記録ID','ck.item':'ごみの種類','ck.aiCount':'AIの個数','ck.aiOrigin':'AIの由来',
+  'ck.humanCount':'人の個数','ck.humanOrigin':'人の由来','ck.match':'由来の一致','ck.diff':'個数の差','ck.rate':'由来の一致率','ck.checked':'判定した行数',
+  'ck.how':'使い方：写真を見て「人の由来」に 陸由来／海上由来／判別できない のどれかを、「人の個数」に数を入れると、一致率が自動で出ます',
+  'ck.origins':'陸由来＝生活や消費で使われた物　海上由来＝漁具・養殖・船の物　判別できない＝元が分からない破片',
+  'rp.shareLink':'レポートのリンクを送る（ログイン不要で見られます）','rp.notFound':'レポートが見つかりませんでした',
+  'rp.noPeople':'参加人数が未入力の活動が{n}回あります。人数を入れると、1人あたりで効果を比べられます',
+  'act.askPeopleAgain':'参加人数を数字で入力してください（例：12）',
+  'ms.title':'取り組みの効果（前と後）','ms.add':'取り組みを記録','ms.askTitle':'陸側でした取り組みを入力してください（例：社屋の喫煙所に吸い殻入れを増やした）',
+  'ms.askDate':'始めた日を入力してください（例：2026-09-01）','ms.saved':'取り組みを記録しました。団体のレポートで前後を比べられます',
+  'ms.since':'{d}から','ms.beforeAfter':'1人あたりの陸由来（前 → 後）','ms.perPerson':'{n}個/人','ms.mark':'ここから：{t}',
+  'ms.noBefore':'取り組み前のデータがありません','ms.noAfter':'取り組み後のデータは、次の活動から集まります',
+  'ms.note':'同じ団体の活動を、取り組みを始めた日の前と後に分けて比べています。季節や天気でも量は変わるため、何回か続けて傾向を見てください',
+  'ms.noteShare':'参加人数が未入力の回があるため、陸由来の割合で比べています。人数を入れると1人あたりで比べられます',
+  'tr.titleMonth':'変化（月ごとの陸由来の割合）','tr.titleAct':'変化（活動ごとの陸由来の割合）','tr.perPerson':'1人あたり{n}個',
+  'tr.share':'陸由来の割合：最初 {a}% → 最新 {b}%（{d}ポイント）','tr.per':'1人あたりの陸由来：{a}個 → {b}個（{r}%）',
+  'tr.notePeople':'人数で割っているので、参加人数が違う回どうしでも比べられます。減っていれば、陸側の管理が効いているサインです',
+  'tr.noteNoPeople':'拾う人数や時間で量は変わるため、比べているのは割合です。活動に参加人数を入れると、1人あたりの量でも比べられます',
+  'sum.exportIcc':'国際分類（ICC）で書き出す（CSV）','icc.site':'場所・活動','icc.date':'日付','icc.people':'参加人数','icc.photos':'写真の枚数',
+  'icc.count':'個数','icc.from':'アプリでの名前',
+  'icc.note':'国際海岸クリーンアップ（ICC）のデータカードの項目に読み替えた集計です。AIが写真から数えた値で、ICCの項目にないものは「その他」にまとめています',
+  'act.open':'活動・団体','act.title':'活動','act.joining':'参加中','act.joined':'「{name}」に参加しました',
+  'act.joinNote':'この間に記録したごみは、この活動にまとまります（開始から24時間）','act.report':'レポート','act.leave':'抜ける',
+  'act.joinH':'活動に参加する','act.join':'参加','act.personal':'参加しなくても、今までどおり個人で記録できます',
+  'act.hostH':'活動を主催する','act.new':'活動を作る','act.name':'活動名','act.place':'場所','act.placePh':'例：サザンビーチちがさき',
+  'act.org':'団体','act.noOrg':'団体なし（個人の活動）','act.create':'作成','act.cancel':'やめる','act.defName':'{m}月{d}日のビーチクリーン',
+  'act.created':'活動を作りました。参加者にこのコードかQRを見せてください','act.qrHint':'スマホのカメラで読み取ると、参加した状態でアプリが開きます',
+  'act.copyLink':'参加リンクをコピー','act.copied':'コピーしました','act.code':'参加コード','act.people':'参加{n}人','act.ended':'終了',
+  'act.showCode':'コードを表示','act.finish':'人数・終了','act.askPeople':'参加人数を入力してください（終了時刻も今の時刻で記録します）',
+  'act.orgH':'団体','act.staffCode':'主催者コード','act.orgReport':'団体のレポート','act.newOrg':'団体を作る','act.joinOrg':'主催者コードで入る',
+  'act.orgNote':'団体には主催する人だけが入ります。参加者は活動のコードで参加するだけで大丈夫です',
+  'act.askOrg':'団体名を入力してください（例：会社名）','act.askStaff':'主催者コードを入力してください',
+  'act.reportKind':'活動レポート','act.orgActs':'活動{n}回','act.perPerson':'1人あたり{n}個','act.photos':'写真{n}枚',
+  'コードが見つかりません':'コードが見つかりません',
+  'guide.open':'撮り方','guide.title':'撮り方','guide.ok':'わかった',
+  'g1.t':'カメラの位置情報をオンにする','g1.d':'スマホのカメラで撮った元の写真を使います。スクリーンショットや加工した写真は使えません',
+  'g2.t':'拾ったごみを並べて、上から撮る','g2.d':'重ならないように並べ、1枚に20個くらいまで。AIが種類ごとに数えます',
+  'g3.t':'撮ったら袋へ','g3.d':'同じごみを二度撮らないように。拾ったごみが全部、どれかの写真に写っている状態をめざします',
+  'g.warn':'人の顔、家、車のナンバーが写らないようにしてください。写真はみんなに公開されます',
+  'cnt.total':'合計{n}個','cnt.approx':'（概数を含む）','cnt.overseas':'海外','cnt.more':'ほか{n}種類',
+  'origin.陸由来':'陸由来','origin.海上由来':'海上','origin.判別できない':'判別できない'
 },
 en:{
   'photo.alt':'Record photo','photo.altZoom':'Record photo (zoomed)','close':'Close','photo.hint':'Tap the photo to zoom in or out','photo.tap':'Tap to enlarge',
@@ -604,8 +807,9 @@ en:{
   'me':'Me','all':'Others','nav.mine':'My records','nav.all':'Others\u2019 records','nav.prev':'previous','nav.next':'next','count':'{n}',
   'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records',
   'h.purpose':'Why this app','h.promise':'Our promises',
-  'p1.t':'At sea: see the reality','p1.d':'Litter already in the sea or about to enter it. Its origin is hard to trace, so we record the reality',
-  'p2.t':'Upstream: share the source','p2.d':'Litter in rivers, towns and nature. Not to blame anyone, but to learn and share where it comes from',
+  'axis.t':'We designed convenience. Now, design what comes after','axis.d':'Ocean litter can only be stopped on land. Know the risk, and manage it from the land side, together as a society',
+  'p1.t':'At sea: know the risk','p1.d':'Litter already in the sea or about to enter it. We record what is really there',
+  'p2.t':'Before the sea: show land sources','p2.d':'Litter in rivers, towns and nature. Not to blame anyone, but to learn and share where on land it comes from',
   's1.t':'Only photo location is used','s1.d':'The app never accesses your phone\u2019s current location. Choose photos taken with location on',
   's2.t':'Exact location: only you','s2.d':'Others see it blurred to about 300 m',
   's3.t':'Photos are public','s3.d':'Avoid faces, homes and license plates',
@@ -613,20 +817,76 @@ en:{
   'pop.stake':'Who can help improve this','pop.route':'Likely discharge route','pop.items':'Litter found','pop.comment':'AI comment',
   'pop.mp':'MP risk','pop.years':'Until fragmenting','pop.weight':'Est. weight','pop.weightVal':'~{n} g',
   'an.noGps':'This photo has no location data.\n\nPlease choose a photo taken with your camera\u2019s location setting on.\n(This app does not use your phone\u2019s current location, only the photo\u2019s location data.)',
+  'an.noExif':'This photo has no capture data (location or date).\n\nScreenshots and photos re-saved by editing apps cannot be used. Please choose an original photo taken with your phone camera.',
+  'an.zero':'This photo\u2019s location was not recorded correctly (0,0).\n\nPlease retake it with the camera\u2019s location setting on, somewhere with signal.',
+  'an.heic':'HEIC photos are not supported.\n\nPlease set your camera to save as JPEG (\u201cMost compatible\u201d) and take the photo again.',
+  'an.notimage':'Please choose an image file.',
+  'an.needLogin':'Your login has expired. Please log in again.',
+  'an.tooBig':'This photo is too large. Please try another one.',
   'an.loading':'AI analyzing...','an.noTrash':'No litter was found.\nPlease photograph litter you found on a beach, in town, etc.','an.fail':'Analysis failed. Please try again.',
   'an.done':'AI analysis complete','an.doneCat':'AI analysis complete — {c}','an.noGpsShort':'No GPS data','an.noDate':'Date unknown',
   'cf.cat':'Category','cf.place':'Place','cf.edit':'Edit','cf.date':'Date taken','cf.items':'Items','cf.maker':'Maker','cf.brand':'Brand','cf.summary':'Summary',
   'cf.retry':'Retake','cf.send':'Save record','cf.askPlace':'Enter the place name','cf.askDate':'Enter the date taken (e.g. 2026-09-27)','cf.badDate':'Invalid date format (e.g. 2026-09-27)',
   'sv.saving':'Saving...','sv.fail':'Failed to save: ','dn.saved':'Recorded','dn.thanks':'Your record helps protect the ocean','dn.back':'Back to map',
-  'unknown':'Unknown','lang':'Language'
+  'unknown':'Unknown','lang':'Language',
+  'menu':'Menu','sum.open':'Summary','sum.title':'Summary','sum.period':'Period','sum.today':'Today','sum.7d':'7 days','sum.30d':'30 days','sum.all':'All',
+  'sum.area':'Area','sum.view':'Map view','sum.everywhere':'Everywhere',
+  'sum.q':'Of this litter, the share from land','sum.atLeast':'At least','sum.heroSub':'{total} items ({photos} photos)',
+  'sum.upTo':'If the unclear {u}% is also from land, up to {max}%','sum.bySide':'Land share by where it was found',
+  'sum.sideSea':'Found at sea (SEA)','sum.sideLand':'Before the sea (river, town, nature)','sum.landPct':'Land {n}%',
+  'sum.top':'Most common litter','sum.overseas':'{n} items with signs of overseas origin (counted as land)','sum.weight':'Est. weight ~{kg} kg',
+  'sum.estimated':'Some counts are estimates (e.g. small fragments)','sum.noCount':'{n} records without counts are not included',
+  'sum.method':'AI counts items in each photo and sorts them into land-based, sea-based (fishing gear, ships, etc.) or unclear. Unclear items are not counted as land, so the land share is a conservative figure',
+  'sum.empty':'No records to summarize for this period and area yet.<br>Move the map or widen the period',
+  'sum.shareImg':'Save or share this summary as an image','sum.exportCsv':'Export a check sheet (CSV)','sum.imgNote':'Counted by AI from photos. Unclear items are not counted as land',
+  'ck.date':'Date','ck.cat':'Category','ck.place':'Place','ck.photo':'Photo','ck.id':'Record ID','ck.item':'Item','ck.aiCount':'AI count','ck.aiOrigin':'AI origin',
+  'ck.humanCount':'Human count','ck.humanOrigin':'Human origin','ck.match':'Origin match','ck.diff':'Count diff','ck.rate':'Origin agreement','ck.checked':'Rows checked',
+  'ck.how':'How to use: look at each photo and enter 陸由来 / 海上由来 / 判別できない in Human origin and the number in Human count. The agreement is calculated automatically',
+  'ck.origins':'陸由来 = used in daily life or consumption / 海上由来 = fishing, aquaculture or ship items / 判別できない = fragments of unknown origin',
+  'rp.shareLink':'Send the report link (viewable without login)','rp.notFound':'Report not found',
+  'rp.noPeople':'{n} activities have no participant count. Add it to compare effects per person',
+  'act.askPeopleAgain':'Please enter the number of participants as a number (e.g. 12)',
+  'ms.title':'Effect of actions (before vs after)','ms.add':'Record an action','ms.askTitle':'Enter the land-side action taken (e.g. added butt bins at the office smoking area)',
+  'ms.askDate':'Enter the start date (e.g. 2026-09-01)','ms.saved':'Action recorded. Compare before and after in the team report',
+  'ms.since':'from {d}','ms.beforeAfter':'Land items per person (before → after)','ms.perPerson':'{n}/person','ms.mark':'From here: {t}',
+  'ms.noBefore':'No data before this action','ms.noAfter':'Data after this action will come from the next activities',
+  'ms.note':'Activities of this team are split into before and after the start date. Season and weather also change amounts, so watch the trend over several activities',
+  'ms.noteShare':'Some activities have no participant count, so land shares are compared. Add counts to compare per person',
+  'tr.titleMonth':'Change (land share by month)','tr.titleAct':'Change (land share by activity)','tr.perPerson':'{n} per person',
+  'tr.share':'Land share: first {a}% → latest {b}% ({d} pts)','tr.per':'Land items per person: {a} → {b} ({r}%)',
+  'tr.notePeople':'Divided by participants, so activities with different group sizes can be compared. A decrease is a sign that land-side management is working',
+  'tr.noteNoPeople':'Amounts depend on how many people collect and for how long, so shares are compared. Add participant numbers to activities to compare per person',
+  'sum.exportIcc':'Export in international format (ICC, CSV)','icc.site':'Site / activity','icc.date':'Date','icc.people':'People','icc.photos':'Photos',
+  'icc.count':'Count','icc.from':'Names in the app',
+  'icc.note':'Mapped to the International Coastal Cleanup (ICC) data card items. Counted by AI from photos; items not on the ICC card are grouped as Other',
+  'act.open':'Activities & teams','act.title':'Activities','act.joining':'Joined','act.joined':'Joined “{name}”',
+  'act.joinNote':'Litter you record now is grouped into this activity (for 24 hours from the start)','act.report':'Report','act.leave':'Leave',
+  'act.joinH':'Join an activity','act.join':'Join','act.personal':'You can still record on your own without joining',
+  'act.hostH':'Host an activity','act.new':'Create an activity','act.name':'Activity name','act.place':'Place','act.placePh':'e.g. Southern Beach Chigasaki',
+  'act.org':'Team','act.noOrg':'No team (personal activity)','act.create':'Create','act.cancel':'Cancel','act.defName':'Beach cleanup {m}/{d}',
+  'act.created':'Activity created. Show this code or QR to participants','act.qrHint':'Scanning it with a phone camera opens the app already joined',
+  'act.copyLink':'Copy join link','act.copied':'Copied','act.code':'Join code','act.people':'{n} people','act.ended':'Ended',
+  'act.showCode':'Show code','act.finish':'People / end','act.askPeople':'Enter the number of participants (the end time is recorded as now)',
+  'act.orgH':'Teams','act.staffCode':'Organizer code','act.orgReport':'Team report','act.newOrg':'Create a team','act.joinOrg':'Join with organizer code',
+  'act.orgNote':'Only organizers join a team. Participants just join an activity with its code',
+  'act.askOrg':'Enter the team name (e.g. company name)','act.askStaff':'Enter the organizer code',
+  'act.reportKind':'Activity report','act.orgActs':'{n} activities','act.perPerson':'{n} items per person','act.photos':'{n} photos',
+  'guide.open':'How to shoot','guide.title':'How to shoot','guide.ok':'Got it',
+  'g1.t':'Turn on camera location','g1.d':'Use original photos taken with your phone camera. Screenshots and edited photos cannot be used',
+  'g2.t':'Spread out the litter and shoot from above','g2.d':'Avoid overlaps, about 20 pieces per photo. AI counts each type',
+  'g3.t':'Bag it after shooting','g3.d':'Don\u2019t photograph the same litter twice. Aim for every piece you pick up to appear in some photo',
+  'g.warn':'Avoid faces, homes and license plates. Photos are visible to everyone',
+  'cnt.total':'{n} items','cnt.approx':' (incl. estimates)','cnt.overseas':'overseas','cnt.more':'+{n} more types',
+  'origin.陸由来':'Land','origin.海上由来':'Sea-based','origin.判別できない':'Unclear'
 }};
 // サーバーやAIから届く決まった日本語の値を英語で表示するための対応表
 const VALUE_EN={
-  '高':'High','中':'Medium','低':'Low',
+  '高':'High','中':'Medium','低':'Low','陸由来':'Land','海上由来':'Sea-based','判別できない':'Unclear',
   '地域の陸域':'Local land','河川経由':'Via rivers','海外からの漂着':'Washed in from overseas','漁業・養殖':'Fishing / aquaculture','船舶・海上活動':'Ships / at sea','レジャー・観光':'Leisure / tourism',
   'ポイ捨て':'Littering','置き忘れ・放置':'Left behind','ごみ集積所からの散乱':'Scattered from collection points','河川・排水路経由':'Via rivers / drains','海上での投棄・流出':'Dumped or lost at sea','海流による漂着':'Carried by ocean currents','不法投棄':'Illegal dumping',
   'ニックネームを入力してください':'Please enter a nickname','PINは4桁の数字です':'PIN must be 4 digits','このニックネームはすでに使われています':'This nickname is already taken',
-  'ニックネームまたはPINが違います':'Wrong nickname or PIN','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
+  'ニックネームまたはPINが違います':'Wrong nickname or PIN','コードが見つかりません':'Code not found','この団体のメンバーではありません':'You are not a member of this team',
+  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
 };
 let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
   return (navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';})();
@@ -659,12 +919,17 @@ function setLang(l){
   if(typeof showSpec==='function'&&document.getElementById('spec-t')) showSpec(specIdx);
   if(typeof refreshMapTexts==='function') refreshMapTexts();
   if(typeof updateNavInfo==='function'){updateNavInfo('mine');updateNavInfo('digest');}
+  if(document.getElementById('sumv').classList.contains('show')) renderSummary();
+  if(document.getElementById('guidev').classList.contains('show')) renderGuide();
+  if(document.getElementById('actv').classList.contains('show')) renderActivity();
+  updateActChip();
   const cv=document.getElementById('confv');
   if(cv&&cv.classList.contains('show')&&typeof showConfirm==='function'&&analysisResult) showConfirm();
 }
 
 // ページ読み込み後すぐにバックグラウンド処理開始
 window.addEventListener('load', async ()=>{
+  if(await bootReportMode()) return; // レポートのリンクから開いたとき
   const waitL = setInterval(async ()=>{
     if(typeof L !== 'undefined'){
       clearInterval(waitL);
@@ -856,6 +1121,7 @@ const SPEC_ICONS={
   share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>'
 };
 // アプリの目的（ログイン画面と左上の案内で共通）
+const AXIS={ic:'wave',col:'#FFD27A',k:'axis'};
 const PURPOSES=[
   {ic:'wave',  col:'var(--sea)', cats:['SEA'],
    k:'p1'},
@@ -874,6 +1140,7 @@ function renderObSpecs(){
   const box=document.getElementById('ob-specs'); if(!box) return;
   const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+t(x.k+'.t')+'</strong><br>'+t(x.k+'.d')+'</div></div>';
   box.innerHTML=
+    '<div class="ob-axis"><div class="ob-axis-t">'+t('axis.t')+'</div><div class="ob-axis-d">'+t('axis.d')+'</div></div>'+
     '<div class="ob-h">'+t('h.purpose')+'</div>'+
     PURPOSES.map(x=>row(x,'<span class="ob-cat" style="color:'+x.col+'">'+x.cats.join(LANG==='en'?' · ':'・')+'</span>')).join('')+
     '<div class="ob-h">'+t('h.promise')+'</div>'+
@@ -882,7 +1149,7 @@ function renderObSpecs(){
 applyI18nStatic();
 renderObSpecs();
 // メイン画面：7秒ごとに1つずつ切り替えて表示。タップで詳しい説明を開く（開いている間は止まる）
-const TIPS=[...PURPOSES,...SPECS];
+const TIPS=[AXIS,...PURPOSES,...SPECS];
 let specIdx=0, specTimer=null;
 function showSpec(i){
   const x=TIPS[i];
@@ -977,6 +1244,547 @@ function onWallpaperFile(input){
   rd.readAsDataURL(f);
 }
 applyWallpaper();
+
+
+// ── 集計（このアプリの問い：このごみは、何割が陸から来ているか） ──
+let sumPeriod='all', sumArea='view';
+function openSummary(){ document.getElementById('sumv').classList.add('show'); renderSummary(); }
+function closeSummary(){
+  if(reportMode){ location.href=location.origin+location.pathname; return; } // レポート専用画面からはアプリへ
+  document.getElementById('sumv').classList.remove('show'); sumScope=null;
+}
+function setSum(kind,v){ if(kind==='period') sumPeriod=v; else sumArea=v; renderSummary(); }
+// 期間と場所で記録を選ぶ
+function summaryRecords(){
+  const recs=window.allRecords||[];
+  if(typeof sumScope!=='undefined'&&sumScope){ const set=new Set(sumScope.ids); return recs.filter(r=>r.activity_id&&set.has(r.activity_id)); }
+  let start=null;
+  if(sumPeriod==='today'){const d=new Date();d.setHours(0,0,0,0);start=d.getTime();}
+  else if(sumPeriod!=='all') start=Date.now()-Number(sumPeriod)*864e5;
+  const b=(sumArea==='view'&&lmap)?lmap.getBounds():null;
+  return recs.filter(r=>{
+    if(start!==null){const tm=new Date(r.photo_taken_at||r.created_at).getTime();if(!(tm>=start))return false;}
+    if(b&&!(r.lat&&r.lng&&b.contains([r.lat,r.lng])))return false;
+    return true;
+  });
+}
+// 個数と由来を足し合わせる（AIの集計がある記録だけ）
+function aggregate(recs){
+  const z=()=>({total:0,land:0,sea:0,unknown:0});
+  const a={...z(),overseas:0,weight:0,weightKnown:false,estimated:false,photos:0,noCount:0,items:{},seaSide:z(),landSide:z()};
+  recs.forEach(r=>{
+    const c=countsOf(r);
+    if(!c){a.noCount++;return;}
+    a.photos++;
+    const side=normCat(r.category)==='SEA'?a.seaSide:a.landSide;
+    (c.item_counts||[]).forEach(x=>{
+      const n=Number(x.count)||0;
+      const k=x.origin==='陸由来'?'land':x.origin==='海上由来'?'sea':'unknown';
+      a.total+=n;a[k]+=n;side.total+=n;side[k]+=n;
+      if(x.overseas) a.overseas+=n;
+      if(x.estimated) a.estimated=true;
+      if(x.weight_g_each!=null){a.weight+=n*x.weight_g_each;a.weightKnown=true;}
+      const name=canonName(x.name);
+      if(name){a.items[name]=a.items[name]||{n:0,origin:x.origin};a.items[name].n+=n;}
+    });
+  });
+  return a;
+}
+const pct=(n,d)=>d?Math.round(n/d*100):0;
+// 活動・団体のレポートの見出し（何の活動か、何人で、いつ）
+function scopeMeta(recs){
+  const s=sumScope, acts=s.acts||[];
+  const people=acts.reduce((n,a)=>n+(a.participants||0),0), hasPeople=acts.some(a=>a.participants!=null);
+  let title,sub;
+  if(s.type==='activity'&&acts[0]){ const a=acts[0]; title=a.name; sub=[a.org_name,a.place_name].filter(Boolean).join(' ・ ');
+    const when=fmtDate(a.starts_at)+(fmtTime(a.starts_at)?' '+fmtTime(a.starts_at):'')+(a.ends_at?'–'+fmtTime(a.ends_at):'');
+    return {kind:t('act.reportKind'),title,sub,when,people:hasPeople?people:null,count:acts.length}; }
+  title=s.orgName||''; sub=t('act.orgActs',{n:acts.length});
+  const ds=acts.map(a=>fmtDate(a.starts_at)).filter(Boolean).sort();
+  return {kind:t('act.orgReport'),title,sub,when:ds.length?(ds[0]===ds[ds.length-1]?ds[0]:ds[0]+' – '+ds[ds.length-1]):'',people:hasPeople?people:null,count:acts.length};
+}
+function scopeHtml(recs,a){
+  const m=scopeMeta(recs);
+  const missing=(sumScope.acts||[]).filter(x=>x.participants==null).length;
+  const per=(m.people&&a.total)?t('act.perPerson',{n:(a.total/m.people).toFixed(1)}):'';
+  return '<div class="sum-scope"><div class="k">'+esc(m.kind)+'</div><div class="n">'+esc(m.title)+'</div>'+
+    '<div class="m">'+[m.sub,m.when,m.people!=null?t('act.people',{n:m.people}):'',per,t('act.photos',{n:a.photos})].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'+
+    (missing&&!reportMode?'<div class="sum-warn">'+t('rp.noPeople',{n:missing})+'</div>':'')+'</div>';
+}
+function renderSummary(){
+  document.querySelectorAll('#sum-period button').forEach(b=>b.classList.toggle('on',b.dataset.v===sumPeriod));
+  document.querySelectorAll('#sum-area button').forEach(b=>b.classList.toggle('on',b.dataset.v===sumArea));
+  const recs=summaryRecords(), a=aggregate(recs), body=document.getElementById('sum-body');
+  document.getElementById('sumv').classList.toggle('scoped',!!sumScope);
+  document.getElementById('sum-scope').innerHTML=sumScope?scopeHtml(recs,a):'';
+  if(!a.total){
+    body.innerHTML='<div class="sum-empty">'+t('sum.empty')+(a.noCount?'<br><span style="font-size:11px;opacity:.7">'+t('sum.noCount',{n:a.noCount})+'</span>':'')+'</div>';
+    return;
+  }
+  const L=pct(a.land,a.total),S=pct(a.sea,a.total),U=Math.max(0,100-L-S);
+  const side=(label,x)=>'<div><div class="k">'+label+'</div><div class="v">'+(x.total?t('sum.landPct',{n:pct(x.land,x.total)}):'—')+'<small>'+(x.total?t('cnt.total',{n:x.total}):'')+'</small></div></div>';
+  const top=Object.entries(a.items).sort((p,q)=>q[1].n-p[1].n).slice(0,5);
+  body.innerHTML=
+    '<div class="sum-hero">'+
+      '<div class="sum-hero-l">'+t('sum.q')+'</div>'+
+      '<div class="sum-hero-n"><span class="pre">'+t('sum.atLeast')+'</span>'+L+'<small>%</small></div>'+
+      '<div class="sum-hero-s">'+t('sum.heroSub',{total:a.total,photos:a.photos})+(U>0?'<br>'+t('sum.upTo',{u:U,max:L+U}):'')+'</div>'+
+      '<div class="sum-bar"><span style="width:'+L+'%;background:'+ORIGIN_COL['陸由来']+'"></span><span style="width:'+S+'%;background:'+ORIGIN_COL['海上由来']+'"></span><span style="width:'+U+'%;background:rgba(255,255,255,.25)"></span></div>'+
+      '<div class="sum-leg"><span><i style="background:'+ORIGIN_COL['陸由来']+'"></i>'+t('origin.陸由来')+' '+a.land+'</span><span><i style="background:'+ORIGIN_COL['海上由来']+'"></i>'+t('origin.海上由来')+' '+a.sea+'</span><span><i style="background:rgba(255,255,255,.4)"></i>'+t('origin.判別できない')+' '+a.unknown+'</span></div>'+
+    '</div>'+
+    '<div class="sum-sec"><div class="sum-h">'+t('sum.bySide')+'</div><div class="sum-side">'+side(t('sum.sideSea'),a.seaSide)+side(t('sum.sideLand'),a.landSide)+'</div></div>'+
+    trendHtml(recs)+measuresHtml(recs)+
+    '<div class="sum-sec"><div class="sum-h">'+t('sum.top')+'</div><div class="cnt-list">'+top.map(([name,v])=>'<div class="cnt-row"><span class="cnt-dot" style="background:'+(ORIGIN_COL[v.origin]||ORIGIN_COL['判別できない'])+'"></span><span class="cnt-name">'+esc(name)+'</span><span class="cnt-n">×'+v.n+'</span></div>').join('')+'</div></div>'+
+    '<div class="sum-note">'+
+      (a.overseas?t('sum.overseas',{n:a.overseas})+'<br>':'')+
+      (a.weightKnown?t('sum.weight',{kg:(a.weight/1000).toFixed(a.weight<10000?2:1)})+'<br>':'')+
+      (a.estimated?t('sum.estimated')+'<br>':'')+
+      (a.noCount?t('sum.noCount',{n:a.noCount})+'<br>':'')+
+      t('sum.method')+
+    '</div>'+
+    '<div class="sum-acts">'+(sumScope?'<button class="sum-act main" onclick="shareReportLink()">'+t('rp.shareLink')+'</button>':'')+'<button class="sum-act'+(sumScope?'':' main')+'" onclick="shareSummaryImage()">'+t('sum.shareImg')+'</button><button class="sum-act" onclick="exportCheckCsv()">'+t('sum.exportCsv')+'</button><button class="sum-act" onclick="exportIccCsv()">'+t('sum.exportIcc')+'</button></div>'+
+    '<div class="sum-axis">'+t('axis.t')+'</div>';
+}
+
+
+// ── ごみの名前をそろえる（同じものが別々に数えられないように） ──
+const NAME_SYNONYMS=[
+  [/キャップ|ふた|蓋/,'ペットボトルのキャップ'],[/ペット\s*ボトル|PET\s*ボトル|ＰＥＴ/i,'PETボトル'],
+  [/吸い?殻|たばこ|タバコ|煙草|フィルター/,'たばこの吸い殻'],[/空き?缶|アルミ缶|スチール缶|飲料缶|缶/,'飲料缶'],
+  [/瓶|ビン|びん/,'ガラス瓶'],[/ボトル/,'PETボトル'],[/レジ袋|ビニール袋|ポリ袋/,'レジ袋'],[/包装|パッケージ|菓子袋|袋/,'食品の包装・袋'],
+  [/発泡/,'発泡スチロール片'],[/漁網|網/,'漁網'],[/ロープ|ひも|紐/,'ロープ・ひも'],[/ブイ|浮き|フロート/,'ブイ・浮き'],
+  [/釣り?糸|テグス/,'釣り糸'],[/ルアー|釣り?具|釣り?針/,'釣り具・ルアー'],[/ストロー/,'ストロー'],[/カップ/,'プラスチックカップ'],
+  [/トレー|弁当|容器/,'食品容器・トレー'],[/ライター/,'ライター'],[/花火/,'花火'],[/風船/,'風船'],[/マスク/,'マスク'],
+  [/フィルム/,'フィルム片'],[/破片|かけら|欠片/,'プラスチック破片']
+];
+function canonName(n){
+  const s=String(n||'').trim();
+  // 外国語表記などの補足は外して、種類でそろえる（例：ハングル表記のPETボトル → PETボトル）
+  for(const [re,name] of NAME_SYNONYMS) if(re.test(s)) return name;
+  return s;
+}
+
+// ── 答え合わせ用に書き出す（AIの判定の横に、人の判定を書き込む表） ──
+function csvCell(v){ v=String(v??''); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+function exportCheckCsv(){
+  const recs=summaryRecords().filter(r=>countsOf(r));
+  if(!recs.length){alert(t('sum.empty').replace('<br>','\n'));return;}
+  const head=[t('ck.date'),t('ck.cat'),t('ck.place'),t('ck.photo'),t('ck.id'),t('ck.item'),t('ck.aiCount'),t('ck.aiOrigin'),t('ck.humanCount'),t('ck.humanOrigin'),t('ck.match'),t('ck.diff')];
+  const rows=[head];
+  recs.forEach(r=>{
+    (countsOf(r).item_counts||[]).forEach(x=>{
+      const n=rows.length+1; // Excelの行番号
+      rows.push([fmtDate(r.photo_taken_at||r.created_at),normCat(r.category),r.location_name||'',r.image_url||'',r.id,canonName(x.name),x.count,x.origin,'','',
+        `=IF(J${n}="","",IF(J${n}=H${n},1,0))`,`=IF(I${n}="","",I${n}-G${n})`]);
+    });
+  });
+  const last=rows.length;
+  rows.push([]);
+  rows.push([t('ck.rate'),'','','','','','','','','',`=IFERROR(AVERAGE(K2:K${last}),"")`,'']);
+  rows.push([t('ck.checked'),'','','','','','','','','',`=COUNT(K2:K${last})`,'']);
+  rows.push([t('ck.how')]);
+  rows.push([t('ck.origins')]);
+  const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'umi_check_'+stamp+'.csv');
+}
+// ファイルを保存（スマホは共有シート、PCはダウンロード）
+async function saveBlob(blob,name){
+  try{
+    const f=new File([blob],name,{type:blob.type});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return;}
+  }catch(e){ if(e&&e.name==='AbortError') return; }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+}
+
+// ── 成果を1枚の画像に（そのまま社内や仲間に見せられる形） ──
+function summaryPlaceLabel(recs){
+  const c={};recs.forEach(r=>{const n=(r.location_name||'').trim();if(n)c[n]=(c[n]||0)+1;});
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];
+  return top?top[0]:'';
+}
+function summaryPeriodLabel(recs){
+  const ds=recs.map(r=>fmtDate(r.photo_taken_at||r.created_at)).filter(Boolean).sort();
+  if(!ds.length) return '';
+  return ds[0]===ds[ds.length-1]?ds[0]:ds[0]+' – '+ds[ds.length-1];
+}
+async function shareSummaryImage(){
+  const recs=summaryRecords().filter(r=>countsOf(r)), a=aggregate(recs);
+  if(!a.total){alert(t('sum.empty').replace('<br>','\n'));return;}
+  const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;
+  const g=c.getContext('2d');
+  const FONT='"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif';
+  const grad=g.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#0A2233');grad.addColorStop(1,'#04111C');
+  g.fillStyle=grad;g.fillRect(0,0,W,H);
+  const text=(s,x,y,size,color,weight,align)=>{g.font=(weight||400)+' '+size+'px '+FONT;g.fillStyle=color;g.textAlign=align||'left';g.fillText(s,x,y);};
+  const L=pct(a.land,a.total),S=pct(a.sea,a.total),U=Math.max(0,100-L-S);
+  text('umi',90,140,44,'#5FD3E6',300);
+  const place=summaryPlaceLabel(recs),period=summaryPeriodLabel(recs);
+  if(sumScope){
+    const m=scopeMeta(recs);
+    text(m.when||period,W-90,140,30,'rgba(255,255,255,.7)',400,'right');
+    text(m.title,90,200,34,'#fff',500);
+    text([m.sub,m.people!=null?t('act.people',{n:m.people}):''].filter(Boolean).join('　'),90,240,26,'rgba(255,255,255,.65)',400);
+  } else {
+    text([place,period].filter(Boolean).join('　'),W-90,140,30,'rgba(255,255,255,.7)',400,'right');
+  }
+  const oy=sumScope?70:0; // 活動の見出しがあるときは、本体を下げる
+  text(t('sum.q'),90,280+oy,40,'rgba(255,255,255,.85)',400);
+  text(t('sum.atLeast'),90,420+oy,46,'rgba(255,255,255,.9)',500);
+  g.font='600 220px '+FONT;const preW=(()=>{g.font='500 46px '+FONT;return g.measureText(t('sum.atLeast')).width;})();
+  text(String(L),90+preW+24,470+oy,220,'#FFAA44',600);
+  g.font='600 220px '+FONT;const numW=g.measureText(String(L)).width;
+  text('%',90+preW+24+numW+12,470+oy,80,'#FFAA44',500);
+  text(t('sum.heroSub',{total:a.total,photos:a.photos}),90,560+oy,34,'rgba(255,255,255,.75)',400);
+  // 帯グラフ
+  const bx=90,by=610+oy,bw=W-180,bh=34;let x=bx;
+  [[L,'#FFAA44'],[S,'#22CCEE'],[U,'rgba(255,255,255,.28)']].forEach(([p,col])=>{const w=bw*p/100;g.fillStyle=col;g.fillRect(x,by,w,bh);x+=w;});
+  const leg=[[t('origin.陸由来')+' '+a.land,'#FFAA44'],[t('origin.海上由来')+' '+a.sea,'#22CCEE'],[t('origin.判別できない')+' '+a.unknown,'rgba(255,255,255,.5)']];
+  let lx=bx;leg.forEach(([s_,col])=>{g.fillStyle=col;g.beginPath();g.arc(lx+10,by+bh+48,10,0,7);g.fill();text(s_,lx+30,by+bh+60,30,'rgba(255,255,255,.8)');g.font='400 30px '+FONT;lx+=g.measureText(s_).width+80;});
+  // 多かったごみ
+  text(t('sum.top'),90,820+oy,30,'rgba(170,221,238,.9)',500);
+  const top=Object.entries(a.items).sort((p,q)=>q[1].n-p[1].n).slice(0,4);
+  top.forEach(([name,v],i)=>{const y=880+oy+i*62;g.fillStyle=ORIGIN_COL[v.origin]||'rgba(255,255,255,.5)';g.beginPath();g.arc(100,y-12,10,0,7);g.fill();
+    text(name,128,y,36,'#fff');text('×'+v.n,W-90,y,36,'rgba(255,255,255,.75)',400,'right');});
+  // 軸
+  g.fillStyle='rgba(255,210,122,.35)';g.fillRect(90,1180,W-180,2);
+  text(t('axis.t'),W/2,1250,40,'#FFE3A8',500,'center');
+  text(t('sum.imgNote'),W/2,1305,22,'rgba(255,255,255,.45)',400,'center');
+  const blob=await new Promise(res=>c.toBlob(res,'image/png'));
+  const d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  await saveBlob(blob,'umi_summary_'+stamp+'.png');
+  return c; // テスト用
+}
+
+
+// ── 活動（団体・参加・主催）。個人での利用は、活動に参加しなくても今までどおり ──
+const ACT_KEY='umi_activity';
+function currentActivity(){
+  try{const a=JSON.parse(localStorage.getItem(ACT_KEY)||'null');if(a&&a.until>Date.now())return a;}catch(e){}
+  return null;
+}
+function setCurrentActivity(a){
+  try{ if(a) localStorage.setItem(ACT_KEY,JSON.stringify(a)); else localStorage.removeItem(ACT_KEY); }catch(e){}
+  updateActChip();
+}
+function updateActChip(){
+  const a=currentActivity(),app=document.getElementById('app');
+  if(app) app.classList.toggle('in-act',!!a);
+  const el=document.getElementById('act-chip-t');
+  if(el&&a) el.textContent=t('act.joining')+'：'+a.name;
+}
+// コードで参加（参加者は団体に入らなくてよい。開始から24時間は参加中のまま）
+async function joinActivity(code,silent){
+  const res=await api('activity_join',{code});
+  if(res.error){ if(!silent) alert(tv(res.error)); return false; }
+  const a=res.activity, start=new Date(a.starts_at||Date.now()).getTime();
+  setCurrentActivity({id:a.id,name:a.name,code:a.join_code,place:a.place_name||'',org:a.org_name||'',until:Math.max(start,Date.now())+24*3600e3});
+  return true;
+}
+function leaveActivity(){ setCurrentActivity(null); renderActivity(); }
+// QRコードやリンクで開いたとき（?join=コード）は、ログイン後に自動で参加
+function pendingJoinFromUrl(){
+  try{
+    const u=new URL(location.href),c=u.searchParams.get('join');
+    if(c){sessionStorage.setItem('umi_join',c);u.searchParams.delete('join');history.replaceState(null,'',u.pathname+u.search+u.hash);}
+  }catch(e){}
+}
+pendingJoinFromUrl();
+async function consumePendingJoin(){
+  let c=null;try{c=sessionStorage.getItem('umi_join');sessionStorage.removeItem('umi_join');}catch(e){}
+  if(c&&await joinActivity(c,true)){ const a=currentActivity(); if(a) toast(t('act.joined',{name:a.name})); }
+}
+function joinUrl(code){ return location.origin+location.pathname+'?join='+encodeURIComponent(code); }
+function qrHtml(text){
+  try{ const q=qrcode(0,'M'); q.addData(text); q.make(); return q.createImgTag(6,0); }catch(e){ return ''; }
+}
+function toast(msg){
+  let el=document.getElementById('toast');
+  if(!el){el=document.createElement('div');el.id='toast';el.style.cssText='position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 160px);transform:translateX(-50%);z-index:6000;padding:10px 16px;border-radius:14px;background:rgba(6,22,36,.92);border:1px solid rgba(255,210,122,.5);color:#fff;font-size:13px;max-width:86%;text-align:center;transition:opacity .4s';document.body.appendChild(el);}
+  el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0';},3200);
+}
+
+let actMine={orgs:[],activities:[]}, actShowForm=false, actCreated=null;
+async function openActivity(){ document.getElementById('actv').classList.add('show'); renderActivity(); await refreshMine(); }
+function closeActivity(){ document.getElementById('actv').classList.remove('show'); actShowForm=false; actCreated=null; }
+async function refreshMine(){ const r=await api('mine'); if(!r.error){actMine=r;renderActivity();} }
+function fmtTime(iso){ if(!iso)return ''; const d=new Date(iso); return isNaN(d)?'':String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function actLine(a){ return [a.org_name||orgName(a.org_id),a.place_name,fmtDate(a.starts_at)].filter(Boolean).map(esc).join(' ・ '); }
+function orgName(id){ const o=(actMine.orgs||[]).find(o=>o.id===id); return o?o.name:''; }
+function renderActivity(){
+  const box=document.getElementById('act-body'); if(!box) return;
+  const cur=currentActivity();
+  let h='';
+  // 作った直後：コードとQRを大きく
+  if(actCreated){
+    const a=actCreated;
+    h+='<div class="act-card"><div class="act-sub">'+t('act.created')+'</div><div class="act-name">'+esc(a.name)+'</div>'+
+       '<div class="act-code">'+esc(a.join_code)+'</div><div class="act-qr">'+qrHtml(joinUrl(a.join_code))+'</div>'+
+       '<div class="act-sub" style="text-align:center">'+t('act.qrHint')+'</div>'+
+       '<div class="act-btns"><button class="act-btn" onclick="copyText(\''+esc(joinUrl(a.join_code))+'\')">'+t('act.copyLink')+'</button></div></div>';
+  }
+  // 参加中
+  if(cur){
+    h+='<div class="act-card"><div class="act-sub">'+t('act.joining')+'</div><div class="act-name">'+esc(cur.name)+'</div>'+
+       '<div class="act-sub">'+[cur.org,cur.place].filter(Boolean).map(esc).join(' ・ ')+'</div>'+
+       '<div class="act-sub">'+t('act.joinNote')+'</div>'+
+       '<div class="act-btns"><button class="act-btn main" onclick="openReport(\'activity\',\''+cur.id+'\')">'+t('act.report')+'</button><button class="act-btn warn" onclick="leaveActivity()">'+t('act.leave')+'</button></div></div>';
+  } else {
+    h+='<div class="sum-h">'+t('act.joinH')+'</div><div class="act-in"><input id="act-code" maxlength="8" placeholder="ABC234" autocomplete="off"><button class="act-btn main" onclick="joinByInput()">'+t('act.join')+'</button></div><div class="act-err" id="act-err"></div>'+
+       '<div class="act-sub" style="margin-bottom:14px">'+t('act.personal')+'</div>';
+  }
+  // 主催する
+  h+='<div class="sum-sec"><div class="sum-h">'+t('act.hostH')+'</div>';
+  if(actShowForm){
+    const d=new Date(), def=t('act.defName',{m:d.getMonth()+1,d:d.getDate()});
+    h+='<div class="act-form"><label>'+t('act.name')+'</label><input id="af-name" value="'+esc(def)+'">'+
+       '<label>'+t('act.place')+'</label><input id="af-place" placeholder="'+esc(t('act.placePh'))+'">'+
+       '<label>'+t('act.org')+'</label><select id="af-org"><option value="">'+t('act.noOrg')+'</option>'+(actMine.orgs||[]).map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>').join('')+'</select>'+
+       '<div class="act-btns"><button class="act-btn main" onclick="createActivity()">'+t('act.create')+'</button><button class="act-btn" onclick="actShowForm=false;renderActivity()">'+t('act.cancel')+'</button></div><div class="act-err" id="af-err"></div></div>';
+  } else {
+    h+='<div class="act-btns" style="margin-top:0"><button class="act-btn main" onclick="actShowForm=true;actCreated=null;renderActivity()">'+t('act.new')+'</button></div>';
+  }
+  // 自分の活動
+  const acts=actMine.activities||[];
+  if(acts.length){
+    h+='<div class="act-list" style="margin-top:12px">'+acts.map(a=>
+      '<div class="act-card plain"><div class="act-name">'+esc(a.name)+'</div><div class="act-sub">'+actLine(a)+'</div>'+
+      '<div class="act-sub">'+t('act.code')+' <b style="letter-spacing:.12em">'+esc(a.join_code)+'</b>'+(a.participants!=null?' ・ '+t('act.people',{n:a.participants}):'')+(a.ends_at?' ・ '+t('act.ended'):'')+'</div>'+
+      '<div class="act-btns"><button class="act-btn" onclick="openReport(\'activity\',\''+a.id+'\')">'+t('act.report')+'</button><button class="act-btn" onclick="showCode(\''+a.id+'\')">'+t('act.showCode')+'</button><button class="act-btn" onclick="finishActivity(\''+a.id+'\')">'+t('act.finish')+'</button></div></div>').join('')+'</div>';
+  }
+  h+='</div>';
+  // 団体
+  h+='<div class="sum-sec"><div class="sum-h">'+t('act.orgH')+'</div>';
+  (actMine.orgs||[]).forEach(o=>{
+    h+='<div class="act-card plain"><div class="act-name">'+esc(o.name)+'</div><div class="act-sub">'+t('act.staffCode')+' <b style="letter-spacing:.12em">'+esc(o.staff_code)+'</b></div>'+
+       '<div class="act-btns"><button class="act-btn" onclick="openReport(\'org\',\''+o.id+'\')">'+t('act.orgReport')+'</button><button class="act-btn" onclick="addMeasure(\''+o.id+'\')">'+t('ms.add')+'</button></div></div>';
+  });
+  h+='<div class="act-btns"><button class="act-btn" onclick="createOrg()">'+t('act.newOrg')+'</button><button class="act-btn" onclick="joinOrg()">'+t('act.joinOrg')+'</button></div>'+
+     '<div class="act-sub" style="margin-top:8px">'+t('act.orgNote')+'</div></div>';
+  box.innerHTML=h;
+}
+async function joinByInput(){
+  const v=document.getElementById('act-code').value, err=document.getElementById('act-err');
+  err.textContent='';
+  const res=await api('activity_join',{code:v});
+  if(res.error){err.textContent=tv(res.error);return;}
+  await joinActivity(v,true); toast(t('act.joined',{name:res.activity.name})); renderActivity();
+}
+async function createActivity(){
+  const name=document.getElementById('af-name').value.trim(), place=document.getElementById('af-place').value.trim(), org=document.getElementById('af-org').value;
+  const res=await api('activity_create',{name,place_name:place,org_id:org||null});
+  if(res.error){document.getElementById('af-err').textContent=tv(res.error);return;}
+  actCreated=res.activity; actShowForm=false;
+  await joinActivity(res.activity.join_code,true); // 作った人も参加中に
+  await refreshMine();
+}
+function showCode(id){ actCreated=(actMine.activities||[]).find(a=>a.id===id)||null; actShowForm=false; renderActivity(); document.getElementById('actv').scrollTop=0; }
+async function finishActivity(id){
+  const a=(actMine.activities||[]).find(x=>x.id===id); if(!a) return;
+  let v=prompt(t('act.askPeople'),a.participants!=null?a.participants:'');
+  while(v!==null&&!/^\s*[1-9]\d{0,4}\s*$/.test(v)) v=prompt(t('act.askPeopleAgain'),'');
+  if(v===null) return;
+  const res=await api('activity_update',{id,participants:Number(v),ends_at:a.ends_at||new Date().toISOString()});
+  if(res.error){alert(tv(res.error));return;}
+  await refreshMine();
+}
+// 取り組み（陸側でした対策）を記録
+async function addMeasure(orgId){
+  const title=prompt(t('ms.askTitle')); if(!title) return;
+  const d=new Date(), today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const day=prompt(t('ms.askDate'),today); if(!day) return;
+  const res=await api('measure_create',{org_id:orgId,title,started_on:day});
+  if(res.error){alert(tv(res.error));return;}
+  toast(t('ms.saved'));
+}
+async function createOrg(){
+  const n=prompt(t('act.askOrg')); if(!n) return;
+  const res=await api('org_create',{name:n}); if(res.error){alert(tv(res.error));return;}
+  await refreshMine();
+}
+async function joinOrg(){
+  const c=prompt(t('act.askStaff')); if(!c) return;
+  const res=await api('org_join',{code:c}); if(res.error){alert(tv(res.error));return;}
+  await refreshMine();
+}
+function copyText(s){ try{navigator.clipboard.writeText(s);toast(t('act.copied'));}catch(e){prompt('',s);} }
+
+// ── 活動・団体のレポート（集計画面を、その活動の記録だけに絞って開く） ──
+let sumScope=null;
+async function loadScope(type,id){
+  if(type==='org'){
+    const r=await api('org_info',{id}); if(r.error) return null;
+    return {type,id,ids:r.activities.map(a=>a.id),acts:r.activities,measures:r.measures||[],orgName:r.org.name};
+  }
+  const r=await api('activity_info',{ids:[id]}); if(r.error||!r.activities.length) return null;
+  return {type,id,ids:[id],acts:r.activities,measures:[],orgName:r.activities[0].org_name||''};
+}
+async function openReport(type,id){
+  const sc=await loadScope(type,id);
+  if(!sc){alert(t('rp.notFound'));return;}
+  sumScope=sc;
+  closeActivity();
+  openSummary();
+}
+// 経営者などに送るレポートのリンク（ログインなしで、読むだけの画面が開く）
+function reportUrl(){ return location.origin+location.pathname+'?report='+(sumScope.type==='org'?'o':'a')+'.'+sumScope.id+'&lang='+LANG; }
+async function shareReportLink(){
+  const url=reportUrl(), title=scopeMeta(summaryRecords()).title;
+  try{ if(navigator.share){ await navigator.share({title:'umi — '+title,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  copyText(url);
+}
+// リンクから開いたとき：ログイン画面を出さずに、レポートだけを表示
+let reportMode=false;
+async function bootReportMode(){
+  let p=null; try{p=new URL(location.href).searchParams.get('report');}catch(e){}
+  if(!p||!/^[ao]\.[0-9a-zA-Z-]{1,64}$/.test(p)) return false;
+  reportMode=true;
+  // 送った人と同じ言語で開く（受け取った人の端末の設定は変えない）
+  try{const l=new URL(location.href).searchParams.get('lang');if(l==='ja'||l==='en'){LANG=l;applyI18nStatic();}}catch(e){}
+  document.getElementById('sumv').querySelector('.sheet-x').insertAdjacentHTML('beforebegin','<div class="lang-seg rp-lang" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="LANG=\'ja\';applyI18nStatic();renderSummary()">JA</button><button type="button" data-lang="en" onclick="LANG=\'en\';applyI18nStatic();renderSummary()">EN</button></div>');
+  applyI18nStatic();
+  document.getElementById('ob').style.display='none';
+  document.body.classList.add('report-mode');
+  const [type,id]=[p[0]==='o'?'org':'activity',p.slice(2)];
+  const [sc,list]=await Promise.all([loadScope(type,id),api('list')]);
+  window.allRecords=(list&&list.records)||[];
+  if(!sc){ document.getElementById('sum-body').innerHTML='<div class="sum-empty">'+t('rp.notFound')+'</div>'; document.getElementById('sumv').classList.add('show'); return true; }
+  sumScope=sc;
+  openSummary();
+  return true;
+}
+
+
+// ── 変化を見る（同じ場所・同じ団体で、陸由来がどう変わったか） ──
+// 量は拾った人数や時間で変わるので、比べるのは「陸由来の割合」と、人数が分かるときの「1人あたりの陸由来の個数」
+function trendGroups(recs){
+  const groups=new Map();
+  const byAct=!!(sumScope&&sumScope.type==='org');
+  recs.forEach(r=>{
+    const c=countsOf(r); if(!c) return;
+    let key,label,date,people=null;
+    if(byAct){
+      const a=(sumScope.acts||[]).find(x=>x.id===r.activity_id); if(!a) return;
+      key=a.id; label=a.name; date=a.starts_at; people=a.participants;
+    } else {
+      const d=new Date(r.photo_taken_at||r.created_at); if(isNaN(d)) return;
+      key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); label=LANG==='en'?key:(d.getFullYear()+'年'+(d.getMonth()+1)+'月'); date=key+'-01';
+    }
+    if(!groups.has(key)) groups.set(key,{key,label,date,people,total:0,land:0});
+    const g=groups.get(key);
+    (c.item_counts||[]).forEach(x=>{const n=Number(x.count)||0;g.total+=n;if(x.origin==='陸由来')g.land+=n;});
+  });
+  return [...groups.values()].filter(g=>g.total>0).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+}
+function trendHtml(recs){
+  const gs=trendGroups(recs);
+  if(gs.length<2) return '';
+  const usePeople=gs.every(g=>g.people);
+  const ms=(sumScope&&sumScope.measures)||[];
+  const shown=gs.slice(-8);
+  const rows=shown.map((g,i)=>{
+    const prev=i?shown[i-1]:null;
+    const marks=ms.filter(m=>String(m.started_on)<=String(g.date).slice(0,10)&&(!prev||String(m.started_on)>String(prev.date).slice(0,10)));
+    return marks.map(m=>'<div class="tr-mark">'+t('ms.mark',{t:esc(m.title)})+'</div>').join('')+trRow(g);
+  }).join('');
+  function trRow(g){
+    const p=pct(g.land,g.total), per=usePeople?(g.land/g.people):null;
+    return '<div class="tr-row"><div class="tr-l">'+esc(g.label)+'</div><div class="tr-bar"><span style="width:'+p+'%"></span></div>'+
+      '<div class="tr-v">'+p+'%<small>'+(per!=null?t('tr.perPerson',{n:per.toFixed(1)}):t('cnt.total',{n:g.total}))+'</small></div></div>';
+  }
+  const f=gs[0], l=gs[gs.length-1], d=pct(l.land,l.total)-pct(f.land,f.total);
+  let change=t('tr.share',{a:pct(f.land,f.total),b:pct(l.land,l.total),d:(d>0?'+':'')+d});
+  if(usePeople){ const a=f.land/f.people,b=l.land/l.people; change+='<br>'+t('tr.per',{a:a.toFixed(1),b:b.toFixed(1),r:a?Math.round((b-a)/a*100):0}); }
+  return '<div class="sum-sec"><div class="sum-h">'+t(sumScope&&sumScope.type==='org'?'tr.titleAct':'tr.titleMonth')+'</div>'+rows+
+    '<div class="tr-change">'+change+'</div><div class="sum-note" style="margin-top:6px">'+t(usePeople?'tr.notePeople':'tr.noteNoPeople')+'</div></div>';
+}
+
+
+// ── 取り組みの前後で、陸由来がどう変わったか ──
+// 比べるのは「1人あたりの陸由来の個数」（人数が分からない回があるときは割合）
+function measuresHtml(recs){
+  if(!sumScope||sumScope.type!=='org'||!(sumScope.measures||[]).length) return '';
+  const gs=trendGroups(recs);
+  const usePeople=gs.length&&gs.every(g=>g.people);
+  const val=list=>{
+    if(!list.length) return null;
+    const land=list.reduce((n,g)=>n+g.land,0), total=list.reduce((n,g)=>n+g.total,0), people=list.reduce((n,g)=>n+(g.people||0),0);
+    return usePeople?(people?land/people:null):(total?land/total*100:null);
+  };
+  const fmt=v=>usePeople?t('ms.perPerson',{n:v.toFixed(1)}):Math.round(v)+'%';
+  const rows=sumScope.measures.map(m=>{
+    const d=String(m.started_on);
+    const before=gs.filter(g=>String(g.date).slice(0,10)<d), after=gs.filter(g=>String(g.date).slice(0,10)>=d);
+    const b=val(before), a=val(after);
+    let res;
+    if(b==null) res=t('ms.noBefore');
+    else if(a==null) res=t('ms.noAfter');
+    else { const r=b?Math.round((a-b)/b*100):0; res=fmt(b)+' → '+fmt(a)+'<b class="'+(r<0?'ms-good':'ms-bad')+'">（'+(r>0?'+':'')+r+'%）</b>'; }
+    return '<div class="ms-row"><div class="ms-t">'+esc(m.title)+'</div><div class="ms-d">'+t('ms.since',{d:esc(d)})+(m.note?' ・ '+esc(m.note):'')+'</div><div class="ms-v">'+t('ms.beforeAfter')+'：'+res+'</div></div>';
+  }).join('');
+  return '<div class="sum-sec"><div class="sum-h">'+t('ms.title')+'</div>'+rows+'<div class="sum-note" style="margin-top:6px">'+t(usePeople?'ms.note':'ms.noteShare')+'</div></div>';
+}
+
+// ── 国際分類（ICC：国際海岸クリーンアップのデータカード）で書き出す ──
+// アプリの標準の名前 → ICCの項目。当てはまらないものは「その他」にまとめる
+const ICC_MAP={
+  'PETボトル':['Beverage Bottles (Plastic)','飲料ボトル（プラスチック）'],
+  'ペットボトルのキャップ':['Bottle Caps (Plastic)','キャップ（プラスチック）'],
+  '飲料缶':['Beverage Cans','飲料缶'],
+  'ガラス瓶':['Beverage Bottles (Glass)','飲料ボトル（ガラス）'],
+  '食品の包装・袋':['Food Wrappers (candy, chips, etc.)','食品の包装'],
+  'レジ袋':['Grocery Bags (Plastic)','レジ袋（プラスチック）'],
+  'プラスチックカップ':['Cups & Plates (Plastic)','カップ・皿（プラスチック）'],
+  'ストロー':['Straws/Stirrers','ストロー・マドラー'],
+  '食品容器・トレー':['Take Out/Away Containers (Plastic)','持ち帰り容器（プラスチック）'],
+  'たばこの吸い殻':['Cigarette Butts','たばこの吸い殻'],
+  '漁網':['Fishing Net & Pieces','漁網・その破片'],
+  'ロープ・ひも':['Rope (1 yard/meter = 1 piece)','ロープ（1m＝1個）'],
+  'ブイ・浮き':['Fishing Buoys, Pots & Traps','漁業用の浮き・かご・わな'],
+  '釣り糸':['Fishing Line (1 yard/meter = 1 piece)','釣り糸（1m＝1個）'],
+};
+function iccItem(x){
+  const n=canonName(x.name);
+  if(n==='食品容器・トレー'&&/発泡/.test(String(x.material||'')+String(x.name||''))) return ['Take Out/Away Containers (Foam)','持ち帰り容器（発泡）'];
+  return ICC_MAP[n]||['Other (not on ICC card)','その他（ICCの項目外）'];
+}
+function exportIccCsv(){
+  const recs=summaryRecords().filter(r=>countsOf(r));
+  if(!recs.length){alert(t('sum.empty').replace('<br>','\n'));return;}
+  const tally=new Map();
+  recs.forEach(r=>(countsOf(r).item_counts||[]).forEach(x=>{
+    const [en,ja]=iccItem(x), k=en;
+    if(!tally.has(k)) tally.set(k,{en,ja,n:0,names:new Set()});
+    const g=tally.get(k); g.n+=Number(x.count)||0; g.names.add(canonName(x.name));
+  }));
+  const m=sumScope?scopeMeta(recs):null;
+  const people=m&&m.people!=null?m.people:'';
+  const rows=[
+    ['International Coastal Cleanup — summary by umi'],
+    [t('icc.site'),m?(m.title+(m.sub?' / '+m.sub:'')):summaryPlaceLabel(recs)],
+    [t('icc.date'),m?m.when:summaryPeriodLabel(recs)],
+    [t('icc.people'),people],
+    [t('icc.photos'),recs.length],
+    [],
+    ['ICC item','項目（日本語）',t('icc.count'),t('icc.from')],
+  ];
+  [...tally.values()].sort((a,b)=>b.n-a.n).forEach(g=>rows.push([g.en,g.ja,g.n,[...g.names].join(' / ')]));
+  rows.push([]);
+  rows.push([t('icc.note')]);
+  const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'umi_icc_'+stamp+'.csv');
+}
+
+// ── 撮り方の案内（初めての人には自動で1回表示） ──
+function renderGuide(){
+  const step=(n,k)=>'<div class="guide-step"><div class="guide-n">'+n+'</div><div><div class="guide-t">'+t(k+'.t')+'</div><div class="guide-d">'+t(k+'.d')+'</div></div></div>';
+  document.getElementById('guide-body').innerHTML=step(1,'g1')+step(2,'g2')+step(3,'g3')+'<div class="guide-warn">'+t('g.warn')+'</div>';
+}
+function openGuide(){ renderGuide(); document.getElementById('guidev').classList.add('show'); }
+function closeGuide(){ document.getElementById('guidev').classList.remove('show'); try{localStorage.setItem('umi_guided','1');}catch(e){} }
+function maybeShowGuide(){ let seen=null; try{seen=localStorage.getItem('umi_guided');}catch(e){} if(!seen) openGuide(); }
 
 // ── 地図操作ツール（右側：拡大・縮小・全体表示） ──
 function addMapTools(){
@@ -1123,6 +1931,23 @@ function shown(v){
   return v!=null&&v!==''&&!['不明','推定不能','読取不可','その他'].includes(String(v).trim());
 }
 
+// ── 「何が・何個・どこから」の表示（確認画面とポップアップで共通） ──
+const ORIGIN_COL={'陸由来':'#FFAA44','海上由来':'#22CCEE','判別できない':'rgba(255,255,255,.45)'};
+function countsOf(r){ const a=r&&(r.analysis_json||r); return a&&a.counts&&a.counts.total?a:null; }
+// 合計と内訳の1行（例：合計12個 ｜ 陸由来 9・海上 1・判別できない 2）
+function countsSummaryHtml(a){
+  const c=a.counts;
+  const part=(k,n)=>n?`<span style="color:${ORIGIN_COL[k]}">${esc(t('origin.'+k))} ${n}</span>`:'';
+  const parts=[part('陸由来',c.land),part('海上由来',c.sea),part('判別できない',c.unknown)].filter(Boolean).join(LANG==='en'?' · ':' ・ ');
+  return `<div class="cnt-sum"><b>${t('cnt.total',{n:c.total})}${c.estimated?t('cnt.approx'):''}</b><span class="cnt-parts">${parts}</span></div>`;
+}
+// 種類ごとの一覧（色の点で由来を示す）
+function countsListHtml(a,max){
+  const list=(a.item_counts||[]).slice(0,max||99);
+  const more=(a.item_counts||[]).length-list.length;
+  return '<div class="cnt-list">'+list.map(x=>`<div class="cnt-row"><span class="cnt-dot" style="background:${ORIGIN_COL[x.origin]||ORIGIN_COL['判別できない']}" title="${esc(t('origin.'+(x.origin||'判別できない')))}"></span><span class="cnt-name">${esc(x.name)}${x.overseas?` <span class="cnt-os">${t('cnt.overseas')}</span>`:''}</span><span class="cnt-n">×${x.count}${x.estimated?'~':''}</span></div>`).join('')+(more>0?`<div class="cnt-more">${t('cnt.more',{n:more})}</div>`:'')+'</div>';
+}
+
 // ── 写真の全画面表示 ──
 function openPhoto(src){
   const v=document.getElementById('photo-viewer');
@@ -1216,7 +2041,7 @@ function addPin(r){
         </div>
         <div class="umi-pop-div"></div>
         <div class="umi-pop-label">${t('pop.items')}</div>
-        <div class="umi-pop-items">${items||'—'}</div>
+        ${countsOf(r)?countsSummaryHtml(countsOf(r))+countsListHtml(countsOf(r),5):`<div class="umi-pop-items">${items||'—'}</div>`}
         ${summary?`<div class="umi-pop-label">${t('pop.comment')}</div><div class="umi-pop-comment">${summary}</div>`:''}
         <div class="umi-pop-nums">
           <div class="umi-pop-num">
@@ -1413,7 +2238,10 @@ function startApp(){
   }
   initNav();
   startSpecTips();
-  applyWallpaper(); // 画面の大きさが決まってから帯の高さを合わせる
+  applyWallpaper();
+  maybeShowGuide(); // 初めての人には撮り方を案内
+  updateActChip();
+  consumePendingJoin(); // QRコードから開いた人は、その活動に参加 // 画面の大きさが決まってから帯の高さを合わせる
   if(preloaded&&needReload){
     needReload=false;
     if(lmap) lmap.invalidateSize();
@@ -1443,43 +2271,63 @@ let photoTakenAt=null;
 
 function onFile(input){
   if(!input.files[0]) return;
-  capturedBlob=input.files[0];
-  userLat=null;userLng=null;photoTakenAt=null; // 前の写真の位置・日時を使い回さない
-  const rd=new FileReader();
-  rd.onload=async e=>{
-    capturedUrl=e.target.result;
-    const [loc,dt]=await Promise.all([
-      extractGPS(input.files[0]),
-      extractPhotoDate(input.files[0])
-    ]);
-    if(loc){userLat=loc.lat;userLng=loc.lng;}
-    photoTakenAt=dt;
-    closeCam();
-    input.value=''; // 同じ写真をもう一度選べるように
-    analyze();
-  };
-  rd.readAsDataURL(input.files[0]);
+  const file=input.files[0];
+  capturedBlob=file;
+  userLat=null;userLng=null;photoTakenAt=null;photoIssue=null; // 前の写真の情報を使い回さない
+  input.value=''; // 同じ写真をもう一度選べるように
+  readPhotoMeta(file).then(meta=>{
+    photoIssue=meta.issue;
+    if(meta.gps){userLat=meta.gps.lat;userLng=meta.gps.lng;}
+    photoTakenAt=meta.date;
+    if(meta.issue==='heic'||meta.issue==='notimage'){closeCam();alert(t('an.'+meta.issue));return;}
+    const rd=new FileReader();
+    rd.onload=e=>{capturedUrl=e.target.result;closeCam();analyze();};
+    rd.readAsDataURL(file);
+  });
 }
 
-// ── EXIF GPS ──
-async function extractGPS(file){
+// ── 写真の情報（位置・撮影日）を読む。読めない理由も返す ──
+// issue: null=問題なし / 'heic'=HEIC形式 / 'notimage'=画像でない / 'noexif'=写真情報なし / 'nogps'=位置情報なし / 'zero'=位置が0,0
+let photoIssue=null;
+function readPhotoMeta(file){
   return new Promise(resolve=>{
+    const done=(o)=>resolve(Object.assign({gps:null,date:null,issue:null},o));
+    const name=(file.name||'').toLowerCase(), type=(file.type||'').toLowerCase();
+    if(type.includes('heic')||type.includes('heif')||/\.(heic|heif)$/.test(name)) return done({issue:'heic'});
+    if(type&&!type.startsWith('image/')) return done({issue:'notimage'});
     const rd=new FileReader();
     rd.onload=e=>{
       try{
-        const view=new DataView(e.target.result);
-        if(view.getUint16(0)!==0xFFD8){resolve(null);return;}
-        let off=2;
+        const buf=e.target.result, view=new DataView(buf);
+        if(view.byteLength<4||view.getUint16(0)!==0xFFD8){
+          // JPEG以外（PNGのスクリーンショットなど）。HEICの中身かどうかも確認
+          const head=String.fromCharCode(...new Uint8Array(buf.slice(4,12)));
+          return done({issue:/ftyp(heic|heix|mif1|msf1|hevc)/.test(head)?'heic':'noexif'});
+        }
+        // JPEGの中の情報ブロックを順に見て、Exif（写真情報）を探す。XMPなど別のブロックは飛ばす
+        let off=2, gps=null, date=null, exif=false;
         while(off<view.byteLength-4){
-          const mk=view.getUint16(off);
-          const sz=view.getUint16(off+2);
-          if(mk===0xFFE1){resolve(parseGPS(view.buffer.slice(off+4,off+2+sz)));return;}
+          const mk=view.getUint16(off), sz=view.getUint16(off+2);
+          if(mk===0xFFDA||mk===0xFFD9) break;            // 画像本体に入ったら終わり
+          if(mk===0xFFE1){
+            const blk=buf.slice(off+4,off+2+sz);
+            const h=new Uint8Array(blk.slice(0,4));
+            if(String.fromCharCode(...h)==='Exif'){
+              exif=true;
+              gps=gps||parseGPS(blk);
+              date=date||parseDateFromExif(blk);
+            }
+          }
           if(sz<2) break;
           off+=2+sz;
         }
-        resolve(null);
-      }catch(e){resolve(null);}
+        if(!exif) return done({issue:'noexif'});
+        if(!gps) return done({date,issue:'nogps'});
+        if(Math.abs(gps.lat)<0.0001&&Math.abs(gps.lng)<0.0001) return done({date,issue:'zero'});
+        done({gps,date});
+      }catch(err){done({issue:'noexif'});}
     };
+    rd.onerror=()=>done({issue:'notimage'});
     rd.readAsArrayBuffer(file);
   });
 }
@@ -1518,32 +2366,6 @@ function parseGPS(buf){
 }
 
 // ── EXIF 撮影日 ──
-async function extractPhotoDate(file){
-  return new Promise(resolve=>{
-    const rd=new FileReader();
-    rd.onload=e=>{
-      try{
-        const view=new DataView(e.target.result);
-        if(view.getUint16(0)!==0xFFD8){resolve(null);return;}
-        let off=2;
-        while(off<view.byteLength-4){
-          const mk=view.getUint16(off);
-          const sz=view.getUint16(off+2);
-          if(mk===0xFFE1){
-            const buf=e.target.result.slice(off+4,off+2+sz);
-            resolve(parseDateFromExif(buf));
-            return;
-          }
-          if(sz<2) break;
-          off+=2+sz;
-        }
-        resolve(null);
-      }catch(e){resolve(null);}
-    };
-    rd.readAsArrayBuffer(file);
-  });
-}
-
 function parseDateFromExif(buffer){
   try{
     const view=new DataView(buffer);
@@ -1619,13 +2441,15 @@ async function compressForStorage(dataUrl){
 
 // ── ANALYZE ──
 async function analyze(){
-  if(userLat==null||userLng==null){alert(t('an.noGps'));return;}
+  if(userLat==null||userLng==null){alert(t('an.'+(photoIssue==='noexif'?'noExif':photoIssue==='zero'?'zero':'noGps')));return;}
   showLoad(t('an.loading'));
   try{
     // 10MB制限対策：送信前に圧縮
     const compressed=await compressForAnalysis(capturedUrl);
     const b64=compressed.split(',')[1];
-    const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt})});
+    const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt,token:sessionToken})});
+    if(r.status===401){hideLoad();alert(t('an.needLogin'));return;}
+    if(r.status===413){hideLoad();alert(t('an.tooBig'));return;}
     if(!r.ok) throw new Error('AI解析失敗');
     analysisResult=await r.json();
     hideLoad();
@@ -1694,7 +2518,7 @@ function showConfirm(){
     </div>
     <div class="cs-row">
       <div class="cs-label">${t('cf.items')}</div>
-      <div class="cs-val">${esc(r.items||t('unknown')).replace(/\n/g,'<br>')}</div>
+      <div class="cs-val">${countsOf(r)?countsSummaryHtml(countsOf(r))+countsListHtml(countsOf(r)):esc(r.items||t('unknown')).replace(/\n/g,'<br>')}</div>
     </div>
     <div class="cs-row">
       <div class="cs-label">${t('pop.mp')}</div>
@@ -1771,6 +2595,7 @@ async function send(){
     const imgUrl=await upload(compBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
+      activity_id:(currentActivity()||{}).id||null,
       category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
       estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
