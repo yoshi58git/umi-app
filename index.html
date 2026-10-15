@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>umi</title>
+<title>motonoumi（元の海）</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -19,7 +19,8 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 
 /* ONBOARDING */
 #ob{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 28px) 28px calc(env(safe-area-inset-bottom,0px) + 28px);z-index:1000;background:linear-gradient(180deg,#0A3A6A 0%,#1A6A9A 30%,#3A9AC0 60%,#8CCFE8 80%,#1A4A6A 100%)}
-#ob-logo{font-size:32px;font-weight:300;letter-spacing:.2em;color:var(--foam);margin-bottom:20px;flex-shrink:0}
+#ob-logo{font-size:32px;font-weight:300;letter-spacing:.12em;color:var(--foam);margin-bottom:20px;flex-shrink:0;text-align:center}
+#ob-logo-sub{font-size:12px;letter-spacing:.3em;color:rgba(255,255,255,.7);margin-top:2px}
 #ob>*{flex-shrink:0}
 .ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:16px}
 .ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.25);border:1px solid rgba(170,221,238,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--foam)}
@@ -150,6 +151,21 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 .act-form select option{color:#000}
 .act-qr{display:flex;justify-content:center;margin:12px 0 4px}
 .act-qr img,.act-qr canvas{background:#fff;padding:8px;border-radius:10px;width:180px;height:180px;image-rendering:pixelated}
+.act-lead{font-size:13px;color:var(--foam);line-height:1.6;margin:-4px 0 14px}
+.act-choice{display:flex;flex-direction:column;gap:10px}
+.act-opt{padding:14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(170,221,238,.25)}
+.act-opt-t{font-size:16px;font-weight:600;margin-bottom:4px}
+.act-step-now{font-size:12px;font-weight:600;color:#FFD27A;letter-spacing:.04em;margin-bottom:2px}
+.act-next{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.06);font-size:12px;line-height:1.6;color:rgba(255,255,255,.85)}
+.act-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.act-st{flex-shrink:0;font-size:11px;padding:3px 8px;border-radius:10px;margin-top:2px}
+.st-open{background:rgba(255,210,122,.15);color:#FFD27A;border:1px solid rgba(255,210,122,.4)}
+.st-done{background:rgba(126,224,168,.12);color:#7EE0A8;border:1px solid rgba(126,224,168,.35)}
+.act-how{margin-top:16px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+.act-how summary{cursor:pointer;font-size:14px;font-weight:500;color:#fff;list-style-position:inside;padding:4px 0}
+.act-how ol{margin:8px 0 4px;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.act-how li{font-size:12px;line-height:1.6;color:rgba(255,255,255,.85)}
+.act-how li b{display:block;font-size:13px;color:#fff;font-weight:600}
 .act-err{font-size:12px;color:#FF9A8A;margin-top:6px;min-height:1em}
 .act-list .act-card{margin-bottom:8px}
 .sum-scope{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);margin-bottom:6px}
@@ -185,7 +201,9 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 
 /* HEADER */
 #hdr{position:relative;z-index:35;display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,16px) 20px 12px;background:linear-gradient(180deg,rgba(4,17,28,.95) 0%,transparent 100%)}
-#logo{font-size:22px;font-weight:300;letter-spacing:.15em;color:var(--foam);display:flex;align-items:center}
+#logo{font-size:19px;font-weight:300;letter-spacing:.04em;color:var(--foam);display:flex;align-items:center}
+#cnt-lbl{display:none!important} /* ニックネームはメニューの一番上に表示 */
+.wp-who{font-size:12px;color:var(--foam);padding:6px 12px 8px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* 壁紙 */
 /* 上部の帯（ヘッダー＋凡例）に写真を敷く。表示位置で写真のどの帯を見せるか選べる */
 #wp-layer{position:absolute;left:0;right:0;top:0;height:var(--hdr-h,96px);z-index:0;display:none;background-size:cover;background-repeat:no-repeat}
@@ -441,6 +459,11 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 .umi-pop-stakeholder{padding:8px 12px;border-radius:8px;background:rgba(26,122,154,.18);border:1px solid rgba(26,122,154,.35);margin-bottom:8px}
 .umi-pop-stakeholder-val{font-size:13px;color:#fff;line-height:1.5}
 .umi-pop-route{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5}
+#batch-stop{display:none;margin:4px auto 0;padding:8px 14px;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:12px;text-decoration:underline;cursor:pointer}
+.umi-pop-links{display:flex;flex-wrap:wrap;gap:6px}
+.umi-pop-link{display:inline-flex;align-items:center;gap:4px;padding:7px 11px;border-radius:12px;border:1px solid rgba(170,221,238,.35);color:#fff!important;text-decoration:none;font-size:12px}
+.umi-pop-link:active{background:rgba(255,255,255,.12)}
+.umi-pop-note{font-size:11px;color:rgba(255,255,255,.55);margin-top:6px;line-height:1.5}
 
 #camcanvas{display:none}
 #filein{display:none}
@@ -544,7 +567,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 <!-- ONBOARDING -->
 <div id="ob">
   <div id="ob-lang"><div class="lang-seg" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="setLang('ja')">JA</button><button type="button" data-lang="en" onclick="setLang('en')">EN</button></div></div>
-  <div id="ob-logo">umi</div>
+  <div id="ob-logo">motonoumi<div id="ob-logo-sub" data-i18n="app.sub">元の海</div></div>
 
   <!-- アプリの大事な仕様（中身は SPECS から自動で作る） -->
   <div id="ob-specs" style="width:100%;max-width:320px;margin-bottom:20px"></div>
@@ -553,7 +576,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
   <div id="ob-auth" style="width:100%;max-width:320px">
     <div style="margin-bottom:14px">
       <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px" data-i18n="auth.nick">ニックネーム</div>
-      <input id="inp-nick" type="text" placeholder="例: umi" data-i18n-ph="auth.nickPh" maxlength="20"
+      <input id="inp-nick" type="text" placeholder="例: shonan" data-i18n-ph="auth.nickPh" maxlength="20"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none">
     </div>
     <div style="margin-bottom:20px">
@@ -594,7 +617,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 <div id="app">
   <div id="wp-layer" aria-hidden="true"></div>
   <div id="hdr">
-    <div id="logo">umi<span id="cnt-lbl"></span>
+    <div id="logo">motonoumi<span id="cnt-lbl"></span>
       <button id="sum-btn" class="hdr-btn" type="button" onclick="openSummary()" aria-label="集計" title="集計" data-i18n-aria="sum.open">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="5"/><line x1="18" y1="20" x2="18" y2="9"/></svg>
       </button>
@@ -604,6 +627,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     </div>
     <!-- 壁紙メニュー -->
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
+      <div class="wp-who"><span data-i18n="me.who">ログイン中：</span><b id="wp-who-name"></b></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
@@ -687,6 +711,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     </div>
   </div>
   <div id="conf-summary"></div>
+  <button id="batch-stop" type="button" onclick="stopBatch()" data-i18n="batch.stop">まとめて記録をやめる</button>
   <div id="confbtns">
     <button id="btn-retry" onclick="retake()" data-i18n="cf.retry">やり直す</button>
     <button id="btn-send" onclick="send()" data-i18n="cf.send">記録する</button>
@@ -708,7 +733,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
   <button id="btn-back" onclick="backToMap()" data-i18n="dn.back">地図に戻る</button>
 </div>
 
-<input type="file" id="filein" accept="image/*" onchange="onFile(this)">
+<input type="file" id="filein" accept="image/*" multiple onchange="onFile(this)">
 
 <script>
 // ── 言語（日本語／英語）。文言はすべてここで管理 ──
@@ -719,7 +744,8 @@ ja:{
   'pin.change':'PINを変更','pin.askCur':'今のPINを入力してください','pin.askNew':'新しいPIN（数字6桁）を入力してください','pin.askNewAgain':'数字6桁で入力してください',
   'pin.askConfirm':'確認のため、新しいPINをもう一度入力してください','pin.mismatch':'2回の入力が一致しませんでした','pin.changed':'PINを変更しました',
   'pin.suggest':'安全のため、メニューからPINを6桁に変更してください',
-  'auth.nick':'ニックネーム','auth.nickPh':'例: umi','auth.pin':'PIN（数字6桁）','auth.pinNote':'PINは暗号化して保存します。忘れると再発行できません',
+  'app.sub':'元の海','me.who':'ログイン中：',
+  'auth.nick':'ニックネーム','auth.nickPh':'例: shonan','auth.pin':'PIN（数字6桁）','auth.pinNote':'PINは暗号化して保存します。忘れると再発行できません',
   'auth.start':'はじめる','auth.register':'新規登録','auth.login':'ログイン','auth.first':'はじめて？ ','auth.have':'アカウントあり？ ',
   'auth.needNick':'ニックネームを入力してください','auth.pin4':'PINは4桁の数字です','auth.checking':'確認中...','auth.error':'エラーが発生しました。もう一度お試しください。',
   'net.error':'通信エラー','net.errorCode':'通信エラー（{n}）',
@@ -735,6 +761,13 @@ ja:{
   's2.t':'正確な位置は、あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
   's3.t':'写真はみんなに公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
   's4.t':'AIがごみを解析','s4.d':'素材や発生源を推定し、根拠と確信度を添えて記録します',
+  'batch.reading':'写真を読み込んでいます...','batch.confirm':'{n}枚を、撮影日の古い順に1枚ずつ解析します。確認画面で「記録する」か「とばす」を選ぶと、次の写真に進みます。',
+  'batch.noLocLine':'位置情報のない写真 {n}枚は、とばします','batch.over':'一度に選べるのは{max}枚までです（{n}枚は対象外）',
+  'batch.none':'選んだ{n}枚には、位置情報のある写真がありませんでした。','batch.progress':'{i}/{n}枚目','batch.skip':'この写真をとばす','batch.stop':'まとめて記録をやめる',
+  'batch.saved':'記録しました（{i}/{n}）','batch.noTrash':'{i}枚目はごみが見つからなかったので、とばしました','batch.failOne':'{i}枚目は解析できなかったので、とばしました',
+  'batch.done':'まとめて記録が終わりました。\n記録：{saved}枚　とばした：{skipped}枚',
+  'pop.around':'この地点の周りを見る','pop.openMap':'Googleマップ（航空写真）','pop.openGsi':'地理院地図（川・地形）',
+  'pop.blurNote':'ほかの人の記録なので、約300mぼかした位置で開きます',
   'pop.stake':'改善に取り組める主体','pop.route':'推定排出経路','pop.items':'見つかったごみ','pop.comment':'AIのコメント',
   'pop.mp':'MPリスク','pop.years':'粒子化まで','pop.weight':'推定質量','pop.weightVal':'約{n}g',
   'an.noGps':'この写真には位置情報が含まれていません。\n\nスマホのカメラの位置情報をオンにして撮影した写真を選んでください。\n（このアプリはスマホの現在地を使わず、写真の位置情報だけを使います）',
@@ -780,6 +813,20 @@ ja:{
   'sum.exportIcc':'国際分類（ICC）で書き出す（CSV）','icc.site':'場所・活動','icc.date':'日付','icc.people':'参加人数','icc.photos':'写真の枚数',
   'icc.count':'個数','icc.from':'アプリでの名前',
   'icc.note':'国際海岸クリーンアップ（ICC）のデータカードの項目に読み替えた集計です。AIが写真から数えた値で、ICCの項目にないものは「その他」にまとめています',
+  'ax.lead':'みんなで拾う日（ビーチクリーンなど）の記録を、ひとつにまとめる機能です。まとめると、その日の「何割が陸から来たか」をレポートにできます。',
+  'ax.joinT':'参加する','ax.joinD':'主催者から聞いた6文字のコードを入れてください。主催者のQRを読み取った人は、もう参加しています。',
+  'ax.hostT':'主催する','ax.hostD':'みんなの記録をまとめる「活動」を作ります。入力は活動名・場所・団体の3つだけ。',
+  'ax.createShow':'作って、コードを表示','ax.nowShow':'参加者にこのコードかQRを見せてください',
+  'ax.afterShow':'終わったら、この画面の「主催した活動」から「終わったら人数を入れる」を押してください。人数を入れると、1人あたりで比べられるレポートになります。',
+  'ax.joinUntil':'{when}まで、あなたが撮った記録はこの活動にまとまります（この時間に撮った写真だけ）',
+  'ax.seeReport':'レポートを見る','ax.howT':'活動の流れ（3ステップ）',
+  'ax.s1t':'1. 主催者が活動を作る（30秒）','ax.s1d':'活動名と場所を入れると、参加コードとQRが出ます',
+  'ax.s2t':'2. 参加者はQRを読み取るだけ','ax.s2d':'アプリが開いて、ニックネームとPINを登録すれば参加完了。あとはいつもどおり撮るだけです',
+  'ax.s3t':'3. 終わったら人数を入れて、レポートを送る','ax.s3d':'「何割が陸から来たか」と多かったごみが1枚にまとまります。リンクで、ログインしていない人にも送れます',
+  'ax.mineH':'主催した活動','ax.stOpen':'開催中','ax.stNoPeople':'人数が未入力','ax.stDone':'完了',
+  'ax.enterPeople':'終わったら人数を入れる','ax.fixPeople':'人数を直す',
+  'ax.orgT':'団体（会社・学校など）で続ける','ax.orgD':'同じ団体で何度も活動するなら、団体を作るとまとめてレポートにでき、陸側でした取り組みの前後も比べられます。団体には主催する人だけが入ります。',
+  'ax.staffHint':'（主催者仲間に伝えると、同じ団体に入れます）',
   'act.open':'活動・団体','act.title':'活動','act.joining':'参加中','act.joined':'「{name}」に参加しました',
   'act.joinNote':'この間に記録したごみは、この活動にまとまります（開始から24時間）','act.report':'レポート','act.leave':'抜ける',
   'act.joinH':'活動に参加する','act.join':'参加','act.personal':'参加しなくても、今までどおり個人で記録できます',
@@ -807,7 +854,8 @@ en:{
   'pin.change':'Change PIN','pin.askCur':'Enter your current PIN','pin.askNew':'Enter a new 6-digit PIN','pin.askNewAgain':'Please enter 6 digits',
   'pin.askConfirm':'Enter the new PIN again to confirm','pin.mismatch':'The two entries did not match','pin.changed':'PIN changed',
   'pin.suggest':'For safety, please change your PIN to 6 digits from the menu',
-  'auth.nick':'Nickname','auth.nickPh':'e.g. umi','auth.pin':'PIN (6 digits)','auth.pinNote':'Your PIN is stored encrypted. It cannot be reissued if you forget it',
+  'app.sub':'back to the original sea','me.who':'Logged in as ',
+  'auth.nick':'Nickname','auth.nickPh':'e.g. shonan','auth.pin':'PIN (6 digits)','auth.pinNote':'Your PIN is stored encrypted. It cannot be reissued if you forget it',
   'auth.start':'Start','auth.register':'Sign up','auth.login':'Log in','auth.first':'New here? ','auth.have':'Have an account? ',
   'auth.needNick':'Please enter a nickname','auth.pin4':'PIN must be 4 digits','auth.checking':'Checking...','auth.error':'Something went wrong. Please try again.',
   'net.error':'Connection error','net.errorCode':'Connection error ({n})',
@@ -823,6 +871,13 @@ en:{
   's2.t':'Exact location: only you','s2.d':'Others see it blurred to about 300 m',
   's3.t':'Photos are public','s3.d':'Avoid faces, homes and license plates',
   's4.t':'AI analyzes the litter','s4.d':'It estimates material and source, with reasons and confidence',
+  'batch.reading':'Reading photos...','batch.confirm':'{n} photos will be analyzed one by one, oldest first. Choose “Save record” or “Skip” on each to move on.',
+  'batch.noLocLine':'{n} photos without location data will be skipped','batch.over':'Up to {max} photos at a time ({n} not included)',
+  'batch.none':'None of the {n} selected photos have location data.','batch.progress':'Photo {i}/{n}','batch.skip':'Skip this photo','batch.stop':'Stop batch recording',
+  'batch.saved':'Recorded ({i}/{n})','batch.noTrash':'No litter found in photo {i}, skipped','batch.failOne':'Photo {i} could not be analyzed, skipped',
+  'batch.done':'Batch recording finished.\nRecorded: {saved}　Skipped: {skipped}',
+  'pop.around':'Explore around this point','pop.openMap':'Google Maps (satellite)','pop.openGsi':'GSI Maps (rivers, terrain)',
+  'pop.blurNote':'Another person\u2019s record, so it opens at the location blurred to about 300 m',
   'pop.stake':'Who can help improve this','pop.route':'Likely discharge route','pop.items':'Litter found','pop.comment':'AI comment',
   'pop.mp':'MP risk','pop.years':'Until fragmenting','pop.weight':'Est. weight','pop.weightVal':'~{n} g',
   'an.noGps':'This photo has no location data.\n\nPlease choose a photo taken with your camera\u2019s location setting on.\n(This app does not use your phone\u2019s current location, only the photo\u2019s location data.)',
@@ -868,6 +923,20 @@ en:{
   'sum.exportIcc':'Export in international format (ICC, CSV)','icc.site':'Site / activity','icc.date':'Date','icc.people':'People','icc.photos':'Photos',
   'icc.count':'Count','icc.from':'Names in the app',
   'icc.note':'Mapped to the International Coastal Cleanup (ICC) data card items. Counted by AI from photos; items not on the ICC card are grouped as Other',
+  'ax.lead':'Group the records from a cleanup day (a beach cleanup, etc.) into one activity. Then you can report what share of that day’s litter came from land.',
+  'ax.joinT':'Join','ax.joinD':'Enter the 6-character code from the organizer. If you scanned the organizer’s QR, you have already joined.',
+  'ax.hostT':'Host','ax.hostD':'Create an activity that collects everyone’s records. Just a name, a place and a team.',
+  'ax.createShow':'Create and show code','ax.nowShow':'Show this code or QR to participants',
+  'ax.afterShow':'When it ends, tap “Enter the number of people” under “Activities you host”. With the number of people, the report can compare per person.',
+  'ax.joinUntil':'Until {when}, records you take are grouped into this activity (only photos taken in this time)',
+  'ax.seeReport':'See report','ax.howT':'How activities work (3 steps)',
+  'ax.s1t':'1. The organizer creates an activity (30 seconds)','ax.s1d':'Enter a name and place to get a join code and QR',
+  'ax.s2t':'2. Participants just scan the QR','ax.s2d':'The app opens; register a nickname and PIN and you’re in. Then take photos as usual',
+  'ax.s3t':'3. When it ends, enter the number of people and share the report','ax.s3d':'The share from land and the most common litter fit on one page, and the link works without logging in',
+  'ax.mineH':'Activities you host','ax.stOpen':'Ongoing','ax.stNoPeople':'People not entered','ax.stDone':'Done',
+  'ax.enterPeople':'Enter the number of people','ax.fixPeople':'Edit number of people',
+  'ax.orgT':'Continue as a team (company, school, etc.)','ax.orgD':'If the same group runs activities repeatedly, a team gathers them into one report and compares before and after land-side actions. Only organizers join a team.',
+  'ax.staffHint':'(share it with co-organizers to join the same team)',
   'act.open':'Activities & teams','act.title':'Activities','act.joining':'Joined','act.joined':'Joined “{name}”',
   'act.joinNote':'Litter you record now is grouped into this activity (for 24 hours from the start)','act.report':'Report','act.leave':'Leave',
   'act.joinH':'Join an activity','act.join':'Join','act.personal':'You can still record on your own without joining',
@@ -1396,7 +1465,7 @@ function exportCheckCsv(){
   rows.push([t('ck.origins')]);
   const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
   const d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-  saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'umi_check_'+stamp+'.csv');
+  saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'motonoumi_check_'+stamp+'.csv');
 }
 // ファイルを保存（スマホは共有シート、PCはダウンロード）
 async function saveBlob(blob,name){
@@ -1429,7 +1498,7 @@ async function shareSummaryImage(){
   g.fillStyle=grad;g.fillRect(0,0,W,H);
   const text=(s,x,y,size,color,weight,align)=>{g.font=(weight||400)+' '+size+'px '+FONT;g.fillStyle=color;g.textAlign=align||'left';g.fillText(s,x,y);};
   const L=pct(a.land,a.total),S=pct(a.sea,a.total),U=Math.max(0,100-L-S);
-  text('umi',90,140,44,'#5FD3E6',300);
+  text('motonoumi',90,140,40,'#5FD3E6',300);
   const place=summaryPlaceLabel(recs),period=summaryPeriodLabel(recs);
   if(sumScope){
     const m=scopeMeta(recs);
@@ -1463,7 +1532,7 @@ async function shareSummaryImage(){
   text(t('sum.imgNote'),W/2,1305,22,'rgba(255,255,255,.45)',400,'center');
   const blob=await new Promise(res=>c.toBlob(res,'image/png'));
   const d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-  await saveBlob(blob,'umi_summary_'+stamp+'.png');
+  await saveBlob(blob,'motonoumi_summary_'+stamp+'.png');
   return c; // テスト用
 }
 
@@ -1482,14 +1551,14 @@ function updateActChip(){
   const a=currentActivity(),app=document.getElementById('app');
   if(app) app.classList.toggle('in-act',!!a);
   const el=document.getElementById('act-chip-t');
-  if(el&&a) el.textContent=t('act.joining')+'：'+a.name;
+  if(el&&a) el.textContent=t('act.joining')+(LANG==='en'?': ':'：')+aiText(a.name);
 }
 // コードで参加（参加者は団体に入らなくてよい。開始から24時間は参加中のまま）
 async function joinActivity(code,silent){
   const res=await api('activity_join',{code});
   if(res.error){ if(!silent) alert(tv(res.error)); return false; }
   const a=res.activity, start=new Date(a.starts_at||Date.now()).getTime();
-  setCurrentActivity({id:a.id,name:a.name,code:a.join_code,place:a.place_name||'',org:a.org_name||'',until:Math.max(start,Date.now())+24*3600e3});
+  setCurrentActivity({id:a.id,name:a.name,code:a.join_code,place:a.place_name||'',org:a.org_name||'',start,until:Math.max(start,Date.now())+24*3600e3});
   return true;
 }
 function leaveActivity(){ setCurrentActivity(null); renderActivity(); }
@@ -1518,60 +1587,89 @@ function toast(msg){
 let actMine={orgs:[],activities:[]}, actShowForm=false, actCreated=null;
 async function openActivity(){ document.getElementById('actv').classList.add('show'); renderActivity(); await refreshMine(); }
 function closeActivity(){ document.getElementById('actv').classList.remove('show'); actShowForm=false; actCreated=null; }
-async function refreshMine(){ const r=await api('mine'); if(!r.error){actMine=r;renderActivity();} }
+async function refreshMine(){ const r=await api('mine'); if(!r.error){actMine=r;renderActivity();translateMissing();} }
 function fmtTime(iso){ if(!iso)return ''; const d=new Date(iso); return isNaN(d)?'':String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-function actLine(a){ return [a.org_name||orgName(a.org_id),a.place_name,fmtDate(a.starts_at)].filter(Boolean).map(esc).join(' ・ '); }
+function actLine(a){ return [aiText(a.org_name||orgName(a.org_id)),aiText(a.place_name),fmtDate(a.starts_at)].filter(Boolean).map(esc).join(LANG==='en'?' · ':' ・ '); }
 function orgName(id){ const o=(actMine.orgs||[]).find(o=>o.id===id); return o?o.name:''; }
 function renderActivity(){
   const box=document.getElementById('act-body'); if(!box) return;
   const cur=currentActivity();
-  let h='';
-  // 作った直後：コードとQRを大きく
+  const acts=actMine.activities||[];
+  let h='<div class="act-lead">'+t('ax.lead')+'</div>';
+
+  // ── 作った直後：参加者に見せるコードとQR、次にやること ──
   if(actCreated){
     const a=actCreated;
-    h+='<div class="act-card"><div class="act-sub">'+t('act.created')+'</div><div class="act-name">'+esc(a.name)+'</div>'+
+    h+='<div class="act-card"><div class="act-step-now">'+t('ax.nowShow')+'</div><div class="act-name">'+esc(aiText(a.name))+'</div>'+
        '<div class="act-code">'+esc(a.join_code)+'</div><div class="act-qr">'+qrHtml(joinUrl(a.join_code))+'</div>'+
        '<div class="act-sub" style="text-align:center">'+t('act.qrHint')+'</div>'+
-       '<div class="act-btns"><button class="act-btn" onclick="copyText(\''+esc(joinUrl(a.join_code))+'\')">'+t('act.copyLink')+'</button></div></div>';
+       '<div class="act-btns" style="justify-content:center"><button class="act-btn" onclick="copyText(\''+esc(joinUrl(a.join_code))+'\')">'+t('act.copyLink')+'</button></div>'+
+       '<div class="act-next">'+t('ax.afterShow')+'</div></div>';
   }
-  // 参加中
+
+  // ── 参加中：何時まで、何がまとまるか ──
   if(cur){
-    h+='<div class="act-card"><div class="act-sub">'+t('act.joining')+'</div><div class="act-name">'+esc(cur.name)+'</div>'+
-       '<div class="act-sub">'+[cur.org,cur.place].filter(Boolean).map(esc).join(' ・ ')+'</div>'+
-       '<div class="act-sub">'+t('act.joinNote')+'</div>'+
-       '<div class="act-btns"><button class="act-btn main" onclick="openReport(\'activity\',\''+cur.id+'\')">'+t('act.report')+'</button><button class="act-btn warn" onclick="leaveActivity()">'+t('act.leave')+'</button></div></div>';
-  } else {
-    h+='<div class="sum-h">'+t('act.joinH')+'</div><div class="act-in"><input id="act-code" maxlength="8" placeholder="ABC234" autocomplete="off"><button class="act-btn main" onclick="joinByInput()">'+t('act.join')+'</button></div><div class="act-err" id="act-err"></div>'+
-       '<div class="act-sub" style="margin-bottom:14px">'+t('act.personal')+'</div>';
+    const until=new Date(cur.until), when=fmtDate(until.toISOString())+' '+fmtTime(until.toISOString());
+    h+='<div class="act-card"><div class="act-step-now">'+t('act.joining')+'</div><div class="act-name">'+esc(aiText(cur.name))+'</div>'+
+       '<div class="act-sub">'+[aiText(cur.org),aiText(cur.place)].filter(Boolean).map(esc).join(LANG==='en'?' · ':' ・ ')+'</div>'+
+       '<div class="act-sub" style="margin-top:6px">'+t('ax.joinUntil',{when:esc(when)})+'</div>'+
+       '<div class="act-btns"><button class="act-btn main" onclick="openReport(\'activity\',\''+cur.id+'\')">'+t('ax.seeReport')+'</button><button class="act-btn warn" onclick="leaveActivity()">'+t('act.leave')+'</button></div></div>';
   }
-  // 主催する
-  h+='<div class="sum-sec"><div class="sum-h">'+t('act.hostH')+'</div>';
+
+  // ── 参加する／主催する の2択 ──
+  if(!cur&&!actCreated&&!actShowForm){
+    h+='<div class="act-choice">'+
+      '<div class="act-opt"><div class="act-opt-t">'+t('ax.joinT')+'</div><div class="act-sub">'+t('ax.joinD')+'</div>'+
+        '<div class="act-in" style="margin-top:10px"><input id="act-code" maxlength="8" placeholder="ABC234" autocomplete="off" aria-label="'+esc(t('act.code'))+'"><button class="act-btn main" onclick="joinByInput()">'+t('act.join')+'</button></div><div class="act-err" id="act-err"></div></div>'+
+      '<div class="act-opt"><div class="act-opt-t">'+t('ax.hostT')+'</div><div class="act-sub">'+t('ax.hostD')+'</div>'+
+        '<div class="act-btns"><button class="act-btn main" onclick="actShowForm=true;actCreated=null;renderActivity()">'+t('act.new')+'</button></div></div>'+
+    '</div>'+
+    '<div class="act-sub" style="margin:4px 2px 0">'+t('act.personal')+'</div>';
+  }
+
+  // ── 活動を作る（入力は3つだけ） ──
   if(actShowForm){
     const d=new Date(), def=t('act.defName',{m:d.getMonth()+1,d:d.getDate()});
-    h+='<div class="act-form"><label>'+t('act.name')+'</label><input id="af-name" value="'+esc(def)+'">'+
-       '<label>'+t('act.place')+'</label><input id="af-place" placeholder="'+esc(t('act.placePh'))+'">'+
-       '<label>'+t('act.org')+'</label><select id="af-org"><option value="">'+t('act.noOrg')+'</option>'+(actMine.orgs||[]).map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>').join('')+'</select>'+
-       '<div class="act-btns"><button class="act-btn main" onclick="createActivity()">'+t('act.create')+'</button><button class="act-btn" onclick="actShowForm=false;renderActivity()">'+t('act.cancel')+'</button></div><div class="act-err" id="af-err"></div></div>';
-  } else {
-    h+='<div class="act-btns" style="margin-top:0"><button class="act-btn main" onclick="actShowForm=true;actCreated=null;renderActivity()">'+t('act.new')+'</button></div>';
+    h+='<div class="act-card plain"><div class="act-opt-t">'+t('act.new')+'</div>'+
+       '<div class="act-form"><label for="af-name">'+t('act.name')+'</label><input id="af-name" value="'+esc(def)+'">'+
+       '<label for="af-place">'+t('act.place')+'</label><input id="af-place" placeholder="'+esc(t('act.placePh'))+'">'+
+       '<label for="af-org">'+t('act.org')+'</label><select id="af-org"><option value="">'+t('act.noOrg')+'</option>'+(actMine.orgs||[]).map(o=>'<option value="'+o.id+'">'+esc(o.name)+'</option>').join('')+'</select>'+
+       '<div class="act-btns"><button class="act-btn main" onclick="createActivity()">'+t('ax.createShow')+'</button><button class="act-btn" onclick="actShowForm=false;renderActivity()">'+t('act.cancel')+'</button></div><div class="act-err" id="af-err"></div></div></div>';
   }
-  // 自分の活動
-  const acts=actMine.activities||[];
+
+  // ── 活動の流れ（3ステップ） ──
+  h+='<details class="act-how"'+(acts.length||cur?'':' open')+'><summary>'+t('ax.howT')+'</summary><ol>'+
+     '<li><b>'+t('ax.s1t')+'</b><span>'+t('ax.s1d')+'</span></li>'+
+     '<li><b>'+t('ax.s2t')+'</b><span>'+t('ax.s2d')+'</span></li>'+
+     '<li><b>'+t('ax.s3t')+'</b><span>'+t('ax.s3d')+'</span></li></ol></details>';
+
+  // ── 主催した活動：次にやることを1つだけ大きく ──
   if(acts.length){
-    h+='<div class="act-list" style="margin-top:12px">'+acts.map(a=>
-      '<div class="act-card plain"><div class="act-name">'+esc(a.name)+'</div><div class="act-sub">'+actLine(a)+'</div>'+
-      '<div class="act-sub">'+t('act.code')+' <b style="letter-spacing:.12em">'+esc(a.join_code)+'</b>'+(a.participants!=null?' ・ '+t('act.people',{n:a.participants}):'')+(a.ends_at?' ・ '+t('act.ended'):'')+'</div>'+
-      '<div class="act-btns"><button class="act-btn" onclick="openReport(\'activity\',\''+a.id+'\')">'+t('act.report')+'</button><button class="act-btn" onclick="showCode(\''+a.id+'\')">'+t('act.showCode')+'</button><button class="act-btn" onclick="finishActivity(\''+a.id+'\')">'+t('act.finish')+'</button></div></div>').join('')+'</div>';
+    h+='<div class="sum-sec"><div class="sum-h">'+t('ax.mineH')+'</div><div class="act-list">'+acts.map(a=>{
+      const needPeople=a.participants==null;
+      const status=needPeople?(a.ends_at?t('ax.stNoPeople'):t('ax.stOpen')):t('ax.stDone');
+      const stCls=needPeople?'st-open':'st-done';
+      const main=needPeople
+        ?'<button class="act-btn main" onclick="finishActivity(\''+a.id+'\')">'+t('ax.enterPeople')+'</button>'
+        :'<button class="act-btn main" onclick="openReport(\'activity\',\''+a.id+'\')">'+t('ax.seeReport')+'</button>';
+      const sub=needPeople
+        ?'<button class="act-btn" onclick="showCode(\''+a.id+'\')">'+t('act.showCode')+'</button><button class="act-btn" onclick="openReport(\'activity\',\''+a.id+'\')">'+t('act.report')+'</button>'
+        :'<button class="act-btn" onclick="finishActivity(\''+a.id+'\')">'+t('ax.fixPeople')+'</button><button class="act-btn" onclick="showCode(\''+a.id+'\')">'+t('act.showCode')+'</button>';
+      return '<div class="act-card plain"><div class="act-row"><div class="act-name">'+esc(aiText(a.name))+'</div><span class="act-st '+stCls+'">'+status+'</span></div>'+
+        '<div class="act-sub">'+actLine(a)+(a.participants!=null?(LANG==='en'?' · ':' ・ ')+t('act.people',{n:a.participants}):'')+'</div>'+
+        '<div class="act-btns">'+main+sub+'</div></div>';
+    }).join('')+'</div></div>';
   }
-  h+='</div>';
-  // 団体
-  h+='<div class="sum-sec"><div class="sum-h">'+t('act.orgH')+'</div>';
-  (actMine.orgs||[]).forEach(o=>{
-    h+='<div class="act-card plain"><div class="act-name">'+esc(o.name)+'</div><div class="act-sub">'+t('act.staffCode')+' <b style="letter-spacing:.12em">'+esc(o.staff_code)+'</b></div>'+
-       '<div class="act-btns"><button class="act-btn" onclick="openReport(\'org\',\''+o.id+'\')">'+t('act.orgReport')+'</button><button class="act-btn" onclick="addMeasure(\''+o.id+'\')">'+t('ms.add')+'</button></div></div>';
+
+  // ── 団体（必要な人だけ開く） ──
+  const orgs=actMine.orgs||[];
+  h+='<details class="act-how act-org"'+(orgs.length?' open':'')+'><summary>'+t('ax.orgT')+'</summary>'+
+     '<div class="act-sub" style="margin:6px 0 10px">'+t('ax.orgD')+'</div>';
+  orgs.forEach(o=>{
+    h+='<div class="act-card plain"><div class="act-name">'+esc(aiText(o.name))+'</div><div class="act-sub">'+t('act.staffCode')+' <b style="letter-spacing:.12em">'+esc(o.staff_code)+'</b>　'+t('ax.staffHint')+'</div>'+
+       '<div class="act-btns"><button class="act-btn main" onclick="openReport(\'org\',\''+o.id+'\')">'+t('act.orgReport')+'</button><button class="act-btn" onclick="addMeasure(\''+o.id+'\')">'+t('ms.add')+'</button></div></div>';
   });
-  h+='<div class="act-btns"><button class="act-btn" onclick="createOrg()">'+t('act.newOrg')+'</button><button class="act-btn" onclick="joinOrg()">'+t('act.joinOrg')+'</button></div>'+
-     '<div class="act-sub" style="margin-top:8px">'+t('act.orgNote')+'</div></div>';
+  h+='<div class="act-btns"><button class="act-btn" onclick="createOrg()">'+t('act.newOrg')+'</button><button class="act-btn" onclick="joinOrg()">'+t('act.joinOrg')+'</button></div></details>';
   box.innerHTML=h;
 }
 async function joinByInput(){
@@ -1655,7 +1753,7 @@ async function openReport(type,id){
 function reportUrl(){ return location.origin+location.pathname+'?report='+(sumScope.type==='org'?'o':'a')+'.'+sumScope.id+'&lang='+LANG; }
 async function shareReportLink(){
   const url=reportUrl(), title=scopeMeta(summaryRecords()).title;
-  try{ if(navigator.share){ await navigator.share({title:'umi — '+title,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  try{ if(navigator.share){ await navigator.share({title:'motonoumi — '+title,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
   copyText(url);
 }
 // リンクから開いたとき：ログイン画面を出さずに、レポートだけを表示
@@ -1785,7 +1883,7 @@ function exportIccCsv(){
   const m=sumScope?scopeMeta(recs):null;
   const people=m&&m.people!=null?m.people:'';
   const rows=[
-    ['International Coastal Cleanup — summary by umi'],
+    ['International Coastal Cleanup — summary by motonoumi'],
     [t('icc.site'),m?(m.title+(m.sub?' / '+m.sub:'')):summaryPlaceLabel(recs)],
     [t('icc.date'),m?m.when:summaryPeriodLabel(recs)],
     [t('icc.people'),people],
@@ -1798,7 +1896,7 @@ function exportIccCsv(){
   rows.push([t('icc.note')]);
   const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
   const d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-  saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'umi_icc_'+stamp+'.csv');
+  saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'motonoumi_icc_'+stamp+'.csv');
 }
 
 // ── 撮り方の案内（初めての人には自動で1回表示） ──
@@ -2006,6 +2104,11 @@ async function translateMissing(){
     if(hasJa(r.location_name)&&!TR[r.location_name]) need.add(r.location_name);
     (aj.item_counts||[]).forEach(x=>{ if(hasJa(x.name)&&!x.name_en&&!ITEM_EN[canonName(x.name)]&&!TR[x.name]) need.add(x.name); });
   });
+  if(typeof actMine!=='undefined'){
+    (actMine.activities||[]).forEach(a=>[a.name,a.place_name,a.org_name].forEach(v=>{ if(hasJa(v)&&!TR[v]) need.add(v); }));
+    (actMine.orgs||[]).forEach(o=>{ if(hasJa(o.name)&&!TR[o.name]) need.add(o.name); });
+    const ca=currentActivity(); if(ca) [ca.name,ca.place,ca.org].forEach(v=>{ if(hasJa(v)&&!TR[v]) need.add(v); });
+  }
   if(typeof sumScope!=='undefined'&&sumScope){
     [sumScope.orgName,...(sumScope.acts||[]).flatMap(a=>[a.name,a.place_name,a.org_name])].forEach(v=>{ if(hasJa(v)&&!TR[v]) need.add(v); });
   }
@@ -2025,6 +2128,8 @@ async function translateMissing(){
     if(LANG==='en'){
       if(typeof refreshMapTexts==='function') refreshMapTexts();
       if(document.getElementById('sumv').classList.contains('show')) renderSummary();
+      if(document.getElementById('actv').classList.contains('show')) renderActivity();
+      updateActChip();
     }
   }catch(e){} finally{ trRunning=false; }
 }
@@ -2107,6 +2212,18 @@ function addPin(r){
     <div class="umi-pop-label">${t('pop.route')}</div>
     <div class="umi-pop-route">${esc(tv(r.discharge_route))}</div>`:'';
 
+  // 外部の地図で、その地点の周りの環境を見る（ほかの人の記録は、受け取ったぼかした位置のまま）
+  const la=Number(r.lat).toFixed(5), ln=Number(r.lng).toFixed(5);
+  const gmap='https://www.google.com/maps/@?api=1&map_action=map&center='+la+','+ln+'&zoom=17&basemap=satellite';
+  const gsi='https://maps.gsi.go.jp/#16/'+la+'/'+ln+'/';
+  const linksHtml=`
+    <div class="umi-pop-label" style="margin-top:12px">${t('pop.around')}</div>
+    <div class="umi-pop-links">
+      <a class="umi-pop-link" href="${gmap}" target="_blank" rel="noopener noreferrer">${t('pop.openMap')}<span aria-hidden="true">↗</span></a>
+      <a class="umi-pop-link" href="${gsi}" target="_blank" rel="noopener noreferrer">${t('pop.openGsi')}<span aria-hidden="true">↗</span></a>
+    </div>
+    ${r.is_mine?'':`<div class="umi-pop-note">${t('pop.blurNote')}</div>`}`;
+
   const marker = L.marker([r.lat,r.lng],{icon}).addTo(lmap);
   (window._pins=window._pins||[]).push(marker);
   if(hiddenCats.has(cat)) lmap.removeLayer(marker); // 非表示中のカテゴリ
@@ -2141,6 +2258,7 @@ function addPin(r){
         </div>
         ${stakeholderHtml}
         ${routeHtml}
+        ${linksHtml}
       </div>
     </div>`,
     {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,50],autoPanPaddingBottomRight:[10,150]}
@@ -2318,6 +2436,7 @@ function startApp(){
   document.getElementById('app').classList.add('show');
   if(currentNickname){
     document.getElementById('cnt-lbl').textContent=currentNickname;
+    const wn=document.getElementById('wp-who-name'); if(wn) wn.textContent=currentNickname;
   }
   initNav();
   startSpecTips();
@@ -2354,6 +2473,7 @@ let photoTakenAt=null;
 
 function onFile(input){
   if(!input.files[0]) return;
+  if(input.files.length>1){ const fs=[...input.files]; input.value=''; startBatch(fs); return; } // 複数枚
   const file=input.files[0];
   capturedBlob=file;
   userLat=null;userLng=null;photoTakenAt=null;photoIssue=null; // 前の写真の情報を使い回さない
@@ -2367,6 +2487,64 @@ function onFile(input){
     rd.onload=e=>{capturedUrl=e.target.result;closeCam();analyze();};
     rd.readAsDataURL(file);
   });
+}
+
+
+// ── 複数枚をまとめて記録（撮影日の違う過去の写真もOK） ──
+// 撮影日の古い順に1枚ずつ解析し、確認画面で「記録する／とばす」を選ぶと次へ進む
+const BATCH_MAX=20;
+let batch=null;
+async function startBatch(files){
+  const list=files.slice(0,BATCH_MAX), over=Math.max(0,files.length-BATCH_MAX);
+  showLoad(t('batch.reading'));
+  const metas=await Promise.all(list.map(f=>readPhotoMeta(f).then(m=>({file:f,meta:m}))));
+  hideLoad();
+  const ok=metas.filter(x=>x.meta.gps&&!x.meta.issue);
+  const noLoc=metas.length-ok.length;
+  if(!ok.length){ alert(t('batch.none',{n:metas.length})); return; }
+  ok.sort((a,b)=>String(a.meta.date||'9999').localeCompare(String(b.meta.date||'9999')));
+  let msg=t('batch.confirm',{n:ok.length});
+  if(noLoc) msg+='\n'+t('batch.noLocLine',{n:noLoc});
+  if(over) msg+='\n'+t('batch.over',{max:BATCH_MAX,n:over});
+  if(!confirm(msg)) return;
+  closeCam();
+  batch={items:ok,i:-1,saved:0,skipped:0,noLoc,over};
+  batchNext();
+}
+function batchNext(){
+  if(!batch) return;
+  document.getElementById('confv').classList.remove('show');
+  batch.i++;
+  if(batch.i>=batch.items.length){ finishBatch(); return; }
+  const {file,meta}=batch.items[batch.i];
+  capturedBlob=file; photoIssue=null; userLat=meta.gps.lat; userLng=meta.gps.lng; photoTakenAt=meta.date;
+  const rd=new FileReader();
+  rd.onload=e=>{capturedUrl=e.target.result; analyze();};
+  rd.onerror=()=>{ batch.skipped++; batchNext(); };
+  rd.readAsDataURL(file);
+}
+function batchSkip(){ if(!batch) return false; batch.skipped++; batchNext(); return true; }
+function stopBatch(){
+  if(!batch) return;
+  batch.skipped+=batch.items.length-batch.i; batch.i=batch.items.length;
+  finishBatch();
+}
+function finishBatch(){
+  const b=batch; batch=null;
+  document.getElementById('confv').classList.remove('show');
+  if(!b) return;
+  let msg=t('batch.done',{saved:b.saved,skipped:b.skipped});
+  if(b.noLoc) msg+='\n'+t('batch.noLocLine',{n:b.noLoc});
+  alert(msg);
+}
+
+// 活動にひも付けるのは、その活動の時間内（開始の2時間前〜参加の期限）に撮った写真だけ
+function activityFor(takenAt){
+  const a=currentActivity(); if(!a) return null;
+  if(!takenAt) return a.id;                         // 撮影日が分からない写真は、今撮ったものとして扱う
+  const tm=new Date(takenAt).getTime(); if(isNaN(tm)) return a.id;
+  const start=a.start||(a.until-24*3600e3);
+  return (tm>=start-2*3600e3&&tm<=a.until)?a.id:null;
 }
 
 // ── 写真の情報（位置・撮影日）を読む。読めない理由も返す ──
@@ -2547,25 +2725,28 @@ async function analyze(){
     const compressed=await compressForAnalysis(capturedUrl);
     const b64=compressed.split(',')[1];
     const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt,token:sessionToken})});
-    if(r.status===401){hideLoad();alert(t('an.needLogin'));return;}
+    if(r.status===401){hideLoad();alert(t('an.needLogin'));if(batch){batch=null;}return;}
     if(r.status===413){hideLoad();alert(t('an.tooBig'));return;}
     if(!r.ok) throw new Error('AI解析失敗');
     analysisResult=await r.json();
     hideLoad();
     // ごみ判定
     if(analysisResult.is_trash === false){
+      if(batch){ toast(t('batch.noTrash',{i:batch.i+1})); batchSkip(); return; }
       alert(t('an.noTrash'));
       return;
     }
     showConfirm();
-  }catch(e){hideLoad();alert(t('an.fail'));console.error(e);}
+  }catch(e){hideLoad();console.error(e);if(batch){toast(t('batch.failOne',{i:batch.i+1}));batchSkip();return;}alert(t('an.fail'));}
 }
 
 // ── CONFIRM ──
 function showConfirm(){
   const r=analysisResult;
   document.getElementById('confpre').src=capturedUrl;
-  document.getElementById('jtxt').textContent=t('an.doneCat',{c:r.category||'SEA'});
+  document.getElementById('jtxt').textContent=(batch?t('batch.progress',{i:batch.i+1,n:batch.items.length})+' ・ ':'')+t('an.doneCat',{c:r.category||'SEA'});
+  document.getElementById('btn-retry').textContent=batch?t('batch.skip'):t('cf.retry');
+  document.getElementById('batch-stop').style.display=batch?'block':'none';
 
   // カテゴリ色（共通の catCol を使う）
   const cat=r.category||'SEA';
@@ -2683,7 +2864,7 @@ function changeCategory(cat){
   const col=catCol[cat]||'#22CCEE';
   document.querySelector('#conf-summary .cs-cat-btns').previousElementSibling.style.color=col;
 }
-function retake(){document.getElementById('confv').classList.remove('show');openCam();}
+function retake(){ if(batchSkip()) return; document.getElementById('confv').classList.remove('show');openCam();}
 async function send(){
   document.getElementById('confv').classList.remove('show');
   showLoad(t('sv.saving'));
@@ -2694,7 +2875,7 @@ async function send(){
     const imgUrl=await upload(compBlob);
     const r=analysisResult;
     const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
-      activity_id:(currentActivity()||{}).id||null,
+      activity_id:activityFor(photoTakenAt||r.photo_taken_at),
       category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
       estimated_weight_g:r.estimated_weight_g,degradation_level:r.degradation_level,
@@ -2716,8 +2897,9 @@ async function send(){
     document.getElementById('imp-txt').textContent=aiText(r.summary,r.summary_en)||t('dn.saved');
     addPin(savedRec);
     buildNavRecs();
+    if(batch){ batch.saved++; toast(t('batch.saved',{i:batch.i+1,n:batch.items.length})); batchNext(); return; }
     document.getElementById('donev').classList.add('show');
-  }catch(e){hideLoad();alert(t('sv.fail')+tv(e.message));console.error(e);}
+  }catch(e){hideLoad();alert(t('sv.fail')+tv(e.message));console.error(e);if(batch)batchSkip();}
 }
 function backToMap(){document.getElementById('donev').classList.remove('show');}
 
