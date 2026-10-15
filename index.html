@@ -761,6 +761,9 @@ ja:{
   's2.t':'正確な位置は、あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
   's3.t':'写真はみんなに公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
   's4.t':'AIがごみを解析','s4.d':'素材や発生源を推定し、根拠と確信度を添えて記録します',
+  'batch.resume':'前回のまとめて記録が途中で止まっています（{total}枚中{done}枚まで）。\n残りの{rest}枚を続けますか？',
+  'batch.dupLine':'すでに記録した写真 {n}枚は、とばします','batch.allDup':'選んだ写真（{n}枚）は、すべて記録済みです。',
+  'an.dup':'この写真は、すでに記録されているようです（同じ撮影日時・場所）。もう一度記録しますか？',
   'batch.reading':'写真を読み込んでいます...','batch.confirm':'{n}枚を、撮影日の古い順に1枚ずつ解析します。確認画面で「記録する」か「とばす」を選ぶと、次の写真に進みます。',
   'batch.noLocLine':'位置情報のない写真 {n}枚は、とばします','batch.over':'一度に選べるのは{max}枚までです（{n}枚は対象外）',
   'batch.none':'選んだ{n}枚には、位置情報のある写真がありませんでした。','batch.progress':'{i}/{n}枚目','batch.skip':'この写真をとばす','batch.stop':'まとめて記録をやめる',
@@ -871,6 +874,9 @@ en:{
   's2.t':'Exact location: only you','s2.d':'Others see it blurred to about 300 m',
   's3.t':'Photos are public','s3.d':'Avoid faces, homes and license plates',
   's4.t':'AI analyzes the litter','s4.d':'It estimates material and source, with reasons and confidence',
+  'batch.resume':'Your last batch recording stopped partway ({done} of {total}).\nContinue with the remaining {rest}?',
+  'batch.dupLine':'{n} photos already recorded will be skipped','batch.allDup':'All selected photos ({n}) are already recorded.',
+  'an.dup':'This photo seems to be already recorded (same date, time and place). Record it again?',
   'batch.reading':'Reading photos...','batch.confirm':'{n} photos will be analyzed one by one, oldest first. Choose “Save record” or “Skip” on each to move on.',
   'batch.noLocLine':'{n} photos without location data will be skipped','batch.over':'Up to {max} photos at a time ({n} not included)',
   'batch.none':'None of the {n} selected photos have location data.','batch.progress':'Photo {i}/{n}','batch.skip':'Skip this photo','batch.stop':'Stop batch recording',
@@ -2442,6 +2448,7 @@ function startApp(){
   startSpecTips();
   applyWallpaper();
   maybeShowGuide(); // 初めての人には撮り方を案内
+  setTimeout(resumeBatchIfAny,1800); // 再読み込みで止まったまとめて記録があれば、続けるか聞く（記録の読み込み後）
   updateActChip();
   consumePendingJoin(); // QRコードから開いた人は、その活動に参加 // 画面の大きさが決まってから帯の高さを合わせる
   if(preloaded&&needReload){
@@ -2483,6 +2490,7 @@ function onFile(input){
     if(meta.gps){userLat=meta.gps.lat;userLng=meta.gps.lng;}
     photoTakenAt=meta.date;
     if(meta.issue==='heic'||meta.issue==='notimage'){closeCam();alert(t('an.'+meta.issue));return;}
+    if(!meta.issue&&alreadyRecorded(meta)&&!confirm(t('an.dup'))){closeCam();return;}
     const rd=new FileReader();
     rd.onload=e=>{capturedUrl=e.target.result;closeCam();analyze();};
     rd.readAsDataURL(file);
@@ -2494,21 +2502,59 @@ function onFile(input){
 // 撮影日の古い順に1枚ずつ解析し、確認画面で「記録する／とばす」を選ぶと次へ進む
 const BATCH_MAX=20;
 let batch=null;
+// 途中経過は端末（ブラウザの保存領域）に残し、再読み込みしても続きから再開できるようにする
+const BATCH_DB='motonoumi', BATCH_STORE='batch';
+function batchDb(){
+  return new Promise((res,rej)=>{
+    try{
+      const r=indexedDB.open(BATCH_DB,1);
+      r.onupgradeneeded=()=>r.result.createObjectStore(BATCH_STORE);
+      r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+    }catch(e){rej(e);}
+  });
+}
+async function batchPut(key,val){
+  try{ const db=await batchDb(); await new Promise((res,rej)=>{const tx=db.transaction(BATCH_STORE,'readwrite');tx.objectStore(BATCH_STORE).put(val,key);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);}); db.close(); }catch(e){}
+}
+async function batchGet(key){
+  try{ const db=await batchDb(); const v=await new Promise((res,rej)=>{const r=db.transaction(BATCH_STORE).objectStore(BATCH_STORE).get(key);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}); db.close(); return v; }catch(e){ return null; }
+}
+async function batchClear(){
+  try{ const db=await batchDb(); await new Promise(res=>{const tx=db.transaction(BATCH_STORE,'readwrite');tx.objectStore(BATCH_STORE).clear();tx.oncomplete=res;tx.onerror=res;}); db.close(); }catch(e){}
+}
+// 進み具合だけを保存（写真そのものは最初に1回だけ保存）
+function batchSaveState(){
+  if(!batch) return;
+  batchPut('state',{uid:currentUserId,i:batch.i,saved:batch.saved,skipped:batch.skipped,noLoc:batch.noLoc,dup:batch.dup||0,total:batch.items.length,at:Date.now()});
+}
+// すでに記録した写真か（同じ撮影日時・ほぼ同じ場所の自分の記録がある）
+function alreadyRecorded(meta){
+  if(!meta||!meta.date||!meta.gps) return false;
+  const tm=new Date(meta.date).getTime();
+  return (window.allRecords||[]).some(r=>r.is_mine&&r.photo_taken_at&&Math.abs(new Date(r.photo_taken_at).getTime()-tm)<1500
+    &&Math.abs(r.lat-meta.gps.lat)<0.0003&&Math.abs(r.lng-meta.gps.lng)<0.0003);
+}
 async function startBatch(files){
   const list=files.slice(0,BATCH_MAX), over=Math.max(0,files.length-BATCH_MAX);
   showLoad(t('batch.reading'));
   const metas=await Promise.all(list.map(f=>readPhotoMeta(f).then(m=>({file:f,meta:m}))));
   hideLoad();
-  const ok=metas.filter(x=>x.meta.gps&&!x.meta.issue);
-  const noLoc=metas.length-ok.length;
-  if(!ok.length){ alert(t('batch.none',{n:metas.length})); return; }
+  const withLoc=metas.filter(x=>x.meta.gps&&!x.meta.issue);
+  const noLoc=metas.length-withLoc.length;
+  const ok=withLoc.filter(x=>!alreadyRecorded(x.meta));
+  const dup=withLoc.length-ok.length;
+  if(!ok.length){ alert(dup?t('batch.allDup',{n:dup}):t('batch.none',{n:metas.length})); return; }
   ok.sort((a,b)=>String(a.meta.date||'9999').localeCompare(String(b.meta.date||'9999')));
   let msg=t('batch.confirm',{n:ok.length});
+  if(dup) msg+='\n'+t('batch.dupLine',{n:dup});
   if(noLoc) msg+='\n'+t('batch.noLocLine',{n:noLoc});
   if(over) msg+='\n'+t('batch.over',{max:BATCH_MAX,n:over});
   if(!confirm(msg)) return;
   closeCam();
-  batch={items:ok,i:-1,saved:0,skipped:0,noLoc,over};
+  batch={items:ok,i:-1,saved:0,skipped:0,noLoc,dup,over};
+  // 写真と撮影情報を端末に保存（再読み込みしても続けられるように）
+  await batchClear();
+  await batchPut('items',ok.map(x=>({blob:x.file,meta:x.meta})));
   batchNext();
 }
 function batchNext(){
@@ -2516,6 +2562,7 @@ function batchNext(){
   document.getElementById('confv').classList.remove('show');
   batch.i++;
   if(batch.i>=batch.items.length){ finishBatch(); return; }
+  batchSaveState();
   const {file,meta}=batch.items[batch.i];
   capturedBlob=file; photoIssue=null; userLat=meta.gps.lat; userLng=meta.gps.lng; photoTakenAt=meta.date;
   const rd=new FileReader();
@@ -2523,7 +2570,7 @@ function batchNext(){
   rd.onerror=()=>{ batch.skipped++; batchNext(); };
   rd.readAsDataURL(file);
 }
-function batchSkip(){ if(!batch) return false; batch.skipped++; batchNext(); return true; }
+function batchSkip(){ if(!batch) return false; batch.skipped++; batchSaveState(); batchNext(); return true; }
 function stopBatch(){
   if(!batch) return;
   batch.skipped+=batch.items.length-batch.i; batch.i=batch.items.length;
@@ -2531,12 +2578,34 @@ function stopBatch(){
 }
 function finishBatch(){
   const b=batch; batch=null;
+  batchClear();
   document.getElementById('confv').classList.remove('show');
   if(!b) return;
   let msg=t('batch.done',{saved:b.saved,skipped:b.skipped});
+  if(b.dup) msg+='\n'+t('batch.dupLine',{n:b.dup});
   if(b.noLoc) msg+='\n'+t('batch.noLocLine',{n:b.noLoc});
   alert(msg);
 }
+// 再読み込みのあと：途中のまとめて記録があれば、続けるか聞く
+async function resumeBatchIfAny(){
+  if(batch) return;
+  const st=await batchGet('state'); if(!st) return;
+  if(st.uid!==currentUserId||Date.now()-st.at>3*24*3600e3){ await batchClear(); return; } // 別の人・3日以上前のものは消す
+  const items=await batchGet('items'); if(!items||!items.length){ await batchClear(); return; }
+  const rest=items.length-st.i;
+  if(rest<=0){ await batchClear(); return; }
+  // 途中だった写真が、実はもう記録されていればとばす
+  if(!confirm(t('batch.resume',{done:st.i,total:items.length,rest}))){ await batchClear(); return; }
+  batch={items:items.map(x=>({file:x.blob,meta:x.meta})),i:st.i-1,saved:st.saved,skipped:st.skipped,noLoc:st.noLoc,dup:st.dup||0};
+  // 中断した写真がすでに保存済みなら、その次から
+  while(batch.i+1<batch.items.length&&alreadyRecorded(batch.items[batch.i+1].meta)){ batch.i++; batch.saved++; }
+  batchNext();
+}
+// PCでは、記録の途中でページを離れようとすると確認を出す
+window.addEventListener('beforeunload',e=>{
+  const busy=batch||document.getElementById('ldg')?.classList.contains('show')||document.getElementById('confv')?.classList.contains('show');
+  if(busy){ e.preventDefault(); e.returnValue=''; }
+});
 
 // 活動にひも付けるのは、その活動の時間内（開始の2時間前〜参加の期限）に撮った写真だけ
 function activityFor(takenAt){
@@ -2897,7 +2966,7 @@ async function send(){
     document.getElementById('imp-txt').textContent=aiText(r.summary,r.summary_en)||t('dn.saved');
     addPin(savedRec);
     buildNavRecs();
-    if(batch){ batch.saved++; toast(t('batch.saved',{i:batch.i+1,n:batch.items.length})); batchNext(); return; }
+    if(batch){ batch.saved++; batchSaveState(); toast(t('batch.saved',{i:batch.i+1,n:batch.items.length})); batchNext(); return; }
     document.getElementById('donev').classList.add('show');
   }catch(e){hideLoad();alert(t('sv.fail')+tv(e.message));console.error(e);if(batch)batchSkip();}
 }
