@@ -808,6 +808,7 @@ ja:{
   'batch.resume':'前回のまとめて記録が途中で止まっています（{total}枚中{done}枚まで）。\n残りの{rest}枚を続けますか？',
   'batch.dupLine':'すでに記録した写真 {n}枚は、とばします','batch.allDup':'選んだ写真（{n}枚）は、すべて記録済みです。',
   'an.dup':'この写真は、すでに記録されているようです（同じ撮影日時・場所）。もう一度記録しますか？',
+  'batch.checking':'記録済みの写真がないか確かめています...',
   'batch.reading':'写真を読み込んでいます...','batch.confirm':'{n}枚を、撮影日の古い順に1枚ずつ解析します。確認画面で「記録する」か「とばす」を選ぶと、次の写真に進みます。',
   'batch.noLocLine':'位置情報のない写真 {n}枚は、とばします','batch.over':'一度に選べるのは{max}枚までです（{n}枚は対象外）',
   'batch.none':'選んだ{n}枚には、位置情報のある写真がありませんでした。','batch.progress':'{i}/{n}枚目','batch.skip':'この写真をとばす','batch.stop':'まとめて記録をやめる',
@@ -947,6 +948,7 @@ en:{
   'batch.resume':'Your last batch recording stopped partway ({done} of {total}).\nContinue with the remaining {rest}?',
   'batch.dupLine':'{n} photos already recorded will be skipped','batch.allDup':'All selected photos ({n}) are already recorded.',
   'an.dup':'This photo seems to be already recorded (same date, time and place). Record it again?',
+  'batch.checking':'Checking for photos already recorded...',
   'batch.reading':'Reading photos...','batch.confirm':'{n} photos will be analyzed one by one, oldest first. Choose “Save record” or “Skip” on each to move on.',
   'batch.noLocLine':'{n} photos without location data will be skipped','batch.over':'Up to {max} photos at a time ({n} not included)',
   'batch.none':'None of the {n} selected photos have location data.','batch.progress':'Photo {i}/{n}','batch.skip':'Skip this photo','batch.stop':'Stop batch recording',
@@ -2587,12 +2589,12 @@ function onFile(input){
   capturedBlob=file;
   userLat=null;userLng=null;photoTakenAt=null;photoIssue=null; // 前の写真の情報を使い回さない
   input.value=''; // 同じ写真をもう一度選べるように
-  readPhotoMeta(file).then(meta=>{
+  readPhotoMeta(file).then(async meta=>{
     photoIssue=meta.issue;
     if(meta.gps){userLat=meta.gps.lat;userLng=meta.gps.lng;}
     photoTakenAt=meta.date;
     if(meta.issue==='heic'||meta.issue==='notimage'){closeCam();alert(t('an.'+meta.issue));return;}
-    if(!meta.issue&&alreadyRecorded(meta)&&!confirm(t('an.dup'))){closeCam();return;}
+    if(!meta.issue&&(await findDuplicates([meta]))[0]&&!confirm(t('an.dup'))){closeCam();return;}
     const rd=new FileReader();
     rd.onload=e=>{capturedUrl=e.target.result;closeCam();analyze();};
     rd.readAsDataURL(file);
@@ -2630,11 +2632,37 @@ function batchSaveState(){
   batchPut('state',{uid:currentUserId,i:batch.i,saved:batch.saved,skipped:batch.skipped,noLoc:batch.noLoc,dup:batch.dup||0,total:batch.items.length,at:Date.now()});
 }
 // すでに記録した写真か（同じ撮影日時・ほぼ同じ場所の自分の記録がある）
+// 同じ写真かどうか：撮影日時が同じ秒、位置が約10m以内（同じ写真なら日時と位置は完全に一致する）
+const samePhoto=(t1,lat1,lng1,t2,lat2,lng2)=>Math.abs(t1-t2)<1000&&Math.abs(lat1-lat2)<0.0001&&Math.abs(lng1-lng2)<0.0001;
+// 端末に読み込んでいる自分の記録と比べる（通信できないときの予備）
 function alreadyRecorded(meta){
   if(!meta||!meta.date||!meta.gps) return false;
   const tm=new Date(meta.date).getTime();
-  return (window.allRecords||[]).some(r=>r.is_mine&&r.photo_taken_at&&Math.abs(new Date(r.photo_taken_at).getTime()-tm)<1500
-    &&Math.abs(r.lat-meta.gps.lat)<0.0003&&Math.abs(r.lng-meta.gps.lng)<0.0003);
+  return (window.allRecords||[]).some(r=>r.is_mine&&r.photo_taken_at&&samePhoto(new Date(r.photo_taken_at).getTime(),r.lat,r.lng,tm,meta.gps.lat,meta.gps.lng));
+}
+// サーバーで、自分の全記録と比べる（件数の上限なし）。通信できなければ、端末の記録で比べる
+async function findDuplicates(metas){
+  const items=metas.map(m=>({taken_at:m&&m.date||null,lat:m&&m.gps?m.gps.lat:null,lng:m&&m.gps?m.gps.lng:null}));
+  try{
+    const out=[];
+    for(let i=0;i<items.length;i+=50){
+      const r=await api('dup_check',{items:items.slice(i,i+50)});
+      if(r.error||!Array.isArray(r.dups)) throw new Error(r.error||'dup_check');
+      out.push(...r.dups);
+    }
+    // サーバーの結果に、端末の記録（保存した直後でまだ反映待ちのものなど）も重ねる
+    return out.map((d,i)=>d||alreadyRecorded(metas[i]));
+  }catch(e){ return metas.map(m=>alreadyRecorded(m)); }
+}
+// 一度に同じ写真を2回選んだときは、1回にまとめる
+function dedupeSelection(list){
+  const kept=[];
+  list.forEach(x=>{
+    const m=x.meta, tm=new Date(m.date||0).getTime();
+    const twin=kept.find(k=>m.date&&k.meta.date&&samePhoto(new Date(k.meta.date).getTime(),k.meta.gps.lat,k.meta.gps.lng,tm,m.gps.lat,m.gps.lng));
+    if(!twin) kept.push(x);
+  });
+  return kept;
 }
 async function startBatch(files){
   const list=files.slice(0,BATCH_MAX), over=Math.max(0,files.length-BATCH_MAX);
@@ -2643,7 +2671,11 @@ async function startBatch(files){
   hideLoad();
   const withLoc=metas.filter(x=>x.meta.gps&&!x.meta.issue);
   const noLoc=metas.length-withLoc.length;
-  const ok=withLoc.filter(x=>!alreadyRecorded(x.meta));
+  const uniq=dedupeSelection(withLoc);
+  showLoad(t('batch.checking'));
+  const flags=await findDuplicates(uniq.map(x=>x.meta));
+  hideLoad();
+  const ok=uniq.filter((x,i)=>!flags[i]);
   const dup=withLoc.length-ok.length;
   if(!ok.length){ alert(dup?t('batch.allDup',{n:dup}):t('batch.none',{n:metas.length})); return; }
   ok.sort((a,b)=>String(a.meta.date||'9999').localeCompare(String(b.meta.date||'9999')));
