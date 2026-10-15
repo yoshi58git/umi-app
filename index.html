@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>motonoumi（元の海）</title>
+<title>moto no umi（元の海）</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -207,7 +207,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 
 /* HEADER */
 #hdr{position:relative;z-index:35;display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top,16px) 20px 12px;background:linear-gradient(180deg,rgba(4,17,28,.95) 0%,transparent 100%)}
-#logo{font-size:19px;font-weight:300;letter-spacing:.04em;color:var(--foam);display:flex;align-items:center}
+#logo{font-size:18px;font-weight:300;letter-spacing:.03em;white-space:nowrap;color:var(--foam);display:flex;align-items:center}
 #cnt-lbl{display:none!important} /* ニックネームはメニューの一番上に表示 */
 .wp-who{font-size:12px;color:var(--foam);padding:6px 12px 8px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* 壁紙 */
@@ -573,7 +573,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 <!-- ONBOARDING -->
 <div id="ob">
   <div id="ob-lang"><div class="lang-seg" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="setLang('ja')">JA</button><button type="button" data-lang="en" onclick="setLang('en')">EN</button></div></div>
-  <div id="ob-logo">motonoumi<div id="ob-logo-sub" data-i18n="app.sub">元の海</div></div>
+  <div id="ob-logo">moto no umi<div id="ob-logo-sub" data-i18n="app.sub">元の海</div></div>
 
   <!-- アプリの大事な仕様（中身は SPECS から自動で作る） -->
   <div id="ob-specs" style="width:100%;max-width:320px;margin-bottom:20px"></div>
@@ -627,7 +627,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 <div id="app">
   <div id="wp-layer" aria-hidden="true"></div>
   <div id="hdr">
-    <div id="logo">motonoumi<span id="cnt-lbl"></span>
+    <div id="logo">moto no umi<span id="cnt-lbl"></span>
       <button id="sum-btn" class="hdr-btn" type="button" onclick="openSummary()" aria-label="集計" title="集計" data-i18n-aria="sum.open">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="5"/><line x1="18" y1="20" x2="18" y2="9"/></svg>
       </button>
@@ -902,7 +902,7 @@ en:{
   'pin.change':'Change PIN','pin.askCur':'Enter your current PIN','pin.askNew':'Enter a new 6-digit PIN','pin.askNewAgain':'Please enter 6 digits',
   'pin.askConfirm':'Enter the new PIN again to confirm','pin.mismatch':'The two entries did not match','pin.changed':'PIN changed',
   'pin.suggest':'For safety, please change your PIN to 6 digits from the menu',
-  'app.sub':'back to the original sea','me.who':'Logged in as ',
+  'app.sub':'元の海 — back to the original sea','me.who':'Logged in as ',
   'auth.nick':'Nickname','auth.nickPh':'e.g. shonan','auth.pin':'PIN (6 digits)','auth.pinNote':'Your PIN is stored encrypted',
   'auth.start':'Start','auth.register':'Sign up','auth.login':'Log in','auth.first':'New here? ','auth.have':'Have an account? ',
   'auth.needNick':'Please enter a nickname','auth.pin4':'PIN must be 4 digits','auth.checking':'Checking...','auth.error':'Something went wrong. Please try again.',
@@ -1576,7 +1576,7 @@ async function shareSummaryImage(){
   g.fillStyle=grad;g.fillRect(0,0,W,H);
   const text=(s,x,y,size,color,weight,align)=>{g.font=(weight||400)+' '+size+'px '+FONT;g.fillStyle=color;g.textAlign=align||'left';g.fillText(s,x,y);};
   const L=pct(a.land,a.total),S=pct(a.sea,a.total),U=Math.max(0,100-L-S);
-  text('motonoumi',90,140,40,'#5FD3E6',300);
+  text('moto no umi',90,140,40,'#5FD3E6',300);
   const place=summaryPlaceLabel(recs),period=summaryPeriodLabel(recs);
   if(sumScope){
     const m=scopeMeta(recs);
@@ -1851,7 +1851,7 @@ async function openReport(type,id){
 function reportUrl(){ return location.origin+location.pathname+'?report='+(sumScope.type==='org'?'o':'a')+'.'+sumScope.id+'&lang='+LANG; }
 async function shareReportLink(){
   const url=reportUrl(), title=scopeMeta(summaryRecords()).title;
-  try{ if(navigator.share){ await navigator.share({title:'motonoumi — '+title,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  try{ if(navigator.share){ await navigator.share({title:'moto no umi — '+title,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
   copyText(url);
 }
 // リンクから開いたとき：ログイン画面を出さずに、レポートだけを表示
@@ -1981,7 +1981,7 @@ function exportIccCsv(){
   const m=sumScope?scopeMeta(recs):null;
   const people=m&&m.people!=null?m.people:'';
   const rows=[
-    ['International Coastal Cleanup — summary by motonoumi'],
+    ['International Coastal Cleanup — summary by moto no umi (motonoumi.jp)'],
     [t('icc.site'),m?(m.title+(m.sub?' / '+m.sub:'')):summaryPlaceLabel(recs)],
     [t('icc.date'),m?m.when:summaryPeriodLabel(recs)],
     [t('icc.people'),people],
