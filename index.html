@@ -66,6 +66,12 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #spec-tip.open .st-d{display:block}
 
 /* 集計画面・撮り方（全画面シート） */
+#net-bar,#inapp-bar{position:fixed;left:0;right:0;top:0;z-index:9000;display:none;padding:calc(env(safe-area-inset-top,0px) + 8px) 14px 8px;font-size:12px;line-height:1.5;color:#fff;text-align:center}
+#net-bar{background:#B5473A}
+#net-bar.show{display:block}
+#inapp-bar{background:#8A5A12;text-align:left;align-items:flex-start;gap:10px}
+#inapp-bar.show{display:flex}
+#inapp-bar button{flex-shrink:0;border:none;background:transparent;color:#fff;font-size:20px;line-height:1;cursor:pointer}
 .sheet{position:fixed;inset:0;z-index:5000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;
   background:linear-gradient(180deg,#06192A 0%,#04111C 100%);color:#fff;
   padding:calc(env(safe-area-inset-top,0px) + 14px) 20px calc(env(safe-area-inset-bottom,0px) + 24px)}
@@ -583,7 +589,8 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
       <div style="font-size:11px;color:var(--foam);opacity:.6;letter-spacing:.06em;margin-bottom:6px" data-i18n="auth.pin">PIN（数字6桁）</div>
       <input id="inp-pin" type="password" placeholder="000000" maxlength="8" inputmode="numeric"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:18px;letter-spacing:.3em;font-family:'Inter',sans-serif;outline:none">
-      <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="auth.pinNote">PINは暗号化して保存します。忘れると再発行できません</div>
+      <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="auth.pinNote">PINは暗号化して保存します</div>
+      <div style="font-size:11px;color:#fff;opacity:.8;margin-top:4px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="pin.forgot">PINを忘れたときは、主催者か運営者に連絡してください（仮のPINを発行できます）</div>
     </div>
     <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px">はじめる</button>
     <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-bottom:10px;display:none"></div>
@@ -592,6 +599,9 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 </div>
 
 <!-- APP -->
+<!-- 通信・ブラウザの案内（画面の上に出る帯） -->
+<div id="net-bar" role="status" data-i18n="net.offlineBar">オフラインです。電波のある場所で記録してください</div>
+<div id="inapp-bar" role="status"><span data-i18n="inapp.msg">アプリ内のブラウザで開いています。写真の選択や保存がうまくいかないことがあります。右上のメニューから「ブラウザで開く」を選んでください</span><button type="button" onclick="this.parentNode.style.display='none'" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
 <!-- 集計画面 -->
 <div id="sumv" class="sheet" role="dialog" aria-modal="true">
   <div class="sheet-hdr"><div class="sheet-title" data-i18n="sum.title">集計</div><button class="sheet-x" onclick="closeSummary()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
@@ -632,6 +642,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');changePin()" data-i18n="pin.change">PINを変更</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');logout()" data-i18n="logout">ログアウト</button>
       <div class="wp-sep"></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-in').click()" data-i18n="wp.choose">壁紙の写真を選ぶ</button>
       <div class="wp-pos" id="wp-pos">
@@ -736,6 +747,13 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 <input type="file" id="filein" accept="image/*" multiple onchange="onFile(this)">
 
 <script>
+// 起動の見張り：本体が6秒たっても動き出さなければ、非対応のブラウザとして案内する（古いブラウザでも動く書き方）
+(function(){setTimeout(function(){if(window.__mnBooted)return;var d=document.createElement('div');
+d.setAttribute('style','position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#0A2233;color:#fff;padding:48px 24px;font:16px/1.8 sans-serif');
+d.innerHTML='<b>motonoumi を開けませんでした</b><br>お使いのブラウザが古いか、対応していない可能性があります。<br>iPhoneはSafari、AndroidはChromeを最新にして開いてください。<br><br><b>motonoumi could not start.</b><br>Please open it with the latest Safari (iPhone) or Chrome (Android).';
+document.body.appendChild(d);},6000);})();
+</script>
+<script>
 // ── 言語（日本語／英語）。文言はすべてここで管理 ──
 const I18N={
 ja:{
@@ -745,7 +763,7 @@ ja:{
   'pin.askConfirm':'確認のため、新しいPINをもう一度入力してください','pin.mismatch':'2回の入力が一致しませんでした','pin.changed':'PINを変更しました',
   'pin.suggest':'安全のため、メニューからPINを6桁に変更してください',
   'app.sub':'元の海','me.who':'ログイン中：',
-  'auth.nick':'ニックネーム','auth.nickPh':'例: shonan','auth.pin':'PIN（数字6桁）','auth.pinNote':'PINは暗号化して保存します。忘れると再発行できません',
+  'auth.nick':'ニックネーム','auth.nickPh':'例: shonan','auth.pin':'PIN（数字6桁）','auth.pinNote':'PINは暗号化して保存します',
   'auth.start':'はじめる','auth.register':'新規登録','auth.login':'ログイン','auth.first':'はじめて？ ','auth.have':'アカウントあり？ ',
   'auth.needNick':'ニックネームを入力してください','auth.pin4':'PINは4桁の数字です','auth.checking':'確認中...','auth.error':'エラーが発生しました。もう一度お試しください。',
   'net.error':'通信エラー','net.errorCode':'通信エラー（{n}）',
@@ -761,6 +779,32 @@ ja:{
   's2.t':'正確な位置は、あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
   's3.t':'写真はみんなに公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
   's4.t':'AIがごみを解析','s4.d':'素材や発生源を推定し、根拠と確信度を添えて記録します',
+  'net.offlineBar':'オフラインです。電波のある場所で記録してください','net.offlineNow':'いまオフラインです。電波のある場所に移動してください。',
+  'an.failNet':'解析できませんでした。電波が弱いか、サーバーが混み合っている可能性があります。',
+  'an.retryOne':'もう一度試しますか？','an.retryBatch':'もう一度試しますか？（キャンセルすると一時停止し、次にアプリを開いたときに続きから再開できます）',
+  'sv.retry':'確認画面に戻りました。電波のある場所で、もう一度「記録する」を押してください。解析はやり直しません。',
+  'batch.paused':'まとめて記録を一時停止しました（{total}枚中{done}枚まで）。次にアプリを開いたとき、続きから再開できます。',
+  'cf.discard':'この解析結果を記録せずに閉じますか？',
+  'inapp.msg':'アプリ内のブラウザで開いています。写真の選択や保存がうまくいかないことがあります。右上のメニューから「ブラウザで開く」を選んでください',
+  'logout':'ログアウト','logout.confirm':'ログアウトしますか？（記録はサーバーに残ります。次はニックネームとPINでログインします）',
+  'pin.forgot':'PINを忘れたときは、主催者か運営者に連絡してください（仮のPINを発行できます）',
+  'gd.shoot':'撮り方','gd.setup':'はじめの設定','gd.trouble':'困ったとき',
+  'gd.locT':'カメラの位置情報をオンにする（いちばん大事）',
+  'gd.locIos':'設定 → プライバシーとセキュリティ → 位置情報サービス → カメラ →「このAppの使用中のみ許可」。その後に撮った写真から使えます',
+  'gd.locAndroid':'カメラアプリを開く → 設定（歯車）→「位置情報タグ」や「位置情報を保存」をオン（機種によって名前が違います）。保存形式が HEIC なら JPEG に',
+  'gd.locIosShort':'iPhoneの場合：設定 → プライバシーとセキュリティ → 位置情報サービス → カメラ',
+  'gd.locAndroidShort':'Androidの場合：カメラアプリの設定 →「位置情報タグ」をオン',
+  'gd.homeT':'ホーム画面に追加する（アプリのように使える）',
+  'gd.homeIos':'Safariでこのページを開く → 下の共有ボタン（四角から矢印）→「ホーム画面に追加」',
+  'gd.homeAndroid':'Chromeでこのページを開く → 右上の「︙」→「ホーム画面に追加」または「アプリをインストール」',
+  'gd.envT':'動作環境',
+  'gd.envD':'iPhoneはSafari、AndroidはChromeの最新版がおすすめです。LINEやInstagramなどの中のブラウザでは、写真の選択や保存がうまくいかないことがあります。プライベートブラウズ（シークレットモード）では、閉じるたびにログイン状態が消えます',
+  'q1.q':'「位置情報が含まれていません」と出る','q1.a':'上の「カメラの位置情報をオンにする」を設定して、撮り直した写真を選んでください。スクリーンショットや、加工・保存し直した写真は使えません',
+  'q2.q':'解析や保存が終わらない・失敗する','q2.a':'電波が弱い可能性があります。電波のある場所で「もう一度試す」を押してください。保存に失敗しても、確認画面に戻るので解析はやり直しません',
+  'q3.q':'まとめて記録の途中で止まった','q3.a':'アプリを開き直すと「続けますか？」と聞かれ、止まった写真から再開できます。同じ写真を選び直しても、記録済みの写真は自動でとばします',
+  'q4.q':'ログインできない','q4.a':'ニックネームとPINを確かめてください。5回続けて間違えると、しばらくロックされます。PINを忘れたときは、主催者か運営者に連絡してください',
+  'q5.q':'画面が古いまま・ボタンが反応しない','q5.a':'ページを再読み込みしてください。それでも直らないときは、少し時間をおいてから開き直してください',
+  'q6.q':'端末をほかの人と共有している','q6.a':'使い終わったら、メニューの「ログアウト」を押してください。記録はサーバーに残ります',
   'batch.resume':'前回のまとめて記録が途中で止まっています（{total}枚中{done}枚まで）。\n残りの{rest}枚を続けますか？',
   'batch.dupLine':'すでに記録した写真 {n}枚は、とばします','batch.allDup':'選んだ写真（{n}枚）は、すべて記録済みです。',
   'an.dup':'この写真は、すでに記録されているようです（同じ撮影日時・場所）。もう一度記録しますか？',
@@ -843,7 +887,7 @@ ja:{
   'act.askOrg':'団体名を入力してください（例：会社名）','act.askStaff':'主催者コードを入力してください',
   'act.reportKind':'活動レポート','act.orgActs':'活動{n}回','act.perPerson':'1人あたり{n}個','act.photos':'写真{n}枚',
   'コードが見つかりません':'コードが見つかりません',
-  'guide.open':'撮り方','guide.title':'撮り方','guide.ok':'わかった',
+  'guide.open':'使い方','guide.title':'使い方','guide.ok':'わかった',
   'g1.t':'カメラの位置情報をオンにする','g1.d':'スマホのカメラで撮った元の写真を使います。スクリーンショットや加工した写真は使えません',
   'g2.t':'拾ったごみを並べて、上から撮る','g2.d':'重ならないように並べ、1枚に20個くらいまで。AIが種類ごとに数えます',
   'g3.t':'撮ったら袋へ','g3.d':'同じごみを二度撮らないように。拾ったごみが全部、どれかの写真に写っている状態をめざします',
@@ -858,7 +902,7 @@ en:{
   'pin.askConfirm':'Enter the new PIN again to confirm','pin.mismatch':'The two entries did not match','pin.changed':'PIN changed',
   'pin.suggest':'For safety, please change your PIN to 6 digits from the menu',
   'app.sub':'back to the original sea','me.who':'Logged in as ',
-  'auth.nick':'Nickname','auth.nickPh':'e.g. shonan','auth.pin':'PIN (6 digits)','auth.pinNote':'Your PIN is stored encrypted. It cannot be reissued if you forget it',
+  'auth.nick':'Nickname','auth.nickPh':'e.g. shonan','auth.pin':'PIN (6 digits)','auth.pinNote':'Your PIN is stored encrypted',
   'auth.start':'Start','auth.register':'Sign up','auth.login':'Log in','auth.first':'New here? ','auth.have':'Have an account? ',
   'auth.needNick':'Please enter a nickname','auth.pin4':'PIN must be 4 digits','auth.checking':'Checking...','auth.error':'Something went wrong. Please try again.',
   'net.error':'Connection error','net.errorCode':'Connection error ({n})',
@@ -874,6 +918,32 @@ en:{
   's2.t':'Exact location: only you','s2.d':'Others see it blurred to about 300 m',
   's3.t':'Photos are public','s3.d':'Avoid faces, homes and license plates',
   's4.t':'AI analyzes the litter','s4.d':'It estimates material and source, with reasons and confidence',
+  'net.offlineBar':'You are offline. Please record where you have signal','net.offlineNow':'You are offline now. Please move to a place with signal.',
+  'an.failNet':'Could not analyze. The signal may be weak or the server busy.',
+  'an.retryOne':'Try again?','an.retryBatch':'Try again? (Cancel to pause; you can resume next time you open the app)',
+  'sv.retry':'Back on the confirm screen. Press “Save record” again where you have signal. No re-analysis needed.',
+  'batch.paused':'Batch recording paused ({done} of {total}). You can resume next time you open the app.',
+  'cf.discard':'Close without saving this analysis?',
+  'inapp.msg':'You are in an in-app browser. Choosing or saving photos may not work. Use the menu at the top right to “Open in browser”',
+  'logout':'Log out','logout.confirm':'Log out? (Your records stay on the server. Log in again with your nickname and PIN)',
+  'pin.forgot':'Forgot your PIN? Contact the organizer or operator (a temporary PIN can be issued)',
+  'gd.shoot':'How to shoot','gd.setup':'First-time setup','gd.trouble':'Troubleshooting',
+  'gd.locT':'Turn on camera location (most important)',
+  'gd.locIos':'Settings → Privacy & Security → Location Services → Camera → “While Using the App”. Photos taken after this can be used',
+  'gd.locAndroid':'Open the camera app → Settings (gear) → turn on “Location tags” or “Save location” (names vary by device). If it saves HEIC, switch to JPEG',
+  'gd.locIosShort':'iPhone: Settings → Privacy & Security → Location Services → Camera',
+  'gd.locAndroidShort':'Android: camera app settings → turn on “Location tags”',
+  'gd.homeT':'Add to Home Screen (use it like an app)',
+  'gd.homeIos':'Open this page in Safari → Share button (square with arrow) → “Add to Home Screen”',
+  'gd.homeAndroid':'Open this page in Chrome → “︙” at top right → “Add to Home screen” or “Install app”',
+  'gd.envT':'Supported environment',
+  'gd.envD':'Latest Safari on iPhone and Chrome on Android are recommended. In-app browsers (LINE, Instagram, etc.) may fail to choose or save photos. Private browsing clears your login each time you close it',
+  'q1.q':'“No location data” appears','q1.a':'Turn on camera location above and choose a photo taken after that. Screenshots and edited or re-saved photos cannot be used',
+  'q2.q':'Analysis or saving does not finish or fails','q2.a':'The signal may be weak. Press “Try again” where you have signal. If saving fails you return to the confirm screen, so no re-analysis is needed',
+  'q3.q':'Batch recording stopped partway','q3.a':'Open the app again and it asks “Continue?”, resuming from where it stopped. Choosing the same photos again skips ones already recorded',
+  'q4.q':'Cannot log in','q4.a':'Check your nickname and PIN. After 5 failed attempts, login is locked for a while. If you forgot your PIN, contact the organizer or operator',
+  'q5.q':'The screen looks old or buttons do not respond','q5.a':'Reload the page. If that does not help, wait a little and open it again',
+  'q6.q':'You share this device with others','q6.a':'Press “Log out” in the menu when you finish. Your records stay on the server',
   'batch.resume':'Your last batch recording stopped partway ({done} of {total}).\nContinue with the remaining {rest}?',
   'batch.dupLine':'{n} photos already recorded will be skipped','batch.allDup':'All selected photos ({n}) are already recorded.',
   'an.dup':'This photo seems to be already recorded (same date, time and place). Record it again?',
@@ -955,7 +1025,7 @@ en:{
   'act.orgNote':'Only organizers join a team. Participants just join an activity with its code',
   'act.askOrg':'Enter the team name (e.g. company name)','act.askStaff':'Enter the organizer code',
   'act.reportKind':'Activity report','act.orgActs':'{n} activities','act.perPerson':'{n} items per person','act.photos':'{n} photos',
-  'guide.open':'How to shoot','guide.title':'How to shoot','guide.ok':'Got it',
+  'guide.open':'How to use','guide.title':'How to use','guide.ok':'Got it',
   'g1.t':'Turn on camera location','g1.d':'Use original photos taken with your phone camera. Screenshots and edited photos cannot be used',
   'g2.t':'Spread out the litter and shoot from above','g2.d':'Avoid overlaps, about 20 pieces per photo. AI counts each type',
   'g3.t':'Bag it after shooting','g3.d':'Don\u2019t photograph the same litter twice. Aim for every piece you pick up to appear in some photo',
@@ -1569,6 +1639,17 @@ async function joinActivity(code,silent){
 }
 function leaveActivity(){ setCurrentActivity(null); renderActivity(); }
 // QRコードやリンクで開いたとき（?join=コード）は、ログイン後に自動で参加
+// LINEの中のブラウザで開かれたら、普段のブラウザで開き直す（参加コードなどのURLはそのまま）
+(function(){
+  const ua=navigator.userAgent||'';
+  try{
+    const u=new URL(location.href);
+    if(/\bLine\//i.test(ua)&&!u.searchParams.has('openExternalBrowser')){ u.searchParams.set('openExternalBrowser','1'); location.replace(u.toString()); }
+    if(u.searchParams.has('openExternalBrowser')){ u.searchParams.delete('openExternalBrowser'); history.replaceState(null,'',u.pathname+u.search+u.hash); }
+  }catch(e){}
+  // そのほかのアプリ内ブラウザ（Instagram・Facebook・X など）は、案内を出す
+  window.__inApp=/FBAN|FBAV|Instagram|\bLine\/|MicroMessenger|KAKAOTALK|Twitter|TikTok/i.test(ua);
+})();
 function pendingJoinFromUrl(){
   try{
     const u=new URL(location.href),c=u.searchParams.get('join');
@@ -1703,6 +1784,15 @@ async function finishActivity(id){
   if(res.error){alert(tv(res.error));return;}
   await refreshMine();
 }
+// ログアウト（端末をほかの人と共有するとき）。言語や壁紙は残す
+function logout(){
+  if(!confirm(t('logout.confirm'))) return;
+  try{ localStorage.removeItem('umi_token'); localStorage.removeItem('umi_nick'); localStorage.removeItem('umi_activity'); }catch(e){}
+  setCookie('umi_token','',-1); setCookie('umi_nick','',-1);
+  // メニューを閉じたときの「戻る履歴の整理」と重ならないよう、少し待ってから開き直す
+  setTimeout(()=>location.replace(location.origin+location.pathname),300);
+}
+
 // PINの変更（今のPIN → 新しい6桁 → 確認）
 async function changePin(){
   const cur=prompt(t('pin.askCur')); if(cur===null) return;
@@ -1908,9 +1998,21 @@ function exportIccCsv(){
 // ── 撮り方の案内（初めての人には自動で1回表示） ──
 function renderGuide(){
   const step=(n,k)=>'<div class="guide-step"><div class="guide-n">'+n+'</div><div><div class="guide-t">'+t(k+'.t')+'</div><div class="guide-d">'+t(k+'.d')+'</div></div></div>';
-  document.getElementById('guide-body').innerHTML=step(1,'g1')+step(2,'g2')+step(3,'g3')+'<div class="guide-warn">'+t('g.warn')+'</div>';
+  const qa=k=>'<details class="act-how"><summary>'+t(k+'.q')+'</summary><div class="guide-d" style="margin:6px 0 4px">'+t(k+'.a')+'</div></details>';
+  const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  document.getElementById('guide-body').innerHTML=
+    '<div class="sum-h">'+t('gd.shoot')+'</div>'+step(1,'g1')+step(2,'g2')+step(3,'g3')+'<div class="guide-warn">'+t('g.warn')+'</div>'+
+    '<div class="sum-sec" id="guide-help"><div class="sum-h">'+t('gd.setup')+'</div>'+
+      '<div class="act-card plain"><div class="act-opt-t" style="font-size:14px">'+t('gd.locT')+'</div><div class="guide-d">'+t(isIOS?'gd.locIos':'gd.locAndroid')+'</div><div class="guide-d" style="margin-top:6px;opacity:.75">'+t(isIOS?'gd.locAndroidShort':'gd.locIosShort')+'</div></div>'+
+      '<div class="act-card plain"><div class="act-opt-t" style="font-size:14px">'+t('gd.homeT')+'</div><div class="guide-d">'+t(isIOS?'gd.homeIos':'gd.homeAndroid')+'</div></div>'+
+      '<div class="act-card plain"><div class="act-opt-t" style="font-size:14px">'+t('gd.envT')+'</div><div class="guide-d">'+t('gd.envD')+'</div></div>'+
+    '</div>'+
+    '<div class="sum-sec"><div class="sum-h">'+t('gd.trouble')+'</div>'+qa('q1')+qa('q2')+qa('q3')+qa('q4')+qa('q5')+qa('q6')+'</div>';
 }
-function openGuide(){ renderGuide(); document.getElementById('guidev').classList.add('show'); }
+function openGuide(section){
+  renderGuide(); document.getElementById('guidev').classList.add('show');
+  if(section==='help') setTimeout(()=>{const el=document.getElementById('guide-help'); if(el) el.scrollIntoView({block:'start'});},50);
+}
 function closeGuide(){ document.getElementById('guidev').classList.remove('show'); try{localStorage.setItem('umi_guided','1');}catch(e){} }
 function maybeShowGuide(){ let seen=null; try{seen=localStorage.getItem('umi_guided');}catch(e){} if(!seen) openGuide(); }
 
@@ -2571,6 +2673,12 @@ function batchNext(){
   rd.readAsDataURL(file);
 }
 function batchSkip(){ if(!batch) return false; batch.skipped++; batchSaveState(); batchNext(); return true; }
+function pauseBatch(){
+  if(!batch) return;
+  const b=batch; batch=null; // 途中経過（端末の保存）は消さない → 次に開いたとき続きから
+  document.getElementById('confv').classList.remove('show');
+  alert(t('batch.paused',{done:b.i,total:b.items.length}));
+}
 function stopBatch(){
   if(!batch) return;
   batch.skipped+=batch.items.length-batch.i; batch.i=batch.items.length;
@@ -2658,7 +2766,8 @@ function readPhotoMeta(file){
       }catch(err){done({issue:'noexif'});}
     };
     rd.onerror=()=>done({issue:'notimage'});
-    rd.readAsArrayBuffer(file);
+    // 撮影情報（Exif）は写真の先頭にあるので、先頭の256KBだけを読む（たくさん選んでもメモリを使いすぎない）
+    rd.readAsArrayBuffer(file.slice(0,256*1024));
   });
 }
 function parseGPS(buf){
@@ -2787,7 +2896,7 @@ async function compressForStorage(dataUrl){
 
 // ── ANALYZE ──
 async function analyze(){
-  if(userLat==null||userLng==null){alert(t('an.'+(photoIssue==='noexif'?'noExif':photoIssue==='zero'?'zero':'noGps')));return;}
+  if(userLat==null||userLng==null){alert(t('an.'+(photoIssue==='noexif'?'noExif':photoIssue==='zero'?'zero':'noGps')));openGuide('help');return;}
   showLoad(t('an.loading'));
   try{
     // 10MB制限対策：送信前に圧縮
@@ -2796,7 +2905,7 @@ async function analyze(){
     const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt,token:sessionToken})});
     if(r.status===401){hideLoad();alert(t('an.needLogin'));if(batch){batch=null;}return;}
     if(r.status===413){hideLoad();alert(t('an.tooBig'));return;}
-    if(!r.ok) throw new Error('AI解析失敗');
+    if(!r.ok) throw new Error('server '+r.status);
     analysisResult=await r.json();
     hideLoad();
     // ごみ判定
@@ -2806,7 +2915,13 @@ async function analyze(){
       return;
     }
     showConfirm();
-  }catch(e){hideLoad();console.error(e);if(batch){toast(t('batch.failOne',{i:batch.i+1}));batchSkip();return;}alert(t('an.fail'));}
+  }catch(e){
+    hideLoad();console.error(e);
+    // 通信が途切れた・サーバーが混んでいる：写真はとばさず、もう一度試すか、一時停止して後で続ける
+    const msg=(navigator.onLine===false?t('net.offlineNow'):t('an.failNet'))+'\n\n'+(batch?t('an.retryBatch'):t('an.retryOne'));
+    if(confirm(msg)){ analyze(); return; }
+    if(batch){ pauseBatch(); return; }
+  }
 }
 
 // ── CONFIRM ──
@@ -2934,7 +3049,10 @@ function changeCategory(cat){
   document.querySelector('#conf-summary .cs-cat-btns').previousElementSibling.style.color=col;
 }
 function retake(){ if(batchSkip()) return; document.getElementById('confv').classList.remove('show');openCam();}
+let sending=false;
 async function send(){
+  if(sending) return; // 「記録する」の連打で二重に保存しない
+  sending=true;
   document.getElementById('confv').classList.remove('show');
   showLoad(t('sv.saving'));
   try{
@@ -2968,7 +3086,12 @@ async function send(){
     buildNavRecs();
     if(batch){ batch.saved++; batchSaveState(); toast(t('batch.saved',{i:batch.i+1,n:batch.items.length})); batchNext(); return; }
     document.getElementById('donev').classList.add('show');
-  }catch(e){hideLoad();alert(t('sv.fail')+tv(e.message));console.error(e);if(batch)batchSkip();}
+  }catch(e){
+    hideLoad();console.error(e);
+    // 確認画面を出し直して、解析をやり直さずに「記録する」をもう一度押せるようにする
+    document.getElementById('confv').classList.add('show');
+    alert((navigator.onLine===false?t('net.offlineNow'):t('sv.fail')+tv(e.message))+'\n\n'+t('sv.retry'));
+  }finally{ sending=false; }
 }
 function backToMap(){document.getElementById('donev').classList.remove('show');}
 
@@ -2980,6 +3103,33 @@ function hideLoad(){document.getElementById('ldg').classList.remove('show');}
 applyI18nStatic();
 renderObSpecs();
 switchTab(authMode);
+// 画面（写真の拡大・メニュー・使い方・集計・活動・完了・確認）が開いている間は履歴を1つ積み、
+// 「戻る」でアプリから出ずに、いちばん上の画面を閉じる
+const OVERLAYS=[['photo-viewer',()=>closePhoto()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
+  ['sumv',()=>{ if(!reportMode) closeSummary(); }],['actv',()=>closeActivity()],['donev',()=>backToMap()],
+  ['confv',()=>{ if(confirm(t('cf.discard'))){ if(!batchSkip()) document.getElementById('confv').classList.remove('show'); } }]];
+const isOpen=id=>{const e=document.getElementById(id);return !!e&&e.classList.contains('show');};
+function anyOverlay(){ return OVERLAYS.some(([id])=>isOpen(id)); }
+let histPushed=false;
+function syncBackStack(){
+  if(anyOverlay()&&!histPushed){ history.pushState({mnOverlay:1},''); histPushed=true; }
+  // ボタンで全部閉じたときは、積んだ履歴を取り除く（次の「戻る」が空振りしないように）
+  else if(!anyOverlay()&&histPushed){ histPushed=false; history.back(); }
+}
+new MutationObserver(syncBackStack).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+window.addEventListener('popstate',()=>{
+  if(!histPushed) return;
+  histPushed=false;
+  const top=OVERLAYS.find(([id])=>isOpen(id));
+  if(top) top[1]();
+  setTimeout(syncBackStack,0); // まだ開いている画面があれば、もう一度積む
+});
+window.__mnBooted=true; // 本体が最後まで読み込めた印（見張りへの合図）
+// 電波の状態を表示
+function updateNetBar(){ document.getElementById('net-bar').classList.toggle('show',navigator.onLine===false); }
+window.addEventListener('online',updateNetBar); window.addEventListener('offline',updateNetBar); updateNetBar();
+// アプリ内ブラウザなら案内を出す
+if(window.__inApp) document.getElementById('inapp-bar').classList.add('show');
 </script>
 </body>
 </html>
