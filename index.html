@@ -75,6 +75,24 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #inapp-bar{background:#8A5A12;text-align:left;align-items:flex-start;gap:10px}
 #inapp-bar.show{display:flex}
 #inapp-bar button{flex-shrink:0;border:none;background:transparent;color:#fff;font-size:20px;line-height:1;cursor:pointer}
+.gal-tabs{display:flex;gap:0;margin:0 -20px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
+.gal-tabs button{flex:1;padding:10px 0;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer}
+.gal-tabs button.on{color:#fff;border-bottom-color:#5FD3E6}
+.gal-n{font-size:12px;opacity:.7;font-variant-numeric:tabular-nums}
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:0 -20px}
+.gal-tile{position:relative;aspect-ratio:1/1;border:none;padding:0;background:#0B2A3C;cursor:pointer;overflow:hidden}
+.gal-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-tile .gal-dot{position:absolute;left:6px;top:6px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+.gal-tile .gal-noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.5);padding:6px;text-align:center}
+.gal-empty{padding:40px 10px;text-align:center;font-size:13px;color:rgba(255,255,255,.7);line-height:1.8}
+#galpop{position:fixed;inset:0;z-index:5200;display:none;align-items:center;justify-content:center;background:rgba(2,10,18,.75);padding:calc(env(safe-area-inset-top,0px) + 16px) 12px calc(env(safe-area-inset-bottom,0px) + 16px)}
+#galpop.show{display:flex}
+.galpop-card{position:relative;width:min(340px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:#1E2A35;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.galpop-card .umi-pop{width:100%}
+.galpop-card .umi-pop-body{max-height:none}
+#galpop-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
+.galpop-x{position:absolute;top:8px;right:8px;z-index:2;background:rgba(4,17,28,.6)}
+.galpop-map{margin:10px 14px 14px;flex-shrink:0}
 .sheet{position:fixed;inset:0;z-index:5000;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;
   background:linear-gradient(180deg,#06192A 0%,#04111C 100%);color:#fff;
   padding:calc(env(safe-area-inset-top,0px) + 14px) 20px calc(env(safe-area-inset-bottom,0px) + 24px)}
@@ -615,6 +633,22 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <div class="seg" id="sum-area"><button data-v="view" onclick="setSum('area','view')" data-i18n="sum.view">地図の表示範囲</button><button data-v="all" onclick="setSum('area','all')" data-i18n="sum.everywhere">すべて</button></div></div>
   <div id="sum-body"></div>
 </div>
+<!-- 写真の一覧（自分／みんな） -->
+<div id="galv" class="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="gal.title">写真の一覧</div><button class="sheet-x" onclick="closeGallery()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div class="gal-tabs" role="tablist">
+    <button type="button" role="tab" data-tab="mine" onclick="setGalTab('mine')"><span data-i18n="me">自分</span> <span class="gal-n" id="gal-n-mine"></span></button>
+    <button type="button" role="tab" data-tab="all" onclick="setGalTab('all')"><span data-i18n="all">みんな</span> <span class="gal-n" id="gal-n-all"></span></button>
+  </div>
+  <div id="gal-grid" class="gal-grid"></div>
+</div>
+<div id="galpop" role="dialog" aria-modal="true" onclick="if(event.target===this)closeGalPop()">
+  <div class="galpop-card">
+    <button class="sheet-x galpop-x" onclick="closeGalPop()" aria-label="閉じる" data-i18n-aria="close">&times;</button>
+    <div id="galpop-body"></div>
+    <button type="button" class="act-btn main galpop-map" onclick="galShowOnMap()" data-i18n="gal.onMap">地図で見る</button>
+  </div>
+</div>
 <!-- 活動（団体・参加・主催） -->
 <div id="actv" class="sheet" role="dialog" aria-modal="true">
   <div class="sheet-hdr"><div class="sheet-title" data-i18n="act.title">活動</div><button class="sheet-x" onclick="closeActivity()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
@@ -642,6 +676,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
       <div class="wp-who"><span data-i18n="me.who">ログイン中：</span><b id="wp-who-name"></b></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGallery('mine')" data-i18n="gal.open">写真の一覧</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');changePin()" data-i18n="pin.change">PINを変更</button>
@@ -811,6 +846,8 @@ ja:{
   'batch.resume':'前回のまとめて記録が途中で止まっています（{total}枚中{done}枚まで）。\n残りの{rest}枚を続けますか？',
   'batch.dupLine':'すでに記録した写真 {n}枚は、とばします','batch.allDup':'選んだ写真（{n}枚）は、すべて記録済みです。',
   'an.dup':'この写真は、すでに記録されているようです（同じ撮影日時・場所）。もう一度記録しますか？',
+  'gal.open':'写真の一覧','gal.title':'写真の一覧','gal.onMap':'地図で見る',
+  'gal.emptyMine':'まだ記録がありません。<br>拾ったごみを撮って、最初の1枚を記録しましょう','gal.emptyAll':'ほかの人の記録はまだありません',
   'batch.checking':'記録済みの写真がないか確かめています...',
   'batch.reading':'写真を読み込んでいます...','batch.confirm':'{n}枚を、撮影日の古い順に1枚ずつ解析します。確認画面で「記録する」か「とばす」を選ぶと、次の写真に進みます。',
   'batch.noLocLine':'位置情報のない写真 {n}枚は、とばします','batch.over':'一度に選べるのは{max}枚までです（{n}枚は対象外）',
@@ -951,6 +988,8 @@ en:{
   'batch.resume':'Your last batch recording stopped partway ({done} of {total}).\nContinue with the remaining {rest}?',
   'batch.dupLine':'{n} photos already recorded will be skipped','batch.allDup':'All selected photos ({n}) are already recorded.',
   'an.dup':'This photo seems to be already recorded (same date, time and place). Record it again?',
+  'gal.open':'Photo list','gal.title':'Photo list','gal.onMap':'Show on map',
+  'gal.emptyMine':'No records yet.<br>Photograph the litter you picked up and record your first one','gal.emptyAll':'No records from others yet',
   'batch.checking':'Checking for photos already recorded...',
   'batch.reading':'Reading photos...','batch.confirm':'{n} photos will be analyzed one by one, oldest first. Choose “Save record” or “Skip” on each to move on.',
   'batch.noLocLine':'{n} photos without location data will be skipped','batch.over':'Up to {max} photos at a time ({n} not included)',
@@ -1092,6 +1131,7 @@ function setLang(l){
   if(document.getElementById('sumv').classList.contains('show')) renderSummary();
   if(document.getElementById('guidev').classList.contains('show')) renderGuide();
   if(document.getElementById('actv').classList.contains('show')) renderActivity();
+  if(document.getElementById('galv').classList.contains('show')) renderGallery();
   updateActChip();
   const cv=document.getElementById('confv');
   if(cv&&cv.classList.contains('show')&&typeof showConfirm==='function'&&analysisResult) showConfirm();
@@ -2009,6 +2049,52 @@ function exportIccCsv(){
   saveBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'motonoumi_icc_'+stamp+'.csv');
 }
 
+
+// ── 写真の一覧（自分／みんな）。写真を押すと、地図のポップアップと同じ内容を重ねて表示 ──
+let galTab='mine', galCurrent=null;
+function galRecords(tab){
+  return (window.allRecords||[]).filter(r=>tab==='mine'?r.is_mine:!r.is_mine)
+    .slice().sort((a,b)=>String(b.photo_taken_at||b.created_at||'').localeCompare(String(a.photo_taken_at||a.created_at||'')));
+}
+function openGallery(tab){ if(tab) galTab=tab; document.getElementById('galv').classList.add('show'); renderGallery(); document.getElementById('galv').scrollTop=0; }
+function closeGallery(){ document.getElementById('galv').classList.remove('show'); }
+function setGalTab(tab){ galTab=tab; renderGallery(); document.getElementById('galv').scrollTop=0; }
+function renderGallery(){
+  document.querySelectorAll('.gal-tabs button').forEach(b=>{ const on=b.dataset.tab===galTab; b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on)); });
+  document.getElementById('gal-n-mine').textContent=galRecords('mine').length;
+  document.getElementById('gal-n-all').textContent=galRecords('all').length;
+  const recs=galRecords(galTab), grid=document.getElementById('gal-grid');
+  if(!recs.length){ grid.innerHTML='<div class="gal-empty" style="grid-column:1/-1">'+t(galTab==='mine'?'gal.emptyMine':'gal.emptyAll')+'</div>'; return; }
+  grid.innerHTML=recs.map(r=>{
+    const col=catCol[normCat(r.category)]||'#22CCEE';
+    const label=esc((fmtDate(r.photo_taken_at||r.created_at)||'')+' '+normCat(r.category));
+    return '<button type="button" class="gal-tile" onclick="openGalPop(\''+esc(r.id)+'\')" aria-label="'+label+'">'+
+      (r.image_url?'<img src="'+esc(r.image_url)+'" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">':'<span class="gal-noimg">'+esc((r.items||'').split('\n')[0]||'—')+'</span>')+
+      '<span class="gal-dot" style="background:'+col+'"></span></button>';
+  }).join('');
+}
+// 写真を押したとき：地図のピンと同じポップアップの中身を、一覧の上に重ねる
+function openGalPop(id){
+  const m=markerMap[id];
+  const html=m&&m.getPopup()?m.getPopup().getContent():'';
+  if(!html) return;
+  galCurrent=id;
+  const body=document.getElementById('galpop-body');
+  body.innerHTML=html;
+  document.getElementById('galpop').classList.add('show');
+  body.scrollTop=0;
+  const pb=body.querySelector('.umi-pop-body'); if(pb) updatePopFade(pb);
+}
+function closeGalPop(){ document.getElementById('galpop').classList.remove('show'); galCurrent=null; }
+// 「地図で見る」：一覧を閉じて、その地点のピンを開く（非表示のカテゴリでも表示する）
+function galShowOnMap(){
+  const id=galCurrent; closeGalPop(); closeGallery();
+  const m=markerMap[id]; if(!m||!lmap) return;
+  if(!lmap.hasLayer(m)) m.addTo(lmap);
+  lmap.flyTo(m.getLatLng(),Math.max(lmap.getZoom(),16),{duration:.6});
+  setTimeout(()=>m.openPopup(),700);
+}
+
 // ── 撮り方の案内（初めての人には自動で1回表示） ──
 function renderGuide(){
   const step=(n,k)=>'<div class="guide-step"><div class="guide-n">'+n+'</div><div><div class="guide-t">'+t(k+'.t')+'</div><div class="guide-d">'+t(k+'.d')+'</div></div></div>';
@@ -2541,6 +2627,8 @@ function initNav(){
     },{passive:false,capture:true});
     // 中央（ラベル部分）を上下にスワイプしても送れる
     const mid=el.querySelector('.nav-mid')||el;
+    mid.style.cursor='pointer';
+    mid.addEventListener('click',()=>openGallery(el.id==='nav-mine'?'mine':'all'));
     let ty=0;
     mid.addEventListener('touchstart',(e)=>{ty=e.touches[0].clientY;},{passive:true});
     mid.addEventListener('touchend',(e)=>{
@@ -3149,7 +3237,7 @@ renderObSpecs();
 switchTab(authMode);
 // 画面（写真の拡大・メニュー・使い方・集計・活動・完了・確認）が開いている間は履歴を1つ積み、
 // 「戻る」でアプリから出ずに、いちばん上の画面を閉じる
-const OVERLAYS=[['photo-viewer',()=>closePhoto()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
+const OVERLAYS=[['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
   ['sumv',()=>{ if(!reportMode) closeSummary(); }],['actv',()=>closeActivity()],['donev',()=>backToMap()],
   ['confv',()=>{ if(confirm(t('cf.discard'))){ if(!batchSkip()) document.getElementById('confv').classList.remove('show'); } }]];
 const isOpen=id=>{const e=document.getElementById(id);return !!e&&e.classList.contains('show');};
