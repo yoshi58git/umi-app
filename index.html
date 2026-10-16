@@ -81,6 +81,15 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .terms-body h3{font-size:14px;margin:18px 0 4px;color:#fff}
 .terms-body p{margin:0 0 6px}
 .terms-note{margin-top:16px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.06);font-size:12px;color:rgba(255,255,255,.7)}
+.umi-pop-report{display:block;margin-top:14px;padding:6px 10px;border:none;background:transparent;color:rgba(255,255,255,.5);font-family:inherit;font-size:11px;text-decoration:underline;cursor:pointer}
+.umi-pop-hidden{margin-bottom:10px;padding:8px 10px;border-radius:10px;background:rgba(255,210,122,.12);border:1px solid rgba(255,210,122,.4);color:#FFE3A8;font-size:12px;line-height:1.5}
+#repv{position:fixed;inset:0;z-index:5600;display:none;align-items:flex-end;justify-content:center;background:rgba(2,10,18,.6)}
+#repv.show{display:flex}
+.rep-card{width:min(420px,100%);padding:18px 18px calc(env(safe-area-inset-bottom,0px) + 18px);border-radius:18px 18px 0 0;background:#0F2433;color:#fff}
+.rep-t{font-size:16px;font-weight:600;margin-bottom:4px}
+.rep-d{font-size:12px;color:var(--foam);line-height:1.6;margin-bottom:12px}
+.rep-opt{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);color:#fff;font-family:inherit;font-size:14px;cursor:pointer}
+.rep-cancel{display:block;width:100%;padding:12px;border:none;background:transparent;color:rgba(255,255,255,.7);font-family:inherit;font-size:14px;cursor:pointer}
 .gal-tabs{display:flex;gap:0;margin:0 -20px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
 .gal-tabs button{flex:1;padding:10px 0;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer}
 .gal-tabs button.on{color:#fff;border-bottom-color:#5FD3E6}
@@ -309,6 +318,9 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 }
 .li:active{transform:scale(.96)}
 .ld{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c)}
+.li[data-cat="RIVER"] .ld{border-radius:1px;transform:rotate(45deg) scale(.85)}
+.li[data-cat="CITY"] .ld{border-radius:1px}
+.li[data-cat="GROUND"] .ld{border-radius:0;width:0;height:0;background:transparent;box-shadow:none;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid var(--c)}
 .li-n{font-weight:600;color:var(--c);min-width:10px;text-align:right}
 .li.off{opacity:.45}
 .li.off .ld{background:transparent;box-shadow:none;border:1.5px solid var(--c);width:5px;height:5px}
@@ -606,6 +618,11 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
   transition:transform .15s ease,box-shadow .15s ease;
   cursor:pointer;
 }
+.umi-pin.shape-river{border-radius:2px;transform:rotate(45deg) scale(.9)}
+.umi-pin.shape-city{border-radius:2px}
+.umi-pin.shape-ground{border-radius:0;background:transparent;border:none;box-shadow:none;width:0;height:0;
+  border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid var(--c);filter:drop-shadow(0 0 1px rgba(255,255,255,.9)) drop-shadow(0 0 2px rgba(255,255,255,.4));margin:-2px 0 0 -2px}
+.leaflet-marker-icon:hover .umi-pin.shape-river{transform:rotate(45deg) scale(1.5)}
 .leaflet-marker-icon:hover .umi-pin{
   transform:scale(1.6);
   box-shadow:0 0 0 5px rgba(255,255,255,.3);
@@ -662,6 +679,18 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
   <div class="seg-row sum-filter"><span class="seg-lbl" data-i18n="sum.area">場所</span>
     <div class="seg" id="sum-area"><button data-v="view" onclick="setSum('area','view')" data-i18n="sum.view">地図の表示範囲</button><button data-v="all" onclick="setSum('area','all')" data-i18n="sum.everywhere">すべて</button></div></div>
   <div id="sum-body"></div>
+</div>
+<!-- 報告（不適切な写真） -->
+<div id="repv" role="dialog" aria-modal="true" onclick="if(event.target===this)closeReport()">
+  <div class="rep-card">
+    <div class="rep-t" data-i18n="rep.title">この写真を報告</div>
+    <div class="rep-d" data-i18n="rep.desc">理由を選んでください。複数の人から報告があると、運営者が確認するまで表示されなくなります</div>
+    <button type="button" class="rep-opt" onclick="sendReport('face')" data-i18n="rep.face">人の顔や個人の情報が写っている</button>
+    <button type="button" class="rep-opt" onclick="sendReport('inappropriate')" data-i18n="rep.inappropriate">不適切な内容</button>
+    <button type="button" class="rep-opt" onclick="sendReport('not_litter')" data-i18n="rep.not_litter">ごみの写真ではない</button>
+    <button type="button" class="rep-opt" onclick="sendReport('other')" data-i18n="rep.other">その他</button>
+    <button type="button" class="rep-cancel" onclick="closeReport()" data-i18n="act.cancel">やめる</button>
+  </div>
 </div>
 <!-- 利用規約とプライバシーポリシー -->
 <div id="termsv" class="sheet" role="dialog" aria-modal="true" style="z-index:6000">
@@ -891,7 +920,7 @@ ja:{
   'batch.dupLine':'すでに記録した写真 {n}枚は、とばします','batch.allDup':'選んだ写真（{n}枚）は、すべて記録済みです。',
   'an.dup':'この写真は、すでに記録されているようです（同じ撮影日時・場所）。もう一度記録しますか？',
   'terms.open':'利用規約とプライバシー','terms.title':'利用規約とプライバシーポリシー','terms.agree':'に同意します','terms.need':'利用規約とプライバシーポリシーへの同意が必要です',
-  'terms.body':'<p>moto no umi（元の海）は、海のごみの実態と陸の出どころを記録し、共有するためのアプリです。使う前にお読みください。</p><h3>1. 集める情報</h3><p>ニックネーム、PIN（暗号化して保存し、元の数字は保存しません）、あなたが選んだ写真、写真に記録された撮影日時と位置、AIによる解析の結果、活動や団体に関する入力。端末の現在地は使いません。</p><h3>2. 使う目的</h3><p>ごみの記録と地図への表示、集計とレポート、活動・団体ごとのまとめ、国際的な海岸ごみ調査と同じ分類での集計のために使います。特定の個人や企業を責めたり、名指ししたりするためには使いません。</p><h3>3. 公開される範囲</h3><p>写真、ごみの内容、AIのコメントは、ほかの利用者に公開されます。位置は、あなた以外には約300mぼかして表示し、撮影時刻は日付だけを表示します。ニックネームはほかの利用者に表示しません。会社名・ブランド名・商品名・店名・人名などの固有名詞は、推定も保存もしません。場所は、管轄が分かる都道府県と市区町村だけを記録します。</p><h3>4. 外部のサービス</h3><p>写真は解析のため、AIの提供元（Anthropic社、米国）に送られます。撮影位置は地名を調べるため、OpenStreetMap（Nominatim）に送られます。データの保存にはSupabaseを使います。地図の表示にはOpenStreetMapの地図を使います。「周りを見る」を押したときだけ、GoogleマップやGSI地理院地図に位置が渡ります。</p><h3>5. 削除</h3><p>自分の記録は、ポップアップの「この記録を削除」でいつでも消せます。メニューの「アカウントを削除」で、アカウントとすべての記録・写真を消せます。</p><h3>6. 写真について</h3><p>写真の著作権はあなたに残ります。このアプリでの表示と、集計・レポートへの利用を許可していただきます。人の顔、家、車のナンバー、個人の情報が読める文字は写さないでください。他人の権利を侵す写真や、不適切な写真は投稿しないでください。運営者は、不適切な投稿を削除することがあります。</p><h3>7. 年齢</h3><p>16歳未満の方は、保護者の同意を得て使ってください。</p><h3>8. AIの推定について</h3><p>AIの数え方や判定は推定で、間違うことがあります。数字は目安としてお使いください。</p><h3>9. お問い合わせ</h3><p>運営者：[運営者名]　連絡先：[連絡先]</p><div class="terms-note">制定日：[日付]　内容を変えるときは、アプリでお知らせします。</div>',
+  'terms.body':'<p>moto no umi（元の海）は、海のごみの実態と陸の出どころを記録し、共有するためのアプリです。使う前にお読みください。</p><h3>1. 集める情報</h3><p>ニックネーム、PIN（暗号化して保存し、元の数字は保存しません）、あなたが選んだ写真、写真に記録された撮影日時と位置、AIによる解析の結果、活動や団体に関する入力。端末の現在地は使いません。</p><h3>2. 使う目的</h3><p>ごみの記録と地図への表示、集計とレポート、活動・団体ごとのまとめ、国際的な海岸ごみ調査と同じ分類での集計のために使います。特定の個人や企業を責めたり、名指ししたりするためには使いません。</p><h3>3. 公開される範囲</h3><p>写真、ごみの内容、AIのコメントは、ほかの利用者に公開されます。位置は、あなた以外には約300mぼかして表示し、撮影時刻は日付だけを表示します。ニックネームはほかの利用者に表示しません。会社名・ブランド名・商品名・店名・人名などの固有名詞は、推定も保存もしません。場所は、管轄が分かる都道府県と市区町村だけを記録します。</p><h3>4. 外部のサービス</h3><p>写真は解析のため、AIの提供元（Anthropic社、米国）に送られます。撮影位置は地名を調べるため、OpenStreetMap（Nominatim）に送られます。データの保存にはSupabaseを使います。地図の表示にはOpenStreetMapの地図を使います。「周りを見る」を押したときだけ、GoogleマップやGSI地理院地図に位置が渡ります。</p><h3>5. 削除</h3><p>自分の記録は、ポップアップの「この記録を削除」でいつでも消せます。メニューの「アカウントを削除」で、アカウントとすべての記録・写真を消せます。</p><h3>6. 写真について</h3><p>写真の著作権はあなたに残ります。このアプリでの表示と、集計・レポートへの利用を許可していただきます。人の顔、家、車のナンバー、個人の情報が読める文字は写さないでください。他人の権利を侵す写真や、不適切な写真は投稿しないでください。複数の人から報告された写真は、運営者が確認するまで表示されません。運営者は、不適切な投稿を削除することがあります。</p><h3>7. 年齢</h3><p>16歳未満の方は、保護者の同意を得て使ってください。</p><h3>8. AIの推定について</h3><p>AIの数え方や判定は推定で、間違うことがあります。数字は目安としてお使いください。</p><h3>9. お問い合わせ</h3><p>運営者：[運営者名]　連絡先：[連絡先]</p><div class="terms-note">制定日：[日付]　内容を変えるときは、アプリでお知らせします。</div>',
   'pop.makerGuess':'メーカー（AIの推定・あなたにだけ表示）',
   'del.record':'この記録を削除','del.confirm':'この記録を削除しますか？写真も消え、元に戻せません。','del.done':'記録を削除しました',
   'delacc.open':'アカウントを削除','delacc.confirm':'アカウントを削除しますか？\nあなたのすべての記録と写真が消え、元に戻せません。','delacc.pin':'確認のため、PINを入力してください','delacc.doing':'削除しています...','delacc.done':'アカウントと記録（{n}件）を削除しました。ご利用ありがとうございました。',
@@ -900,6 +929,11 @@ ja:{
   'pv.confirm':'この写真に「{what}」が写っているようです。\n写真はほかの人にも公開されます。\n\nこのまま記録しますか？（キャンセルして撮り直すのがおすすめです）',
   'sum.byArea':'地域（市区町村）ごと','sum.areaUnknown':'地域が分からない記録',
   'sum.areaNote':'陸由来の多い順。海岸や川の管理者、自治体、地域の団体など、どこと一緒に取り組むかを考える目安になります',
+  'rep.open':'この写真を報告','rep.title':'この写真を報告','rep.desc':'理由を選んでください。複数の人から報告があると、運営者が確認するまで表示されなくなります',
+  'rep.face':'人の顔や個人の情報が写っている','rep.inappropriate':'不適切な内容','rep.not_litter':'ごみの写真ではない','rep.other':'その他',
+  'rep.done':'報告しました。あなたの画面からは表示しません。運営者が確認します',
+  'rep.hiddenMine':'複数の人から報告があったため、ほかの人には表示していません。運営者が確認します',
+  'an.limit':'本日の解析の上限に達しました。明日もう一度お試しください',
   'gal.back':'写真の一覧に戻る',
   'gal.open':'写真の一覧','gal.title':'写真の一覧','gal.onMap':'地図で見る',
   'gal.emptyMine':'まだ記録がありません。<br>拾ったごみを撮って、最初の1枚を記録しましょう','gal.emptyAll':'ほかの人の記録はまだありません',
@@ -1044,7 +1078,7 @@ en:{
   'batch.dupLine':'{n} photos already recorded will be skipped','batch.allDup':'All selected photos ({n}) are already recorded.',
   'an.dup':'This photo seems to be already recorded (same date, time and place). Record it again?',
   'terms.open':'Terms & privacy','terms.title':'Terms of use and privacy policy','terms.agree':' — I agree','terms.need':'You need to agree to the terms of use and privacy policy',
-  'terms.body':'<p>moto no umi (元の海) is an app for recording the reality of ocean litter and its sources on land, and sharing them. Please read this before use.</p><h3>1. Information we collect</h3><p>Your nickname, PIN (stored encrypted; the original digits are not stored), the photos you choose, the date, time and location recorded in each photo, AI analysis results, and what you enter about activities and teams. We do not use your device\'s current location.</p><h3>2. Purpose</h3><p>To record litter and show it on the map, to summarize and report, to group records by activity and team, and to tally them in the categories of international coastal cleanup surveys. We never use them to blame or name specific people or companies.</p><h3>3. What is public</h3><p>Photos, litter details and AI comments are visible to other users. Your location is shown to others blurred to about 300 m, and only the date (not the time) is shown. Your nickname is not shown to others. Proper nouns such as company, brand, product, shop or personal names are neither estimated nor stored. For place, only the prefecture and municipality (the responsible jurisdiction) are recorded.</p><h3>4. External services</h3><p>Photos are sent to the AI provider (Anthropic, USA) for analysis. Photo locations are sent to OpenStreetMap (Nominatim) to look up place names. Data is stored with Supabase. Maps use OpenStreetMap. Only when you tap “Explore around this point” is the location passed to Google Maps or GSI Maps.</p><h3>5. Deletion</h3><p>You can delete any of your records at any time with “Delete this record” in its popup. “Delete account” in the menu deletes your account and all your records and photos.</p><h3>6. About photos</h3><p>You keep the copyright of your photos and allow them to be shown in this app and used in summaries and reports. Do not include faces, homes, license plates, or readable personal information. Do not post photos that infringe others\' rights or are inappropriate. The operator may remove inappropriate posts.</p><h3>7. Age</h3><p>Users under 16 should use the app with a guardian\'s consent.</p><h3>8. About AI estimates</h3><p>AI counts and classifications are estimates and can be wrong. Please treat the numbers as a guide.</p><h3>9. Contact</h3><p>Operator: [operator name]　Contact: [contact]</p><div class="terms-note">Effective date: [date]. We will announce any changes in the app.</div>',
+  'terms.body':'<p>moto no umi (元の海) is an app for recording the reality of ocean litter and its sources on land, and sharing them. Please read this before use.</p><h3>1. Information we collect</h3><p>Your nickname, PIN (stored encrypted; the original digits are not stored), the photos you choose, the date, time and location recorded in each photo, AI analysis results, and what you enter about activities and teams. We do not use your device\'s current location.</p><h3>2. Purpose</h3><p>To record litter and show it on the map, to summarize and report, to group records by activity and team, and to tally them in the categories of international coastal cleanup surveys. We never use them to blame or name specific people or companies.</p><h3>3. What is public</h3><p>Photos, litter details and AI comments are visible to other users. Your location is shown to others blurred to about 300 m, and only the date (not the time) is shown. Your nickname is not shown to others. Proper nouns such as company, brand, product, shop or personal names are neither estimated nor stored. For place, only the prefecture and municipality (the responsible jurisdiction) are recorded.</p><h3>4. External services</h3><p>Photos are sent to the AI provider (Anthropic, USA) for analysis. Photo locations are sent to OpenStreetMap (Nominatim) to look up place names. Data is stored with Supabase. Maps use OpenStreetMap. Only when you tap “Explore around this point” is the location passed to Google Maps or GSI Maps.</p><h3>5. Deletion</h3><p>You can delete any of your records at any time with “Delete this record” in its popup. “Delete account” in the menu deletes your account and all your records and photos.</p><h3>6. About photos</h3><p>You keep the copyright of your photos and allow them to be shown in this app and used in summaries and reports. Do not include faces, homes, license plates, or readable personal information. Do not post photos that infringe others\' rights or are inappropriate. Photos reported by several people are hidden until the operator reviews them. The operator may remove inappropriate posts.</p><h3>7. Age</h3><p>Users under 16 should use the app with a guardian\'s consent.</p><h3>8. About AI estimates</h3><p>AI counts and classifications are estimates and can be wrong. Please treat the numbers as a guide.</p><h3>9. Contact</h3><p>Operator: [operator name]　Contact: [contact]</p><div class="terms-note">Effective date: [date]. We will announce any changes in the app.</div>',
   'pop.makerGuess':'Maker (AI estimate, shown only to you)',
   'del.record':'Delete this record','del.confirm':'Delete this record? The photo is also deleted. This cannot be undone.','del.done':'Record deleted',
   'delacc.open':'Delete account','delacc.confirm':'Delete your account?\nAll your records and photos will be deleted. This cannot be undone.','delacc.pin':'Enter your PIN to confirm','delacc.doing':'Deleting...','delacc.done':'Your account and records ({n}) were deleted. Thank you for taking part.',
@@ -1053,6 +1087,11 @@ en:{
   'pv.confirm':'This photo seems to show {what}.\nPhotos are visible to others.\n\nRecord it anyway? (We recommend Cancel and retake)',
   'sum.byArea':'By area (municipality)','sum.areaUnknown':'Area unknown',
   'sum.areaNote':'Sorted by land-based litter. A guide for deciding whom to work with: coast and river managers, municipalities, local groups',
+  'rep.open':'Report this photo','rep.title':'Report this photo','rep.desc':'Choose a reason. If several people report it, it is hidden until the operator reviews it',
+  'rep.face':'Shows faces or personal information','rep.inappropriate':'Inappropriate content','rep.not_litter':'Not a litter photo','rep.other':'Other',
+  'rep.done':'Reported. It is hidden on your screen and the operator will review it',
+  'rep.hiddenMine':'Hidden from others because several people reported it. The operator will review it',
+  'an.limit':'You have reached today\u2019s analysis limit. Please try again tomorrow',
   'gal.back':'Back to photo list',
   'gal.open':'Photo list','gal.title':'Photo list','gal.onMap':'Show on map',
   'gal.emptyMine':'No records yet.<br>Photograph the litter you picked up and record your first one','gal.emptyAll':'No records from others yet',
@@ -1151,7 +1190,7 @@ const VALUE_EN={
   'ニックネームを入力してください':'Please enter a nickname','PINは4桁の数字です':'PIN must be 4 digits','このニックネームはすでに使われています':'This nickname is already taken',
   'ニックネームまたはPINが違います':'Wrong nickname or PIN','コードが見つかりません':'Code not found','PINは6桁の数字です':'PIN must be 6 digits','今のPINが違います':'Your current PIN is incorrect','しばらくしてからもう一度お試しください':'Please try again later',
   '写真が大きすぎるか、空です':'The photo is too large or empty','JPEG形式の写真ではありません':'The photo is not a JPEG','写真を読み込めませんでした':'Could not read the photo','この団体のメンバーではありません':'You are not a member of this team',
-  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','記録が見つかりません':'Record not found','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
+  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','記録が見つかりません':'Record not found','自分の記録は報告できません':'You cannot report your own record','本日の新規登録の上限に達しました。明日もう一度お試しください':'The sign-up limit for today has been reached. Please try again tomorrow','本日の解析の上限に達しました。明日もう一度お試しください':'You have reached today\u2019s analysis limit. Please try again tomorrow','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
 };
 let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
   return (navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';})();
@@ -1926,8 +1965,9 @@ async function finishActivity(id){
   await refreshMine();
 }
 // ログアウト（端末をほかの人と共有するとき）。言語や壁紙は残す
-function logout(){
+async function logout(){
   if(!confirm(t('logout.confirm'))) return;
+  try{ await api('logout'); }catch(e){} // ほかの端末の古い証明書も使えなくする
   try{ localStorage.removeItem('umi_token'); localStorage.removeItem('umi_nick'); localStorage.removeItem('umi_activity'); }catch(e){}
   setCookie('umi_token','',-1); setCookie('umi_nick','',-1);
   // メニューを閉じたときの「戻る履歴の整理」と重ならないよう、少し待ってから開き直す
@@ -1944,6 +1984,7 @@ async function changePin(){
   if(again.trim()!==next.trim()){alert(t('pin.mismatch'));return;}
   const r=await api('change_pin',{current:cur.trim(),next:next.trim()});
   if(r.error){const mins=(String(r.error).match(/(\d+)分後/)||[])[1];alert(mins?t('auth.locked',{m:mins}):tv(r.error));return;}
+  if(r.token) saveSession(r.token,currentNickname); // ほかの端末の証明書は無効になり、この端末には新しい証明書
   toast(t('pin.changed'));
 }
 
@@ -2231,6 +2272,26 @@ async function deleteAccount(){
   setCookie('umi_token','',-1); setCookie('umi_nick','',-1);
   batchClear();
   setTimeout(()=>location.replace(location.origin+location.pathname),300);
+}
+
+
+// ── 不適切な写真の報告 ──
+let reportTarget=null;
+function openReportRecord(id){ reportTarget=id; document.getElementById('repv').classList.add('show'); }
+function closeReport(){ document.getElementById('repv').classList.remove('show'); reportTarget=null; }
+async function sendReport(reason){
+  const id=reportTarget; closeReport(); if(!id) return;
+  if(!sessionToken){ alert(t('an.needLogin')); return; }
+  const r=await api('report',{id,reason});
+  if(r.error){ alert(tv(r.error)); return; }
+  // 報告した人の画面からは、すぐに見えなくする
+  const m=markerMap[id]; if(m&&lmap){ lmap.closePopup(); lmap.removeLayer(m); }
+  delete markerMap[id];
+  window.allRecords=(window.allRecords||[]).filter(x=>x.id!==id);
+  updateStats(); buildNavRecs();
+  const fc=document.querySelector('#galpop .feed-card[data-id="'+CSS.escape(id)+'"]'); if(fc) fc.remove();
+  if(document.getElementById('galv').classList.contains('show')) renderGallery();
+  toast(t('rep.done'));
 }
 
 // ── 利用規約とプライバシーポリシー ──
@@ -2533,7 +2594,7 @@ function addPin(r){
   if(!lmap||!r.lat||!r.lng) return;
   const cat=normCat(r.category);
   const col=catCol[cat]||'#22CCEE';
-  const iconHtml = `<div class="umi-pin" style="--c:${col}" ></div>`;
+  const iconHtml = `<div class="umi-pin shape-${cat.toLowerCase()}" style="--c:${col}" role="img" aria-label="${esc(cat)}"></div>`;
   const icon=L.divIcon({
     className:'',
     html:iconHtml,
@@ -2589,6 +2650,7 @@ function addPin(r){
     `<div class="umi-pop">
       ${img}
       <div class="umi-pop-body">
+        ${r.is_mine&&r.hidden?`<div class="umi-pop-hidden">${t('rep.hiddenMine')}</div>`:''}
         <div class="umi-pop-hdr">
           <span class="umi-pop-badge" style="color:${col}">${esc(cat)}</span>
           <span class="umi-pop-loc">${loc}</span>
@@ -2615,7 +2677,7 @@ function addPin(r){
         ${stakeholderHtml}
         ${routeHtml}
         ${linksHtml}
-        ${r.is_mine?`<button type="button" class="umi-pop-del" onclick="deleteRecord('${esc(r.id)}')">${t('del.record')}</button>`:''}
+        ${r.is_mine?`<button type="button" class="umi-pop-del" onclick="deleteRecord('${esc(r.id)}')">${t('del.record')}</button>`:`<button type="button" class="umi-pop-report" onclick="openReportRecord('${esc(r.id)}')">${t('rep.open')}</button>`}
       </div>
     </div>`,
     {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,50],autoPanPaddingBottomRight:[10,150]}
@@ -3186,6 +3248,7 @@ async function analyze(){
     const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({imageBase64:b64,lat:userLat,lng:userLng,photoTakenAt:photoTakenAt,token:sessionToken})});
     if(r.status===401){hideLoad();alert(t('an.needLogin'));if(batch){batch=null;}return;}
     if(r.status===413){hideLoad();alert(t('an.tooBig'));return;}
+    if(r.status===429){hideLoad();alert(t('an.limit'));if(batch)pauseBatch();return;}
     if(!r.ok) throw new Error('server '+r.status);
     analysisResult=await r.json();
     hideLoad();
@@ -3379,7 +3442,7 @@ renderObSpecs();
 switchTab(authMode);
 // 画面（写真の拡大・メニュー・使い方・集計・活動・完了・確認）が開いている間は履歴を1つ積み、
 // 「戻る」でアプリから出ずに、いちばん上の画面を閉じる
-const OVERLAYS=[['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
+const OVERLAYS=[['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
   ['sumv',()=>{ if(!reportMode) closeSummary(); }],['actv',()=>closeActivity()],['donev',()=>backToMap()],
   ['confv',()=>{ if(confirm(t('cf.discard'))){ if(!batchSkip()) document.getElementById('confv').classList.remove('show'); } }]];
 const isOpen=id=>{const e=document.getElementById(id);return !!e&&e.classList.contains('show');};
