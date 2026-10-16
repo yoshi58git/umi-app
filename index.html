@@ -91,12 +91,21 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .gal-tile .gal-dot{position:absolute;left:6px;top:6px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
 .gal-tile .gal-noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.5);padding:6px;text-align:center}
 .gal-empty{padding:40px 10px;text-align:center;font-size:13px;color:rgba(255,255,255,.7);line-height:1.8}
-#galpop{position:fixed;inset:0;z-index:5200;display:none;align-items:center;justify-content:center;background:rgba(2,10,18,.75);padding:calc(env(safe-area-inset-top,0px) + 16px) 12px calc(env(safe-area-inset-bottom,0px) + 16px)}
+/* フィード：一覧で開いた記録から、上下に前後の記録が続く */
+#galpop{position:fixed;inset:0;z-index:5200;display:none;flex-direction:column;background:#04111C}
 #galpop.show{display:flex}
-.galpop-card{position:relative;width:min(340px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:#1E2A35;box-shadow:0 12px 40px rgba(0,0,0,.5)}
-.galpop-card .umi-pop{width:100%}
-.galpop-card .umi-pop-body{max-height:none}
-#galpop-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
+.feed-hdr{flex-shrink:0;padding:calc(env(safe-area-inset-top,0px) + 8px) 8px 8px;background:rgba(4,17,28,.96);border-bottom:1px solid rgba(255,255,255,.08)}
+.feed-back{display:flex;align-items:center;gap:6px;border:none;background:transparent;color:#fff;font-family:inherit;font-size:15px;font-weight:500;padding:6px 8px;cursor:pointer}
+.feed-back svg{width:22px;height:22px}
+#galpop-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+.feed-card{max-width:480px;margin:0 auto 14px;background:#1E2A35;border-radius:0;overflow:hidden}
+@media (min-width:500px){.feed-card{border-radius:16px;margin-top:14px}}
+.feed-card .umi-pop{width:100%}
+/* 写真の枠は正方形に固定（読み込み前後で位置がずれない）*/
+.feed-card .umi-pop-photo img{width:100%;height:auto!important;aspect-ratio:1/1;object-fit:contain}
+.feed-card .umi-pop-body{max-height:none;overflow:visible}
+.feed-card .umi-pop-body.has-more{-webkit-mask-image:none;mask-image:none}
+.feed-map{display:block;margin:0 16px 16px}
 #galpop-body::-webkit-scrollbar,.sheet::-webkit-scrollbar,#ob::-webkit-scrollbar{display:none}
 .sheet,#ob{scrollbar-width:none;-ms-overflow-style:none}
 .galpop-x{position:absolute;top:8px;right:8px;z-index:2;background:rgba(4,17,28,.6)}
@@ -669,12 +678,14 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
   </div>
   <div id="gal-grid" class="gal-grid"></div>
 </div>
-<div id="galpop" role="dialog" aria-modal="true" onclick="if(event.target===this)closeGalPop()">
-  <div class="galpop-card">
-    <button class="sheet-x galpop-x" onclick="closeGalPop()" aria-label="閉じる" data-i18n-aria="close">&times;</button>
-    <div id="galpop-body"></div>
-    <button type="button" class="act-btn main galpop-map" onclick="galShowOnMap()" data-i18n="gal.onMap">地図で見る</button>
+<div id="galpop" role="dialog" aria-modal="true">
+  <div class="feed-hdr">
+    <button type="button" class="feed-back" onclick="closeGalPop()" aria-label="写真の一覧に戻る" data-i18n-aria="gal.back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span id="feed-title"></span>
+    </button>
   </div>
+  <div id="galpop-body" class="feed"></div>
 </div>
 <!-- 活動（団体・参加・主催） -->
 <div id="actv" class="sheet" role="dialog" aria-modal="true">
@@ -889,6 +900,7 @@ ja:{
   'pv.confirm':'この写真に「{what}」が写っているようです。\n写真はほかの人にも公開されます。\n\nこのまま記録しますか？（キャンセルして撮り直すのがおすすめです）',
   'sum.byArea':'地域（市区町村）ごと','sum.areaUnknown':'地域が分からない記録',
   'sum.areaNote':'陸由来の多い順。海岸や川の管理者、自治体、地域の団体など、どこと一緒に取り組むかを考える目安になります',
+  'gal.back':'写真の一覧に戻る',
   'gal.open':'写真の一覧','gal.title':'写真の一覧','gal.onMap':'地図で見る',
   'gal.emptyMine':'まだ記録がありません。<br>拾ったごみを撮って、最初の1枚を記録しましょう','gal.emptyAll':'ほかの人の記録はまだありません',
   'batch.checking':'記録済みの写真がないか確かめています...',
@@ -1041,6 +1053,7 @@ en:{
   'pv.confirm':'This photo seems to show {what}.\nPhotos are visible to others.\n\nRecord it anyway? (We recommend Cancel and retake)',
   'sum.byArea':'By area (municipality)','sum.areaUnknown':'Area unknown',
   'sum.areaNote':'Sorted by land-based litter. A guide for deciding whom to work with: coast and river managers, municipalities, local groups',
+  'gal.back':'Back to photo list',
   'gal.open':'Photo list','gal.title':'Photo list','gal.onMap':'Show on map',
   'gal.emptyMine':'No records yet.<br>Photograph the litter you picked up and record your first one','gal.emptyAll':'No records from others yet',
   'batch.checking':'Checking for photos already recorded...',
@@ -2142,27 +2155,46 @@ function renderGallery(){
   grid.innerHTML=recs.map(r=>{
     const col=catCol[normCat(r.category)]||'#22CCEE';
     const label=esc((fmtDate(r.photo_taken_at||r.created_at)||'')+' '+normCat(r.category));
-    return '<button type="button" class="gal-tile" onclick="openGalPop(\''+esc(r.id)+'\')" aria-label="'+label+'">'+
+    return '<button type="button" class="gal-tile" data-id="'+esc(r.id)+'" onclick="openGalPop(\''+esc(r.id)+'\')" aria-label="'+label+'">'+
       (r.image_url?'<img src="'+esc(r.image_url)+'" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">':'<span class="gal-noimg">'+esc((r.items||'').split('\n')[0]||'—')+'</span>')+
       '<span class="gal-dot" style="background:'+col+'"></span></button>';
   }).join('');
 }
 // 写真を押したとき：地図のピンと同じポップアップの中身を、一覧の上に重ねる
+// 一覧で押した記録から始まるフィードを開く（同じタブの記録が、新しい順に上下へ続く）
 function openGalPop(id){
-  const m=markerMap[id];
-  const html=m&&m.getPopup()?m.getPopup().getContent():'';
-  if(!html) return;
-  galCurrent=id;
+  const recs=galRecords(galTab);
   const body=document.getElementById('galpop-body');
-  body.innerHTML=html;
+  body.innerHTML=recs.map(r=>{
+    const m=markerMap[r.id];
+    let html=m&&m.getPopup()?m.getPopup().getContent():'';
+    if(!html) return '';
+    html=html.replace(/<img /g,'<img loading="lazy" decoding="async" '); // 写真は見える直前に読み込む
+    return '<article class="feed-card" data-id="'+esc(r.id)+'">'+html+
+      '<button type="button" class="act-btn feed-map" onclick="galShowOnMap(\''+esc(r.id)+'\')">'+t('gal.onMap')+'</button></article>';
+  }).join('');
+  document.getElementById('feed-title').textContent=t('gal.title')+' ・ '+t(galTab==='mine'?'me':'all');
   document.getElementById('galpop').classList.add('show');
+  galCurrent=id;
+  const target=body.querySelector('.feed-card[data-id="'+CSS.escape(id)+'"]');
   body.scrollTop=0;
-  const pb=body.querySelector('.umi-pop-body'); if(pb) updatePopFade(pb);
+  // 押した記録のカードが、見出しのすぐ下にぴったり来るように
+  if(target) requestAnimationFrame(()=>{ body.scrollTop+=target.getBoundingClientRect().top-body.getBoundingClientRect().top; });
 }
-function closeGalPop(){ document.getElementById('galpop').classList.remove('show'); galCurrent=null; }
+function closeGalPop(){
+  // 一覧に戻るとき、最後に見ていた写真が一覧の画面内に来るようにする
+  const body=document.getElementById('galpop-body');
+  const cards=[...body.querySelectorAll('.feed-card')];
+  const top=body.getBoundingClientRect().top;
+  const seen=cards.find(c=>c.getBoundingClientRect().bottom>top+40);
+  document.getElementById('galpop').classList.remove('show');
+  body.innerHTML='';
+  if(seen){ const tile=document.querySelector('.gal-tile[data-id="'+CSS.escape(seen.dataset.id)+'"]'); if(tile) tile.scrollIntoView({block:'center'}); }
+  galCurrent=null;
+}
 // 「地図で見る」：一覧を閉じて、その地点のピンを開く（非表示のカテゴリでも表示する）
-function galShowOnMap(){
-  const id=galCurrent; closeGalPop(); closeGallery();
+function galShowOnMap(id){
+  id=id||galCurrent; closeGalPop(); closeGallery();
   const m=markerMap[id]; if(!m||!lmap) return;
   if(!lmap.hasLayer(m)) m.addTo(lmap);
   lmap.flyTo(m.getLatLng(),Math.max(lmap.getZoom(),16),{duration:.6});
@@ -2182,7 +2214,8 @@ async function deleteRecord(id){
   delete markerMap[id];
   window.allRecords=(window.allRecords||[]).filter(x=>x.id!==id);
   updateStats(); buildNavRecs();
-  if(document.getElementById('galpop').classList.contains('show')) closeGalPop();
+  const fc=document.querySelector('#galpop .feed-card[data-id="'+CSS.escape(id)+'"]'); if(fc) fc.remove();
+  if(document.getElementById('galpop').classList.contains('show')&&!document.querySelector('#galpop .feed-card')) closeGalPop();
   if(document.getElementById('galv').classList.contains('show')) renderGallery();
   toast(t('del.done'));
 }
