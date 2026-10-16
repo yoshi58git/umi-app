@@ -22,6 +22,9 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 #ob-logo{font-size:32px;font-weight:300;letter-spacing:.12em;color:var(--foam);margin-bottom:20px;flex-shrink:0;text-align:center}
 #ob-logo-sub{font-size:12px;letter-spacing:.3em;color:rgba(255,255,255,.7);margin-top:2px}
 #ob>*{flex-shrink:0}
+#ob{word-break:keep-all;overflow-wrap:anywhere;line-break:strict}
+.nb{white-space:nowrap}
+#ob .ob-tx,#ob .ob-axis,#ob .ob-mini-row{text-wrap:pretty}
 .ob-row{display:flex;align-items:flex-start;gap:14px;width:100%;max-width:320px;margin-bottom:16px}
 .ob-ic{width:34px;height:34px;border-radius:50%;background:rgba(26,122,154,.25);border:1px solid rgba(170,221,238,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--foam)}
 .ob-tx{font-size:12px;color:var(--foam);line-height:1.6}
@@ -590,7 +593,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
       <input id="inp-pin" type="password" placeholder="000000" maxlength="8" inputmode="numeric"
         style="width:100%;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:var(--white);font-size:18px;letter-spacing:.3em;font-family:'Inter',sans-serif;outline:none">
       <div style="font-size:11px;color:#fff;opacity:.9;margin-top:6px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="auth.pinNote">PINは暗号化して保存します</div>
-      <div style="font-size:11px;color:#fff;opacity:.8;margin-top:4px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="pin.forgot">PINを忘れたときは、主催者か運営者に連絡してください（仮のPINを発行できます）</div>
+      <div style="font-size:11px;color:#fff;opacity:.8;margin-top:4px;text-shadow:0 1px 3px rgba(4,30,50,.6)" data-i18n="pin.forgot" data-i18n-wbr>PINを忘れたときは、主催者か運営者に連絡してください（仮のPINを発行できます）</div>
     </div>
     <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px">はじめる</button>
     <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-bottom:10px;display:none"></div>
@@ -772,13 +775,13 @@ ja:{
   'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
   'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示',
   'h.purpose':'このアプリの目的','h.promise':'大切な約束',
-  'axis.t':'便利は設計してきた。次は、管理を設計する','axis.d':'海のごみは、陸でしか止められない。リスクを知り、社会全体で陸側から管理に取り組むためのアプリです',
-  'p1.t':'海のごみ：リスクを知る','p1.d':'すでに海に出た、または出る寸前のごみ。その実態を記録します',
-  'p2.t':'海に出る前：陸の出どころを示す','p2.d':'川・街・自然地のごみ。誰かを責めるためではなく、陸のどこから来るかを知り、共有します',
-  's1.t':'写真の位置情報だけを使います','s1.d':'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください',
-  's2.t':'正確な位置は、あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
-  's3.t':'写真はみんなに公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
-  's4.t':'AIがごみを解析','s4.d':'素材や発生源を推定し、根拠と確信度を添えて記録します',
+  'axis.t':'便利は設計してきた。|次は、管理を設計する','axis.d':'海のごみは、|陸でしか|止められない。|リスクを知り、|社会全体で|陸側から|管理に|取り組むための|アプリです',
+  'p1.t':'海のごみ：|リスクを知る','p1.d':'すでに|海に出た、|または|出る寸前の|ごみ。|その実態を|記録します',
+  'p2.t':'海に出る前：|陸の出どころを示す','p2.d':'川・街・自然地の|ごみ。|誰かを責めるためではなく、|陸のどこから来るかを|知り、|共有します',
+  's1.t':'写真の|位置情報だけを|使います','s1.d':'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください',
+  's2.t':'正確な位置は、|あなたにだけ','s2.d':'ほかの人には約300m単位でぼかして表示します',
+  's3.t':'写真は|みんなに|公開されます','s3.d':'人の顔や家、車のナンバーが写らないように',
+  's4.t':'AIが|ごみを|解析','s4.d':'素材や発生源を推定し、根拠と確信度を添えて記録します',
   'net.offlineBar':'オフラインです。電波のある場所で記録してください','net.offlineNow':'いまオフラインです。電波のある場所に移動してください。',
   'an.failNet':'解析できませんでした。電波が弱いか、サーバーが混み合っている可能性があります。',
   'an.retryOne':'もう一度試しますか？','an.retryBatch':'もう一度試しますか？（キャンセルすると一時停止し、次にアプリを開いたときに続きから再開できます）',
@@ -787,7 +790,7 @@ ja:{
   'cf.discard':'この解析結果を記録せずに閉じますか？',
   'inapp.msg':'アプリ内のブラウザで開いています。写真の選択や保存がうまくいかないことがあります。右上のメニューから「ブラウザで開く」を選んでください',
   'logout':'ログアウト','logout.confirm':'ログアウトしますか？（記録はサーバーに残ります。次はニックネームとPINでログインします）',
-  'pin.forgot':'PINを忘れたときは、主催者か運営者に連絡してください（仮のPINを発行できます）',
+  'pin.forgot':'PINを忘れたときは、|主催者か|運営者に|連絡してください|（仮のPINを|発行できます）',
   'gd.shoot':'撮り方','gd.setup':'はじめの設定','gd.trouble':'困ったとき',
   'gd.locT':'カメラの位置情報をオンにする（いちばん大事）',
   'gd.locIos':'設定 → プライバシーとセキュリティ → 位置情報サービス → カメラ →「このAppの使用中のみ許可」。その後に撮った写真から使えます',
@@ -1047,17 +1050,26 @@ const VALUE_EN={
 };
 let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
   return (navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';})();
-function t(k,vars){
+function tRaw(k,vars){
   let s=(I18N[LANG]&&I18N[LANG][k])??I18N.ja[k]??k;
   if(vars) for(const v in vars) s=s.split('{'+v+'}').join(vars[v]);
   return s;
+}
+// ふつうの文言（改行の印「|」は取り除く）
+function t(k,vars){ return tRaw(k,vars).split('|').join(''); }
+// 改行してよい位置（文節の切れ目）だけで改行するためのHTML
+// 印で分けた「まとまり」の中では改行せず、まとまりの間（<wbr>）でだけ改行する（印のない英語などは普段どおり）
+function th(k,vars){
+  const raw=tRaw(k,vars), e=x=>x.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  if(raw.indexOf('|')<0) return e(raw);
+  return raw.split('|').map(x=>'<span class="nb">'+e(x)+'</span>').join('<wbr>');
 }
 // データの値（MPリスクや発生源など）を表示言語に合わせる。AIの自由文はそのまま
 function tv(v){ return LANG==='en'&&v!=null&&VALUE_EN[String(v).trim()]?VALUE_EN[String(v).trim()]:v; }
 // 画面の固定文言を書き換える（data-i18n＝文字、-ph＝入力欄の例、-aria＝読み上げ名と説明）
 function applyI18nStatic(){
   document.documentElement.lang=LANG;
-  document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n);});
+  document.querySelectorAll('[data-i18n]').forEach(e=>{ if(e.hasAttribute('data-i18n-wbr')) e.innerHTML=th(e.dataset.i18n); else e.textContent=t(e.dataset.i18n); });
   document.querySelectorAll('[data-i18n-ph]').forEach(e=>{e.placeholder=t(e.dataset.i18nPh);});
   document.querySelectorAll('[data-i18n-aria]').forEach(e=>{const v=t(e.dataset.i18nAria);e.setAttribute('aria-label',v);if(e.hasAttribute('title'))e.title=v;});
   document.querySelectorAll('[data-i18n-alt]').forEach(e=>{e.alt=t(e.dataset.i18nAlt);});
@@ -1295,13 +1307,13 @@ const specSvg=(k,w)=>'<svg viewBox="0 0 24 24" width="'+w+'" height="'+w+'" fill
 // ログイン画面の仕様欄を作る（言語を切り替えたら作り直す）
 function renderObSpecs(){
   const box=document.getElementById('ob-specs'); if(!box) return;
-  const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+t(x.k+'.t')+'</strong><br>'+t(x.k+'.d')+'</div></div>';
+  const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+th(x.k+'.t')+'</strong><br>'+th(x.k+'.d')+'</div></div>';
   box.innerHTML=
-    '<div class="ob-axis"><div class="ob-axis-t">'+t('axis.t')+'</div><div class="ob-axis-d">'+t('axis.d')+'</div></div>'+
+    '<div class="ob-axis"><div class="ob-axis-t">'+th('axis.t')+'</div><div class="ob-axis-d">'+th('axis.d')+'</div></div>'+
     '<div class="ob-h">'+t('h.purpose')+'</div>'+
     PURPOSES.map(x=>row(x,'<span class="ob-cat" style="color:'+x.col+'">'+x.cats.join(LANG==='en'?' · ':'・')+'</span>')).join('')+
     '<div class="ob-h">'+t('h.promise')+'</div>'+
-    '<div class="ob-mini">'+SPECS.map(x=>'<div class="ob-mini-row"><span class="ob-mini-ic">'+specSvg(x.ic,14)+'</span>'+t(x.k+'.t')+'</div>').join('')+'</div>';
+    '<div class="ob-mini">'+SPECS.map(x=>'<div class="ob-mini-row"><span class="ob-mini-ic">'+specSvg(x.ic,14)+'</span><span>'+th(x.k+'.t')+'</span></div>').join('')+'</div>';
 }
 applyI18nStatic();
 renderObSpecs();
