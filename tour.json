@@ -1,0 +1,90 @@
+{
+  "updated": "2026-10-17",
+  "stops": [
+    {
+      "id": "home",
+      "view": { "lat": 35.31, "lng": 139.40, "zoom": 11 },
+      "title": { "ja": "ここから始まる", "en": "It starts here" },
+      "text": {
+        "ja": "あなたが浜で拾ったごみは、世界の海とつながっています。地図と一緒に、ごみの行き先と、世界の今を巡りましょう。下にスクロールしてください。",
+        "en": "The litter you pick up on the beach is connected to the world’s oceans. Scroll down to follow where it goes and what the world is doing now."
+      }
+    },
+    {
+      "id": "land",
+      "view": { "lat": 34, "lng": 140, "zoom": 5 },
+      "figure": { "ja": "170万トン", "en": "1.7 million t" },
+      "title": { "ja": "陸から川へ、川から海へ", "en": "From land to rivers, from rivers to sea" },
+      "text": {
+        "ja": "2019年、世界で610万トンのプラスチックごみが川や海などに流れ出し、そのうち170万トンが海に入りました。海には推定3000万トン、川にはさらに1億900万トンがたまっていて、陸の管理が良くなっても、海への流出は何十年も続くとされています。",
+        "en": "In 2019, 6.1 million tonnes of plastic waste leaked into rivers, lakes and seas, and 1.7 million tonnes reached the ocean. An estimated 30 million tonnes are already in the sea and 109 million tonnes in rivers, so leakage will continue for decades even if management on land improves."
+      },
+      "source": { "name": "OECD Global Plastics Outlook (2022)", "url": "https://www.oecd.org/environment/plastic-pollution-is-growing-relentlessly-as-waste-management-and-recycling-fall-short.htm" }
+    },
+    {
+      "id": "npw",
+      "gyre": "npw",
+      "view": { "lat": 30, "lng": 158, "zoom": 3 },
+      "title": { "ja": "北太平洋・西", "en": "North Pacific (west)" },
+      "text": {
+        "ja": "日本とハワイの間。海流が渦を巻く「環流」に、ごみが集まります。日本の陸から海に出たごみも、海流に乗ってこうした海域に運ばれると考えられています。",
+        "en": "Between Japan and Hawaii. Litter gathers where ocean currents swirl in a gyre. Litter that leaves land in Japan is thought to be carried to waters like these."
+      },
+      "source": { "name": "NOAA Ocean Service", "url": "https://oceanservice.noaa.gov/education/tutorial-coastal/marine-debris/md05.html" }
+    },
+    {
+      "id": "npe",
+      "gyre": "npe",
+      "view": { "lat": 30, "lng": 215, "zoom": 3 },
+      "title": { "ja": "北太平洋・東（太平洋ごみベルト）", "en": "North Pacific (east): the Great Pacific Garbage Patch" },
+      "text": {
+        "ja": "ハワイとカリフォルニアの間で、世界で最も有名なごみの集まる海域です。ごみは島のように固まっているのではなく、細かくなって海面から海底まで広く散らばっています。",
+        "en": "Between Hawaii and California, the best-known area where litter gathers. It is not a solid island: much of it breaks into small pieces spread from the surface to the seafloor."
+      },
+      "source": { "name": "NOAA Ocean Service", "url": "https://oceanservice.noaa.gov/education/tutorial-coastal/marine-debris/md05.html" }
+    },
+    {
+      "id": "gyres",
+      "gyre": "all",
+      "view": { "lat": 5, "lng": 160, "zoom": 1 },
+      "figure": { "ja": "5つの環流", "en": "5 gyres" },
+      "title": { "ja": "世界の5つの環流すべてに", "en": "In all five of the world’s gyres" },
+      "text": {
+        "ja": "太平洋と大西洋に2つずつ、インド洋に1つ。大きさは違っても、どの環流にもごみが集まる海域があります。どれも、もとは陸から出たごみです。",
+        "en": "Two each in the Pacific and Atlantic, one in the Indian Ocean. Every gyre has an area where litter gathers, of different sizes. All of it originally came from land."
+      },
+      "source": { "name": "NOAA Ocean Service", "url": "https://oceanservice.noaa.gov/education/tutorial-coastal/marine-debris/md05.html" }
+    },
+    {
+      "id": "production",
+      "view": { "lat": 25, "lng": 120, "zoom": 2 },
+      "figure": { "ja": "4億6000万トン", "en": "460 million t" },
+      "title": { "ja": "作る量は20年で2倍", "en": "Production doubled in 20 years" },
+      "text": {
+        "ja": "世界のプラスチックの生産量は、2000年から2019年で2倍の4億6000万トンになりました。使った後の管理が追いつかず、リサイクルされるのは1割に満たないとされています。",
+        "en": "Global plastic production doubled from 2000 to 2019 to 460 million tonnes. Management after use has not kept up, and less than one tenth is recycled."
+      },
+      "source": { "name": "OECD Global Plastics Outlook (2022)", "url": "https://www.oecd.org/environment/plastic-pollution-is-growing-relentlessly-as-waste-management-and-recycling-fall-short.htm" }
+    },
+    {
+      "id": "treaty",
+      "view": { "lat": 30, "lng": 60, "zoom": 2 },
+      "title": { "ja": "世界のルールづくりの今", "en": "The world’s rule-making now" },
+      "text": {
+        "ja": "プラスチック汚染をなくす国際条約の交渉は、2025年8月のジュネーブで合意に至りませんでした。2026年2月に新しい議長が選ばれ、9月にはバンコクで非公開の協議、2027年3月の会合で正式な交渉が再開される予定です。争点は今も、条約が「作る段階」まで扱うか、「捨てる段階」だけを扱うかです。",
+        "en": "Negotiations on an international treaty to end plastic pollution failed to reach agreement in Geneva in August 2025. A new chair was elected in February 2026, closed talks were held in Bangkok in September, and formal negotiations are due to resume in March 2027. The key dispute remains whether the treaty covers production or only disposal."
+      },
+      "source": { "name": "UNEP INC / Oceanographic Magazine (Aug 2026)", "url": "https://www.unep.org/en/inc-plastic-pollution" }
+    },
+    {
+      "id": "back",
+      "view": { "lat": 35.31, "lng": 139.40, "zoom": 12 },
+      "title": { "ja": "だから、陸で止める", "en": "So we stop it on land" },
+      "text": {
+        "ja": "便利は設計してきた。次は、使った後の管理を設計する番です。あなたの浜で、何が、どこから来ているかを記録することが、その第一歩になります。",
+        "en": "We designed convenience. Now it is time to design what comes after use. Recording what is on your beach, and where it comes from, is the first step."
+      },
+      "cta": true
+    }
+  ]
+}

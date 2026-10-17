@@ -97,6 +97,33 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .gyre-pop-t{font-size:14px;font-weight:600;color:#FFE3A8;margin-bottom:4px}
 .gyre-pop-d{font-size:12px;line-height:1.6;color:rgba(255,255,255,.88)}
 .gyre-pop-n{font-size:11px;line-height:1.6;color:rgba(255,255,255,.55);margin-top:8px}
+/* ツアー：地図の上半分はそのまま、下半分のカードを上下にスクロール */
+#tourv{position:fixed;left:0;right:0;bottom:0;height:46vh;z-index:3000;display:none;flex-direction:column;
+  background:rgba(4,17,28,.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4)}
+#tourv.show{display:flex}
+.tour-hdr{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 14px 8px 18px}
+.tour-hdr>div:first-child{flex:1;min-width:0}
+.tour-title{font-size:15px;font-weight:600;color:#FFE3A8}
+.tour-upd{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px}
+.tour-dots{display:flex;gap:5px}
+.tour-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25)}
+.tour-dots span.on{background:#FFAA44}
+.tour-cards{flex:1;min-height:0;overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior:contain}
+.tour-cards::-webkit-scrollbar{display:none}
+.tour-card{min-height:100%;box-sizing:border-box;scroll-snap-align:start;padding:6px 20px calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;flex-direction:column;gap:8px}
+.tour-fig{font-size:30px;font-weight:700;color:#FFAA44;line-height:1.1;font-variant-numeric:tabular-nums}
+.tour-ct{font-size:18px;font-weight:600;color:#fff;line-height:1.4}
+.tour-tx{font-size:14px;line-height:1.75;color:rgba(255,255,255,.88)}
+.tour-src{font-size:11px;color:rgba(255,255,255,.5);margin-top:auto}
+.tour-src a{color:rgba(170,221,238,.8)}
+.tour-next{font-size:11px;color:rgba(255,255,255,.45);text-align:center;margin-top:4px;animation:tourNudge 1.8s ease-in-out infinite}
+@keyframes tourNudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.tour-cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+body.touring #hdr,body.touring #btm,body.touring #nav-mine,body.touring #nav-digest,body.touring #spec-tip,body.touring #act-chip,body.touring .map-tools,body.touring .leaflet-control-attribution{visibility:hidden}
+body.touring .leaflet-popup{display:none}
+/* 地球のボタンを目立たせる（ツアーを一度開くまで） */
+.map-tool.tour-glow{color:#FFD27A;animation:tourGlow 2.4s ease-in-out infinite}
+@keyframes tourGlow{0%,100%{box-shadow:inset 0 0 0 0 rgba(255,170,68,0)}50%{box-shadow:inset 0 0 0 2px rgba(255,170,68,.85)}}
 .gal-tabs{display:flex;gap:0;margin:0 -20px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
 .gal-tabs button{flex:1;padding:10px 0;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer}
 .gal-tabs button.on{color:#fff;border-bottom-color:#5FD3E6}
@@ -687,6 +714,15 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <div class="seg" id="sum-area"><button data-v="view" onclick="setSum('area','view')" data-i18n="sum.view">地図の表示範囲</button><button data-v="all" onclick="setSum('area','all')" data-i18n="sum.everywhere">すべて</button></div></div>
   <div id="sum-body"></div>
 </div>
+<!-- 世界のごみの今（ツアー） -->
+<div id="tourv" role="dialog" aria-modal="false" aria-labelledby="tour-title">
+  <div class="tour-hdr">
+    <div><div class="tour-title" id="tour-title" data-i18n="tour.title">世界のごみの今</div><div class="tour-upd" id="tour-upd"></div></div>
+    <div class="tour-dots" id="tour-dots" aria-hidden="true"></div>
+    <button class="sheet-x" onclick="closeTour()" aria-label="閉じる" data-i18n-aria="close">&times;</button>
+  </div>
+  <div id="tour-cards" class="tour-cards"></div>
+</div>
 <!-- 報告（不適切な写真） -->
 <div id="repv" role="dialog" aria-modal="true" onclick="if(event.target===this)closeReport()">
   <div class="rep-card">
@@ -747,6 +783,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
       <div class="wp-who"><span data-i18n="me.who">ログイン中：</span><b id="wp-who-name"></b></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTour()" data-i18n="tour.title">世界のごみの今</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGallery('mine')" data-i18n="gal.open">写真の一覧</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
@@ -864,6 +901,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
 
 <input type="file" id="filein" accept="image/*" multiple onchange="onFile(this)">
 
+<script type="application/json" id="tour-fallback">{"updated": "2026-10-17", "stops": [{"id": "home", "view": {"lat": 35.31, "lng": 139.4, "zoom": 11}, "title": {"ja": "ここから始まる", "en": "It starts here"}, "text": {"ja": "あなたが浜で拾ったごみは、世界の海とつながっています。地図と一緒に、ごみの行き先と、世界の今を巡りましょう。下にスクロールしてください。", "en": "The litter you pick up on the beach is connected to the world’s oceans. Scroll down to follow where it goes and what the world is doing now."}}, {"id": "land", "view": {"lat": 34, "lng": 140, "zoom": 5}, "figure": {"ja": "170万トン", "en": "1.7 million t"}, "title": {"ja": "陸から川へ、川から海へ", "en": "From land to rivers, from rivers to sea"}, "text": {"ja": "2019年、世界で610万トンのプラスチックごみが川や海などに流れ出し、そのうち170万トンが海に入りました。海には推定3000万トン、川にはさらに1億900万トンがたまっていて、陸の管理が良くなっても、海への流出は何十年も続くとされています。", "en": "In 2019, 6.1 million tonnes of plastic waste leaked into rivers, lakes and seas, and 1.7 million tonnes reached the ocean. An estimated 30 million tonnes are already in the sea and 109 million tonnes in rivers, so leakage will continue for decades even if management on land improves."}, "source": {"name": "OECD Global Plastics Outlook (2022)", "url": "https://www.oecd.org/environment/plastic-pollution-is-growing-relentlessly-as-waste-management-and-recycling-fall-short.htm"}}, {"id": "npw", "gyre": "npw", "view": {"lat": 30, "lng": 158, "zoom": 3}, "title": {"ja": "北太平洋・西", "en": "North Pacific (west)"}, "text": {"ja": "日本とハワイの間。海流が渦を巻く「環流」に、ごみが集まります。日本の陸から海に出たごみも、海流に乗ってこうした海域に運ばれると考えられています。", "en": "Between Japan and Hawaii. Litter gathers where ocean currents swirl in a gyre. Litter that leaves land in Japan is thought to be carried to waters like these."}, "source": {"name": "NOAA Ocean Service", "url": "https://oceanservice.noaa.gov/education/tutorial-coastal/marine-debris/md05.html"}}, {"id": "npe", "gyre": "npe", "view": {"lat": 30, "lng": 215, "zoom": 3}, "title": {"ja": "北太平洋・東（太平洋ごみベルト）", "en": "North Pacific (east): the Great Pacific Garbage Patch"}, "text": {"ja": "ハワイとカリフォルニアの間で、世界で最も有名なごみの集まる海域です。ごみは島のように固まっているのではなく、細かくなって海面から海底まで広く散らばっています。", "en": "Between Hawaii and California, the best-known area where litter gathers. It is not a solid island: much of it breaks into small pieces spread from the surface to the seafloor."}, "source": {"name": "NOAA Ocean Service", "url": "https://oceanservice.noaa.gov/education/tutorial-coastal/marine-debris/md05.html"}}, {"id": "gyres", "gyre": "all", "view": {"lat": 5, "lng": 160, "zoom": 1}, "figure": {"ja": "5つの環流", "en": "5 gyres"}, "title": {"ja": "世界の5つの環流すべてに", "en": "In all five of the world’s gyres"}, "text": {"ja": "太平洋と大西洋に2つずつ、インド洋に1つ。大きさは違っても、どの環流にもごみが集まる海域があります。どれも、もとは陸から出たごみです。", "en": "Two each in the Pacific and Atlantic, one in the Indian Ocean. Every gyre has an area where litter gathers, of different sizes. All of it originally came from land."}, "source": {"name": "NOAA Ocean Service", "url": "https://oceanservice.noaa.gov/education/tutorial-coastal/marine-debris/md05.html"}}, {"id": "production", "view": {"lat": 25, "lng": 120, "zoom": 2}, "figure": {"ja": "4億6000万トン", "en": "460 million t"}, "title": {"ja": "作る量は20年で2倍", "en": "Production doubled in 20 years"}, "text": {"ja": "世界のプラスチックの生産量は、2000年から2019年で2倍の4億6000万トンになりました。使った後の管理が追いつかず、リサイクルされるのは1割に満たないとされています。", "en": "Global plastic production doubled from 2000 to 2019 to 460 million tonnes. Management after use has not kept up, and less than one tenth is recycled."}, "source": {"name": "OECD Global Plastics Outlook (2022)", "url": "https://www.oecd.org/environment/plastic-pollution-is-growing-relentlessly-as-waste-management-and-recycling-fall-short.htm"}}, {"id": "treaty", "view": {"lat": 30, "lng": 60, "zoom": 2}, "title": {"ja": "世界のルールづくりの今", "en": "The world’s rule-making now"}, "text": {"ja": "プラスチック汚染をなくす国際条約の交渉は、2025年8月のジュネーブで合意に至りませんでした。2026年2月に新しい議長が選ばれ、9月にはバンコクで非公開の協議、2027年3月の会合で正式な交渉が再開される予定です。争点は今も、条約が「作る段階」まで扱うか、「捨てる段階」だけを扱うかです。", "en": "Negotiations on an international treaty to end plastic pollution failed to reach agreement in Geneva in August 2025. A new chair was elected in February 2026, closed talks were held in Bangkok in September, and formal negotiations are due to resume in March 2027. The key dispute remains whether the treaty covers production or only disposal."}, "source": {"name": "UNEP INC / Oceanographic Magazine (Aug 2026)", "url": "https://www.unep.org/en/inc-plastic-pollution"}}, {"id": "back", "view": {"lat": 35.31, "lng": 139.4, "zoom": 12}, "title": {"ja": "だから、陸で止める", "en": "So we stop it on land"}, "text": {"ja": "便利は設計してきた。次は、使った後の管理を設計する番です。あなたの浜で、何が、どこから来ているかを記録することが、その第一歩になります。", "en": "We designed convenience. Now it is time to design what comes after use. Recording what is on your beach, and where it comes from, is the first step."}, "cta": true}]}</script>
 <script>
 // 起動の見張り：本体が6秒たっても動き出さなければ、非対応のブラウザとして案内する（古いブラウザでも動く書き方）
 (function(){setTimeout(function(){if(window.__mnBooted)return;var d=document.createElement('div');
@@ -889,6 +927,8 @@ ja:{
   'wp.note':'壁紙はこの端末の中だけに保存され、ほかの人には見えません','wp.saveFail':'壁紙を保存できませんでした。別の写真をお試しください。','wp.loadFail':'この写真は読み込めませんでした。',
   'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
   'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示','gy.world':'世界のごみが集まる海域を見る',
+  'tour.open':'世界のごみの今（ツアー）','tour.title':'世界のごみの今','tour.updated':'最終更新 {d}','tour.next':'下へスクロール','tour.source':'出典',
+  'tour.record':'記録する','tour.backMap':'地図に戻る','tour.fail':'内容を読み込めませんでした。電波のある場所でもう一度お試しください',
   'gy.npe':'北太平洋・東','gy.npw':'北太平洋・西','gy.sp':'南太平洋','gy.na':'北大西洋','gy.sa':'南大西洋','gy.io':'インド洋',
   'gy.npe.d':'ハワイとカリフォルニアの間。「太平洋ごみベルト」と呼ばれ、世界で最も大きいとされる海域です',
   'gy.npw.d':'日本とハワイの間。日本の陸から海に出たごみも、海流に乗ってこうした海域に集まると考えられています',
@@ -1056,6 +1096,8 @@ en:{
   'wp.note':'The wallpaper is saved only on this device and is not visible to others','wp.saveFail':'Could not save the wallpaper. Please try another photo.','wp.loadFail':'This photo could not be loaded.',
   'me':'Me','all':'Others','nav.mine':'My records','nav.all':'Others\u2019 records','nav.prev':'previous','nav.next':'next','count':'{n}',
   'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records','gy.world':'See where litter gathers in the world\u2019s oceans',
+  'tour.open':'The world\u2019s litter now (tour)','tour.title':'The world\u2019s litter now','tour.updated':'Updated {d}','tour.next':'Scroll down','tour.source':'Source',
+  'tour.record':'Record','tour.backMap':'Back to map','tour.fail':'Could not load the content. Please try again where you have signal',
   'gy.npe':'North Pacific (east)','gy.npw':'North Pacific (west)','gy.sp':'South Pacific','gy.na':'North Atlantic','gy.sa':'South Atlantic','gy.io':'Indian Ocean',
   'gy.npe.d':'Between Hawaii and California. Known as the Great Pacific Garbage Patch, considered the largest in the world',
   'gy.npw.d':'Between Japan and Hawaii. Litter that leaves land in Japan is thought to gather in waters like these via ocean currents',
@@ -1264,6 +1306,7 @@ function setLang(l){
   if(document.getElementById('actv').classList.contains('show')) renderActivity();
   if(document.getElementById('galv').classList.contains('show')) renderGallery();
   if(document.getElementById('termsv').classList.contains('show')) openTerms();
+  if(document.getElementById('tourv').classList.contains('show')&&tourData){ const k=tourIdx; renderTour(); tourIdx=-1; goTourStop(Math.max(0,k)); if(tourObs){tourObs.disconnect();document.querySelectorAll('#tour-cards .tour-card').forEach(c=>tourObs.observe(c));} }
   updateActChip();
   const cv=document.getElementById('confv');
   if(cv&&cv.classList.contains('show')&&typeof showConfirm==='function'&&analysisResult) showConfirm();
@@ -2366,7 +2409,7 @@ function addGyres(){
   GYRES.forEach(g=>{
     // 外側ほど薄くなるよう、3重の楕円を重ねる（境界があいまいなことを表す）
     [1,0.72,0.45].forEach((sc,i)=>{
-      const poly=L.polygon(gyrePoints({...g,rl:g.rl*sc,rg:g.rg*sc}),{stroke:i===0,color:'#FFAA44',weight:1,opacity:.5,dashArray:'4 6',fillColor:'#FFAA44',fillOpacity:.10,interactive:i===0,className:'gyre'});
+      const poly=L.polygon(gyrePoints({...g,rl:g.rl*sc,rg:g.rg*sc}),{gyreKey:g.k,stroke:i===0,color:'#FFAA44',weight:1,opacity:.5,dashArray:'4 6',fillColor:'#FFAA44',fillOpacity:.10,interactive:i===0,className:'gyre'});
       if(i===0){
         poly.bindTooltip(t('gy.'+g.k),{permanent:true,direction:'center',className:'gyre-label'});
         poly.bindPopup('<div class="gyre-pop"><div class="gyre-pop-t">'+esc(t('gy.'+g.k))+'</div><div class="gyre-pop-d">'+esc(t('gy.'+g.k+'.d'))+'</div><div class="gyre-pop-n">'+esc(t('gy.note'))+'</div></div>',{maxWidth:280});
@@ -2392,6 +2435,78 @@ function toggleWorld(){
   else { lmap.flyTo([35.32,139.41],12,{duration:.9}); }
 }
 
+
+// ── 世界のごみの今（ツアー）。内容は tour.json（差し替えるだけで最新の動向に更新）。読めなければアプリに入れた控えを使う ──
+let tourData=null, tourBack=null, tourIdx=-1, tourObs=null;
+async function loadTour(){
+  try{
+    const r=await fetch('tour.json?ts='+Date.now(),{cache:'no-store'});
+    if(r.ok){ const d=await r.json(); if(d&&Array.isArray(d.stops)&&d.stops.length) return d; }
+  }catch(e){}
+  try{ return JSON.parse(document.getElementById('tour-fallback').textContent); }catch(e){ return null; }
+}
+const tl=o=>o?(o[LANG]||o.ja||''):'';
+async function openTour(){
+  try{ localStorage.setItem('mn_tour_seen','1'); }catch(e){}
+  document.querySelectorAll('.map-tool.tour-glow').forEach(b=>b.classList.remove('tour-glow'));
+  tourData=await loadTour(); if(!tourData){ alert(t('tour.fail')); return; }
+  tourBack=lmap?{c:lmap.getCenter(),z:lmap.getZoom()}:null;
+  if(lmap) lmap.closePopup();
+  renderTour();
+  document.body.classList.add('touring');
+  document.getElementById('tourv').classList.add('show');
+  const cards=document.getElementById('tour-cards'); cards.scrollTop=0;
+  tourIdx=-1; goTourStop(0);
+  // カードが半分以上見えたら、その場所へ地図を動かす
+  if(tourObs) tourObs.disconnect();
+  tourObs=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting&&e.intersectionRatio>=.55) goTourStop(Number(e.target.dataset.i)); });
+  },{root:cards,threshold:[.55]});
+  cards.querySelectorAll('.tour-card').forEach(c=>tourObs.observe(c));
+}
+function renderTour(){
+  const d=tourData, n=d.stops.length;
+  document.getElementById('tour-upd').textContent=t('tour.updated',{d:d.updated||''});
+  document.getElementById('tour-dots').innerHTML=d.stops.map(()=>'<span></span>').join('');
+  document.getElementById('tour-cards').innerHTML=d.stops.map((st,i)=>
+    '<section class="tour-card" data-i="'+i+'">'+
+      (st.figure?'<div class="tour-fig">'+esc(tl(st.figure))+'</div>':'')+
+      '<div class="tour-ct">'+esc(tl(st.title))+'</div>'+
+      '<div class="tour-tx">'+esc(tl(st.text))+'</div>'+
+      (st.cta?'<div class="tour-cta"><button type="button" class="act-btn main" onclick="closeTour(true);openCam()">'+t('tour.record')+'</button><button type="button" class="act-btn" onclick="closeTour()">'+t('tour.backMap')+'</button></div>':'')+
+      (st.source?'<div class="tour-src">'+t('tour.source')+'：'+(st.source.url&&/^https:\/\//.test(st.source.url)?'<a href="'+esc(st.source.url)+'" target="_blank" rel="noopener noreferrer">'+esc(st.source.name||'')+'</a>':esc(st.source.name||''))+'</div>':'')+
+      (i<n-1?'<div class="tour-next">'+t('tour.next')+'</div>':'')+
+    '</section>').join('');
+}
+function goTourStop(i){
+  if(!tourData||i===tourIdx||!tourData.stops[i]) return;
+  tourIdx=i;
+  document.querySelectorAll('#tour-dots span').forEach((d,k)=>d.classList.toggle('on',k===i));
+  const st=tourData.stops[i], v=st.view||{};
+  highlightGyre(st.gyre||null);
+  if(lmap&&typeof v.lat==='number'){
+    // 地図の下半分はカードで隠れるので、見せたい場所が上半分の真ん中に来るようにずらす
+    const z=v.zoom||3, target=lmap.project([v.lat,v.lng],z).add([0,lmap.getSize().y*0.23]);
+    lmap.flyTo(lmap.unproject(target,z),z,{duration:1.2});
+  }
+}
+// ツアーで話している海域を、濃く強調する（'all' は全部）
+function highlightGyre(k){
+  if(!gyreLayer) return;
+  gyreLayer.eachLayer(l=>{
+    const g=l.options.gyreKey, on=k&&(k==='all'||g===k);
+    l.setStyle({fillOpacity:on?.22:(k?.05:.10),opacity:l.options.stroke?(on?.95:.5):0,weight:on&&l.options.stroke?2:1});
+  });
+}
+function closeTour(keep){
+  if(tourObs){ tourObs.disconnect(); tourObs=null; }
+  document.getElementById('tourv').classList.remove('show');
+  document.body.classList.remove('touring');
+  highlightGyre(null);
+  if(!keep&&lmap&&tourBack) lmap.flyTo(tourBack.c,tourBack.z,{duration:.9});
+  tourBack=null; tourIdx=-1;
+}
+
 // ── 地図操作ツール（右側：拡大・縮小・全体表示） ──
 function addMapTools(){
   const Tools=L.Control.extend({
@@ -2409,7 +2524,8 @@ function addMapTools(){
       btn('map.zoomOut',ic('<line x1="5" y1="12" x2="19" y2="12"/>'),()=>lmap.zoomOut(1));
       L.DomUtil.create('div','map-tool-sep',box);
       btn('map.fit',ic('<polyline points="4 9 4 4 9 4"/><polyline points="20 9 20 4 15 4"/><polyline points="4 15 4 20 9 20"/><polyline points="20 15 20 20 15 20"/><circle cx="12" cy="12" r="2.5"/>'),fitAll);
-      btn('gy.world',ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),toggleWorld);
+      const gb=btn('tour.open',ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),openTour);
+      try{ if(!localStorage.getItem('mn_tour_seen')&&gb) gb.classList.add('tour-glow'); }catch(e){}
       L.DomEvent.disableClickPropagation(box);
       L.DomEvent.disableScrollPropagation(box);
       return box;
@@ -3516,7 +3632,7 @@ renderObSpecs();
 switchTab(authMode);
 // 画面（写真の拡大・メニュー・使い方・集計・活動・完了・確認）が開いている間は履歴を1つ積み、
 // 「戻る」でアプリから出ずに、いちばん上の画面を閉じる
-const OVERLAYS=[['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
+const OVERLAYS=[['tourv',()=>closeTour()],['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
   ['sumv',()=>{ if(!reportMode) closeSummary(); }],['actv',()=>closeActivity()],['donev',()=>backToMap()],
   ['confv',()=>{ if(confirm(t('cf.discard'))){ if(!batchSkip()) document.getElementById('confv').classList.remove('show'); } }]];
 const isOpen=id=>{const e=document.getElementById(id);return !!e&&e.classList.contains('show');};
