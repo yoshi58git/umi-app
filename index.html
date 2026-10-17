@@ -124,6 +124,41 @@ body.touring .leaflet-popup{display:none}
 /* 地球のボタンを目立たせる（ツアーを一度開くまで） */
 .map-tool.tour-glow{color:#FFD27A;animation:tourGlow 2.4s ease-in-out infinite}
 @keyframes tourGlow{0%,100%{box-shadow:inset 0 0 0 0 rgba(255,170,68,0)}50%{box-shadow:inset 0 0 0 2px rgba(255,170,68,.85)}}
+.st-lead{padding:14px;border-radius:14px;background:rgba(255,210,122,.08);border:1px solid rgba(255,210,122,.35);margin-bottom:14px}
+.st-lead-t{font-size:16px;font-weight:600;color:#FFE3A8;line-height:1.5}
+.st-lead-d{font-size:12px;line-height:1.7;color:rgba(255,255,255,.85);margin-top:4px}
+.st-stage{display:flex;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+.st-n{width:28px;height:28px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+.st-stage.done .st-n{background:#2F7F60;color:#fff}
+.st-stage.now .st-n{background:#FFAA44;color:#04111C}
+.st-t{font-size:14px;font-weight:600}
+.st-c{font-size:12px;line-height:1.6;color:rgba(255,255,255,.7);margin-top:2px}
+.st-now-tag{font-size:10px;font-weight:700;color:#FFAA44;margin-left:6px}
+.st-check{margin:8px 0 2px;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,170,68,.35)}
+.st-item{display:flex;gap:8px;font-size:13px;line-height:1.55;padding:4px 0}
+.st-item .mk{width:18px;flex-shrink:0;text-align:center;font-weight:700}
+.st-item.ok .mk{color:#7EE0A8}.st-item.ng .mk{color:rgba(255,255,255,.35)}
+.st-item small{display:block;font-size:11px;color:rgba(255,255,255,.55)}
+.st-next{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(255,170,68,.12);font-size:13px;line-height:1.6}
+.st-next b{color:#FFD27A}
+#comp-chip{position:absolute;left:12px;top:calc(var(--hdr-h,96px) + 6px);z-index:26;display:none;align-items:center;gap:8px;max-width:calc(100% - 160px);
+  padding:6px 12px 6px 10px;border-radius:16px;border:1px solid rgba(255,170,68,.6);background:rgba(6,22,36,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;font-family:inherit;font-size:11px;cursor:pointer}
+#app.has-comp #comp-chip{display:flex}
+#app.has-comp #spec-tip{display:none}
+#app.has-comp.in-act #comp-chip{top:calc(var(--hdr-h,96px) + 44px)}
+.cc-step{font-weight:700;color:#FFD27A;white-space:nowrap}
+.cc-dots{display:flex;gap:3px;flex-shrink:0}
+.cc-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25)}
+.cc-dots span.ok{background:#7EE0A8}
+.cc-dots.big{gap:6px;margin:6px 0 10px}.cc-dots.big span{width:10px;height:10px}
+.cc-next{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,.85)}
+#compv{position:fixed;inset:0;z-index:5600;display:none;align-items:flex-end;justify-content:center;background:rgba(2,10,18,.6)}
+#compv.show{display:flex}
+.comp-h{font-size:16px;font-weight:600;color:#FFE3A8}
+.comp-msg{font-size:14px;line-height:1.75;color:rgba(255,255,255,.9)}
+.comp-sug{margin-top:10px}
+.comp-sug button{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid rgba(255,170,68,.35);background:rgba(255,170,68,.06);color:#fff;font-family:inherit;font-size:13px;line-height:1.55;cursor:pointer}
+.comp-sug small{display:block;font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
 .gal-tabs{display:flex;gap:0;margin:0 -20px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
 .gal-tabs button{flex:1;padding:10px 0;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer}
 .gal-tabs button.on{color:#fff;border-bottom-color:#5FD3E6}
@@ -714,6 +749,22 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <div class="seg" id="sum-area"><button data-v="view" onclick="setSum('area','view')" data-i18n="sum.view">地図の表示範囲</button><button data-v="all" onclick="setSum('area','all')" data-i18n="sum.everywhere">すべて</button></div></div>
   <div id="sum-body"></div>
 </div>
+<!-- 伴走のカード（行動の直後に出る） -->
+<div id="compv" role="dialog" aria-modal="true" onclick="if(event.target===this)closeComp()">
+  <div class="rep-card comp-card">
+    <div class="comp-h" id="comp-h"></div>
+    <div class="cc-dots big" id="comp-dots"></div>
+    <div class="comp-msg" id="comp-msg"></div>
+    <div id="comp-extra"></div>
+    <div class="act-btns" id="comp-btns"></div>
+    <button type="button" class="rep-cancel" onclick="closeComp()" data-i18n="comp.later">あとで</button>
+  </div>
+</div>
+<!-- 進め方（段階と、ステップ1のチェック） -->
+<div id="stepv" class="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="st.title">進め方</div><button class="sheet-x" onclick="closeSteps()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div id="step-body"></div>
+</div>
 <!-- 世界のごみの今（ツアー） -->
 <div id="tourv" role="dialog" aria-modal="false" aria-labelledby="tour-title">
   <div class="tour-hdr">
@@ -783,6 +834,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
       <div class="wp-who"><span data-i18n="me.who">ログイン中：</span><b id="wp-who-name"></b></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSteps()" data-i18n="st.title">進め方</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTour()" data-i18n="tour.title">世界のごみの今</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGallery('mine')" data-i18n="gal.open">写真の一覧</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
@@ -817,6 +869,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <button class="li" data-cat="GROUND" style="--c:var(--ground)" onclick="toggleCat('GROUND')" aria-pressed="true"><span class="ld"></span>GROUND<span class="li-n" id="s-ground">0</span></button>
   </div>
   <!-- アプリの仕様をさりげなく切り替え表示（タップで詳しく） -->
+  <button id="comp-chip" type="button" onclick="openSteps()"><span class="cc-step" id="cc-step"></span><span class="cc-dots" id="cc-dots"></span><span class="cc-next" id="cc-next"></span></button>
   <button id="act-chip" type="button" onclick="openActivity()"><span class="ac-dot"></span><span id="act-chip-t"></span></button>
   <button id="spec-tip" type="button" aria-live="polite" onclick="toggleSpecTip()">
     <span class="st-ic" id="spec-ic"></span>
@@ -927,6 +980,43 @@ ja:{
   'wp.note':'壁紙はこの端末の中だけに保存され、ほかの人には見えません','wp.saveFail':'壁紙を保存できませんでした。別の写真をお試しください。','wp.loadFail':'この写真は読み込めませんでした。',
   'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
   'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示','gy.world':'世界のごみが集まる海域を見る',
+  'comp.later':'あとで','comp.step1':'ステップ1','comp.next':'次',
+  'comp.short.c1':'同じ浜で続けて測る','comp.short.c2':'参加人数を入れる','comp.short.c3':'陸側の取り組みを1つ決める','comp.short.c4':'取り組みの後も測る','comp.short.c5':'減るまで続ける',
+  'comp.stepH':'ステップ1：5つのうち{n}つ達成','comp.progressH':'一歩進みました（5つのうち{n}つ）','comp.passedH':'ステップ1を達成しました',
+  'comp.notYet':'取り組みの後の記録がそろいましたが、まだ「続けて減った」とは言えません（{v}）。天気や季節でも量は変わります。取り組みの中身を管理者と見直すか、もう少し続けて測りましょう。ここで止めないことが、いちばん大事です。',
+  'comp.cal':'次の活動をカレンダーに','comp.calAsk':'次の活動の日を入力してください（例：2026-11-14）','comp.calTitle':'moto no umi 浜の活動（同じ浜で測る）',
+  'comp.calDesc':'同じ浜で記録して、参加人数も入れる。ステップ1の条件に近づきます','comp.ownIdea':'自分たちで考えた取り組みを記録する',
+  'ms.reportBtn':'団体のレポートを見る',
+  'sg.why':'陸由来の{share}%が{item}（{area}）。',
+  'sg.butt.t':'吸い殻が出やすい場所（駅から浜への道・駐車場・喫煙所）の管理を見直す','sg.butt.who':'相談先：その場所の管理者、自治体の担当課',
+  'sg.drink.t':'飲み物の容器を、浜の近くで回収できるようにする（自動販売機の横の回収箱、イベントの回収）','sg.drink.who':'相談先：設置者・店舗、イベントの主催者',
+  'sg.food.t':'食べ物の包装や容器を、持ち帰りやすく・捨てやすくする（浜の近くの飲食・イベント）','sg.food.who':'相談先：近くの飲食店、イベントの主催者',
+  'sg.bag.t':'袋が風で飛ばないよう、ごみの集積所や浜のごみ箱の管理を見直す','sg.bag.who':'相談先：自治体の担当課、集積所の管理者',
+  'sg.leisure.t':'浜の利用のルール（花火・風船など）と、持ち帰りの呼びかけを見直す','sg.leisure.who':'相談先：海岸の管理者、自治体、地域の団体',
+  'sg.frag.t':'細かい破片の出どころ（上流の川・排水路）を、ほかの場所の記録とあわせて調べる','sg.frag.who':'相談先：河川の管理者、自治体、近くの団体',
+  'h.way':'進め方','way.t':'日付ではなく、|確かめて|一歩ずつ',
+  'way.d':'まず1つの浜で、|陸側の取り組みで|ごみが減ったことを示す。|確かめてから、|担当・地域・制度へ|広げます',
+  'st.title':'進め方','st.loading':'読み込んでいます...','st.now':'いまここ','st.cond':'次へ進む条件',
+  'st.lead':'条件を満たすまで、次へ進みません。最初の一歩で挫折しないことが、いちばん大事です。',
+  'st0.t':'道具を確かめる','st0.c':'AIの数え方を、人の答え合わせと比べて、十分に一致している',
+  'st0.open':'答え合わせの表を書き出す（集計から）','st0.done':'一致を確かめた',
+  'st1.t':'1か所で証明する','st1.c':'同じ浜で、陸側の取り組みの後、1人あたりの陸由来ごみが続けて減っている',
+  'st2.t':'担当に組み込む','st2.c':'その場所の管理者が、担当・予算・手順として文書にしている',
+  'st3.t':'ほかの場所で再現する','st3.c':'3〜5か所・団体で、同じ測り方で、同じように減っている',
+  'st4.t':'地域の制度に入る','st4.c':'都道府県や市町村の計画・協議会・施策の中で、この指標が使われている',
+  'st5.t':'国・業界・世界へ','st5.c':'制度や基準を決める場で、根拠として使われている',
+  'st1.c1':'同じ浜で3回以上測っている','st1.c2':'すべての活動に参加人数が入っている','st1.c3':'陸側の取り組みを1つ記録している',
+  'st1.c4':'取り組みの前に1回以上、後に2回以上測っている','st1.c5':'取り組みの後、1人あたりの陸由来ごみが続けて減っている',
+  'st.n':'いま{n}回','st.missing':'未入力 {n}回','st.ba':'前 {b}回・後 {a}回','st.pp':'1人あたり 前 {b}個 → 後 {a}個',
+  'st.nextH':'次にやること',
+  'st1.c1.next':'同じ浜で、活動を続けて記録しましょう。毎回、同じ団体の活動として作ってください。','st1.c1.btn':'活動を作る',
+  'st1.c2.next':'参加人数が入っていない活動があります。人数がないと、1人あたりで比べられません。','st1.c2.btn':'人数を入れる',
+  'st1.c3.next':'集計の「地域ごと」と「多かったごみ」を見て、陸側で手を打つことを1つ決め、団体の「取り組みを記録」に入れましょう。','st1.c3.btn':'取り組みを記録する',
+  'st1.c4.next':'取り組みの効果を確かめるため、同じ浜で続けて測りましょう。後に2回以上の記録が必要です。','st1.c4.btn':'次の活動を作る',
+  'st1.c5.next':'まだ減ったとは言えません。取り組みの中身を見直すか、もう少し続けて測りましょう。挫折しないことがいちばん大事です。','st1.c5.btn':'団体のレポートを見る',
+  'st1.passed':'ステップ1の条件を満たしました。団体のレポートのリンクを、その場所の管理者に届けましょう（ステップ2）',
+  'st.noOrg':'ステップ1は、同じ浜で続けて測るため、団体で進めます。仲間内のグループでも大丈夫です。まず団体と活動を作りましょう。',
+  'st.note':'ステップ0の確認はこの端末に記録し、ステップ1は団体の記録から自動で判定します。ステップ2より先は、人と人とのやり取りで進みます。',
   'tour.open':'世界のごみの今（ツアー）','tour.title':'世界のごみの今','tour.updated':'最終更新 {d}','tour.next':'下へスクロール','tour.source':'出典',
   'tour.record':'記録する','tour.backMap':'地図に戻る','tour.fail':'内容を読み込めませんでした。電波のある場所でもう一度お試しください',
   'gy.npe':'北太平洋・東','gy.npw':'北太平洋・西','gy.sp':'南太平洋','gy.na':'北大西洋','gy.sa':'南大西洋','gy.io':'インド洋',
@@ -1096,6 +1186,43 @@ en:{
   'wp.note':'The wallpaper is saved only on this device and is not visible to others','wp.saveFail':'Could not save the wallpaper. Please try another photo.','wp.loadFail':'This photo could not be loaded.',
   'me':'Me','all':'Others','nav.mine':'My records','nav.all':'Others\u2019 records','nav.prev':'previous','nav.next':'next','count':'{n}',
   'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records','gy.world':'See where litter gathers in the world\u2019s oceans',
+  'comp.later':'Later','comp.step1':'Step 1','comp.next':'Next',
+  'comp.short.c1':'keep measuring the same beach','comp.short.c2':'enter participant counts','comp.short.c3':'choose one land-side action','comp.short.c4':'measure after the action','comp.short.c5':'keep going until it falls',
+  'comp.stepH':'Step 1: {n} of 5 met','comp.progressH':'One step forward ({n} of 5)','comp.passedH':'Step 1 achieved',
+  'comp.notYet':'You have records after the action, but a steady decrease is not shown yet ({v}). Weather and seasons also change amounts. Review the action with the manager, or keep measuring a little longer. Not stopping here matters most.',
+  'comp.cal':'Add next activity to calendar','comp.calAsk':'Enter the date of the next activity (e.g. 2026-11-14)','comp.calTitle':'moto no umi beach activity (same beach)',
+  'comp.calDesc':'Record at the same beach and enter the number of people. It brings you closer to step 1','comp.ownIdea':'Record an action of your own',
+  'ms.reportBtn':'See team report',
+  'sg.why':'{share}% of land litter is {item} ({area}).',
+  'sg.butt.t':'Review management where butts are dropped (station-to-beach paths, parking, smoking areas)','sg.butt.who':'Talk to: the place\u2019s manager, the municipal office',
+  'sg.drink.t':'Make drink containers easy to return near the beach (bins by vending machines, event collection)','sg.drink.who':'Talk to: operators and shops, event organizers',
+  'sg.food.t':'Make food packaging easy to take home or dispose of (nearby food and events)','sg.food.who':'Talk to: nearby eateries, event organizers',
+  'sg.bag.t':'Review waste collection points and beach bins so bags do not blow away','sg.bag.who':'Talk to: the municipal office, collection point managers',
+  'sg.leisure.t':'Review beach-use rules (fireworks, balloons) and take-home messages','sg.leisure.who':'Talk to: the coast manager, municipality, local groups',
+  'sg.frag.t':'Trace where small fragments come from (upstream rivers, drains) with other places\u2019 records','sg.frag.who':'Talk to: the river manager, municipality, nearby groups',
+  'h.way':'Our approach','way.t':'Not by deadlines: |verify, |step by step',
+  'way.d':'First, show at one beach |that a land-side action |reduced litter. |Only then expand |to managers, regions and policy',
+  'st.title':'Our approach','st.loading':'Loading...','st.now':'You are here','st.cond':'Condition to move on',
+  'st.lead':'We do not move on until the condition is met. Not giving up at the first step matters most.',
+  'st0.t':'Verify the tool','st0.c':'AI counts agree well enough with people\u2019s answer checks',
+  'st0.open':'Export the answer-check sheet (from Summary)','st0.done':'Agreement verified',
+  'st1.t':'Prove it in one place','st1.c':'At the same beach, land-based litter per person keeps falling after a land-side action',
+  'st2.t':'Build it into responsibilities','st2.c':'The place\u2019s manager documents it as a role, budget and procedure',
+  'st3.t':'Reproduce elsewhere','st3.c':'3\u20135 places or groups see the same decrease with the same method',
+  'st4.t':'Into regional policy','st4.c':'The indicator is used in prefectural or municipal plans, councils or measures',
+  'st5.t':'To national, industry and global','st5.c':'It is used as evidence where rules and standards are decided',
+  'st1.c1':'Measured 3+ times at the same beach','st1.c2':'Every activity has a participant count','st1.c3':'One land-side action is recorded',
+  'st1.c4':'Measured 1+ times before and 2+ times after the action','st1.c5':'After the action, land-based litter per person keeps falling',
+  'st.n':'{n} so far','st.missing':'{n} missing','st.ba':'before {b} / after {a}','st.pp':'per person: before {b} \u2192 after {a}',
+  'st.nextH':'Next step',
+  'st1.c1.next':'Keep recording activities at the same beach, each as an activity of the same team.','st1.c1.btn':'Create an activity',
+  'st1.c2.next':'Some activities have no participant count. Without it, per-person comparison is impossible.','st1.c2.btn':'Enter people',
+  'st1.c3.next':'Look at \u201cBy area\u201d and the most common litter in the summary, choose one land-side action, and add it with \u201cRecord an action\u201d in your team.','st1.c3.btn':'Record an action',
+  'st1.c4.next':'Keep measuring at the same beach to check the effect. You need 2+ records after the action.','st1.c4.btn':'Create the next activity',
+  'st1.c5.next':'A decrease is not shown yet. Review the action or keep measuring a little longer. Not giving up matters most.','st1.c5.btn':'See team report',
+  'st1.passed':'Step 1 is met. Send the team report link to the manager of that place (step 2)',
+  'st.noOrg':'Step 1 runs as a team so the same beach is measured repeatedly. A group of friends is fine. Create a team and an activity first.',
+  'st.note':'Step 0 is recorded on this device; step 1 is judged automatically from team records. Steps 2 and beyond move forward through people.',
   'tour.open':'The world\u2019s litter now (tour)','tour.title':'The world\u2019s litter now','tour.updated':'Updated {d}','tour.next':'Scroll down','tour.source':'Source',
   'tour.record':'Record','tour.backMap':'Back to map','tour.fail':'Could not load the content. Please try again where you have signal',
   'gy.npe':'North Pacific (east)','gy.npw':'North Pacific (west)','gy.sp':'South Pacific','gy.na':'North Atlantic','gy.sa':'South Atlantic','gy.io':'Indian Ocean',
@@ -1306,6 +1433,8 @@ function setLang(l){
   if(document.getElementById('actv').classList.contains('show')) renderActivity();
   if(document.getElementById('galv').classList.contains('show')) renderGallery();
   if(document.getElementById('termsv').classList.contains('show')) openTerms();
+  if(document.getElementById('stepv').classList.contains('show')) renderSteps();
+  if(compState) refreshCompanion();
   if(document.getElementById('tourv').classList.contains('show')&&tourData){ const k=tourIdx; renderTour(); tourIdx=-1; goTourStop(Math.max(0,k)); if(tourObs){tourObs.disconnect();document.querySelectorAll('#tour-cards .tour-card').forEach(c=>tourObs.observe(c));} }
   updateActChip();
   const cv=document.getElementById('confv');
@@ -1500,6 +1629,7 @@ function initMap(clat, clng, zoom){
 
 // ── アプリの仕様（ログイン画面とメイン画面の案内で共通） ──
 const SPEC_ICONS={
+  steps:'<polyline points="3 18 8 18 8 13 13 13 13 8 18 8 18 3 21 3"/>',
   pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   photo:'<rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/>',
@@ -1515,6 +1645,7 @@ const PURPOSES=[
   {ic:'share', col:'var(--city)', cats:['RIVER','CITY','GROUND'],
    k:'p2'},
 ];
+const WAY={ic:'steps',k:'way',col:'#FFD27A'};
 const SPECS=[
   {ic:'pin',  k:'s1'},
   {ic:'lock', k:'s2'},
@@ -1528,6 +1659,7 @@ function renderObSpecs(){
   const row=(x,extra)=>'<div class="ob-row"><div class="ob-ic"'+(x.col?' style="color:'+x.col+';border-color:'+x.col+'"':'')+'>'+specSvg(x.ic,16)+'</div><div class="ob-tx">'+(extra||'')+'<strong>'+th(x.k+'.t')+'</strong><br>'+th(x.k+'.d')+'</div></div>';
   box.innerHTML=
     '<div class="ob-axis"><div class="ob-axis-t">'+th('axis.t')+'</div><div class="ob-axis-d">'+th('axis.d')+'</div></div>'+
+    '<div class="ob-h">'+t('h.way')+'</div>'+row(WAY)+
     '<div class="ob-h">'+t('h.purpose')+'</div>'+
     PURPOSES.map(x=>row(x,'<span class="ob-cat" style="color:'+x.col+'">'+x.cats.join(LANG==='en'?' · ':'・')+'</span>')).join('')+
     '<div class="ob-h">'+t('h.promise')+'</div>'+
@@ -1536,7 +1668,7 @@ function renderObSpecs(){
 applyI18nStatic();
 renderObSpecs();
 // メイン画面：7秒ごとに1つずつ切り替えて表示。タップで詳しい説明を開く（開いている間は止まる）
-const TIPS=[AXIS,...PURPOSES,...SPECS];
+const TIPS=[AXIS,WAY,...PURPOSES,...SPECS];
 let specIdx=0, specTimer=null;
 function showSpec(i){
   const x=TIPS[i];
@@ -2033,6 +2165,7 @@ async function finishActivity(id){
   const res=await api('activity_update',{id,participants:Number(v),ends_at:a.ends_at||new Date().toISOString()});
   if(res.error){alert(tv(res.error));return;}
   await refreshMine();
+  if(a.org_id){ stepOrg=a.org_id; closeActivity(); showCompanion('finish'); }
 }
 // ログアウト（端末をほかの人と共有するとき）。言語や壁紙は残す
 async function logout(){
@@ -2059,13 +2192,14 @@ async function changePin(){
 }
 
 // 取り組み（陸側でした対策）を記録
-async function addMeasure(orgId){
-  const title=prompt(t('ms.askTitle')); if(!title) return;
+async function addMeasure(orgId,preset){
+  const title=prompt(t('ms.askTitle'),preset||''); if(!title) return;
   const d=new Date(), today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   const day=prompt(t('ms.askDate'),today); if(!day) return;
   const res=await api('measure_create',{org_id:orgId,title,started_on:day});
   if(res.error){alert(tv(res.error));return;}
   toast(t('ms.saved'));
+  stepOrg=orgId; closeActivity(); showCompanion('measure');
 }
 async function createOrg(){
   const n=prompt(t('act.askOrg')); if(!n) return;
@@ -2435,6 +2569,176 @@ function toggleWorld(){
   else { lmap.flyTo([35.32,139.41],12,{duration:.9}); }
 }
 
+
+
+// ── 進め方：日付ではなく、条件を確かめて一歩ずつ。最初の一歩（1か所で減ったことを示す）を挫折させない ──
+const STAGES=['st0','st1','st2','st3','st4','st5'];
+let stepOrg=null, stepData=null;
+async function openSteps(){
+  document.getElementById('stepv').classList.add('show');
+  document.getElementById('step-body').innerHTML='<div class="gal-empty">'+t('st.loading')+'</div>';
+  const mine=await api('mine');
+  actMine=mine.error?actMine:mine;
+  const orgs=(actMine.orgs||[]);
+  if(!stepOrg||!orgs.some(o=>o.id===stepOrg)) stepOrg=orgs[0]?orgs[0].id:null;
+  stepData=stepOrg?await api('org_info',{id:stepOrg}):null;
+  renderSteps();
+}
+function closeSteps(){ document.getElementById('stepv').classList.remove('show'); }
+// ステップ1の条件を、団体の記録から判定する
+function step1Checks(info){
+  const acts=(info&&info.activities||[]).slice().sort((a,b)=>String(a.starts_at).localeCompare(String(b.starts_at)));
+  const ms=(info&&info.measures||[]).slice().sort((a,b)=>String(a.started_on).localeCompare(String(b.started_on)));
+  const perPerson=a=>{
+    if(!a.participants) return null;
+    let land=0; (window.allRecords||[]).filter(r=>r.activity_id===a.id).forEach(r=>{const c=countsOf(r);(c&&c.item_counts||[]).forEach(x=>{if(x.origin==='陸由来')land+=Number(x.count)||0;});});
+    return land/a.participants;
+  };
+  const m=ms[0], d=m?String(m.started_on):null;
+  const before=d?acts.filter(a=>String(a.starts_at).slice(0,10)<d):[], after=d?acts.filter(a=>String(a.starts_at).slice(0,10)>=d):[];
+  const bv=before.map(perPerson).filter(v=>v!=null), av=after.map(perPerson).filter(v=>v!=null);
+  const bAvg=bv.length?bv.reduce((x,y)=>x+y,0)/bv.length:null;
+  const decreased=bAvg!=null&&av.length>=2&&av.every(v=>v<bAvg);
+  const c=[
+    {k:'c1',ok:acts.length>=3,v:t('st.n',{n:acts.length})},
+    {k:'c2',ok:acts.length>0&&acts.every(a=>a.participants>0),v:t('st.missing',{n:acts.filter(a=>!(a.participants>0)).length})},
+    {k:'c3',ok:ms.length>=1,v:m?esc(aiText(m.title)):''},
+    {k:'c4',ok:before.length>=1&&after.length>=2,v:t('st.ba',{b:before.length,a:after.length})},
+    {k:'c5',ok:decreased,v:bAvg!=null&&av.length?t('st.pp',{b:bAvg.toFixed(1),a:av.map(v=>v.toFixed(1)).join(' → ')}):''},
+  ];
+  return c;
+}
+function renderSteps(){
+  const box=document.getElementById('step-body'), orgs=actMine.orgs||[];
+  let h='<div class="st-lead"><div class="st-lead-t">'+t('way.t')+'</div><div class="st-lead-d">'+t('st.lead')+'</div></div>';
+  if(orgs.length>1) h+='<div class="act-form" style="margin-bottom:10px"><label for="st-org">'+t('act.org')+'</label><select id="st-org" onchange="stepOrg=this.value;openSteps()">'+orgs.map(o=>'<option value="'+o.id+'"'+(o.id===stepOrg?' selected':'')+'>'+esc(aiText(o.name))+'</option>').join('')+'</select></div>';
+  const checks=stepOrg&&stepData&&!stepData.error?step1Checks(stepData):null;
+  const s0=(()=>{try{return localStorage.getItem('mn_stage0_'+(stepOrg||'me'))==='1';}catch(e){return false;}})();
+  const s1=checks?checks.every(c=>c.ok):false;
+  const now=!s0?0:(!s1?1:2);
+  STAGES.forEach((k,i)=>{
+    const cls=i<now?'done':(i===now?'now':'');
+    h+='<div class="st-stage '+cls+'"><div class="st-n">'+(i<now?'✓':i)+'</div><div style="flex:1;min-width:0"><div class="st-t">'+t(k+'.t')+(i===now?'<span class="st-now-tag">'+t('st.now')+'</span>':'')+'</div><div class="st-c">'+t('st.cond')+'：'+t(k+'.c')+'</div>';
+    if(i===0){
+      h+='<div class="act-btns"><button class="act-btn" onclick="closeSteps();openSummary()">'+t('st0.open')+'</button><label class="act-btn" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" '+(s0?'checked':'')+' onchange="try{localStorage.setItem(\'mn_stage0_'+(stepOrg||'me')+'\',this.checked?\'1\':\'0\')}catch(e){};renderSteps()">'+t('st0.done')+'</label></div>';
+    }
+    if(i===1){
+      if(!stepOrg){
+        h+='<div class="st-next">'+t('st.noOrg')+'</div><div class="act-btns"><button class="act-btn main" onclick="closeSteps();openActivity()">'+t('act.open')+'</button></div>';
+      } else if(checks){
+        h+='<div class="st-check">'+checks.map(c=>'<div class="st-item '+(c.ok?'ok':'ng')+'"><span class="mk">'+(c.ok?'✓':'・')+'</span><span>'+t('st1.'+c.k)+(c.v?'<small>'+c.v+'</small>':'')+'</span></div>').join('')+'</div>';
+        const first=checks.find(c=>!c.ok);
+        if(first){
+          const act={c1:'openActivity()',c2:'openActivity()',c3:'openActivity()',c4:'openActivity()',c5:"openReport('org','"+stepOrg+"')"}[first.k];
+          h+='<div class="st-next"><b>'+t('st.nextH')+'</b><br>'+t('st1.'+first.k+'.next')+'</div>';
+          if(first.k==='c3') h+=suggestHtml({orgId:stepOrg,info:stepData}).replace(/closeComp\(\);/g,'closeSteps();');
+          else h+='<div class="act-btns"><button class="act-btn main" onclick="closeSteps();'+act+'">'+t('st1.'+first.k+'.btn')+'</button></div>';
+        } else h+='<div class="st-next"><b>'+t('st1.passed')+'</b></div>';
+      }
+    }
+    h+='</div></div>';
+  });
+  h+='<div class="sum-note" style="margin-top:10px">'+t('st.note')+'</div>';
+  box.innerHTML=h;
+}
+
+
+// ── 伴走：行動したその瞬間に、進み具合と次の一手を示す（ステップ1を挫折させない） ──
+let compState=null, compCache={};
+async function compInfo(orgId,fresh){
+  const c=compCache[orgId];
+  if(!fresh&&c&&Date.now()-c.at<5*60e3) return c.info;
+  const info=await api('org_info',{id:orgId});
+  if(!info.error) compCache[orgId]={info,at:Date.now()};
+  return info.error?null:info;
+}
+// 団体（いちばん最近に活動した団体）のステップ1の状態を計算し、帯を更新
+async function refreshCompanion(fresh){
+  const app=document.getElementById('app');
+  if(!sessionToken){ app.classList.remove('has-comp'); return null; }
+  if(!actMine||!(actMine.orgs||[]).length){ const m=await api('mine'); if(!m.error) actMine=m; }
+  const orgs=actMine.orgs||[]; if(!orgs.length){ app.classList.remove('has-comp'); compState=null; return null; }
+  const acts=actMine.activities||[];
+  const latest=acts.filter(a=>a.org_id).sort((a,b)=>String(b.starts_at).localeCompare(String(a.starts_at)))[0];
+  const orgId=(stepOrg&&orgs.some(o=>o.id===stepOrg))?stepOrg:(latest?latest.org_id:orgs[0].id);
+  const info=await compInfo(orgId,fresh); if(!info){ app.classList.remove('has-comp'); return null; }
+  const checks=step1Checks(info), first=checks.find(c=>!c.ok);
+  compState={orgId,info,checks,first,passed:!first};
+  const done=checks.filter(c=>c.ok).length;
+  app.classList.toggle('has-comp',!compState.passed);
+  document.getElementById('cc-step').textContent=t('comp.step1');
+  document.getElementById('cc-dots').innerHTML=checks.map(c=>'<span class="'+(c.ok?'ok':'')+'"></span>').join('');
+  document.getElementById('cc-next').textContent=first?t('comp.next')+'：'+t('comp.short.'+first.k):'';
+  return compState;
+}
+// 行動の直後に出すカード
+async function showCompanion(moment){
+  const before=compState?compState.checks.filter(c=>c.ok).length:null;
+  const st=await refreshCompanion(true); if(!st) return;
+  const done=st.checks.filter(c=>c.ok).length;
+  let head, msg='', extra='', btns='';
+  const c5=st.checks.find(c=>c.k==='c5'), c4=st.checks.find(c=>c.k==='c4');
+  if(st.passed){ head=t('comp.passedH'); msg=t('st1.passed'); btns='<button class="act-btn main" onclick="closeComp();openReport(\'org\',\''+st.orgId+'\')">'+t('ms.reportBtn')+'</button>'; }
+  else {
+    head=before!=null&&done>before?t('comp.progressH',{n:done}):t('comp.stepH',{n:done});
+    // 取り組みの後の記録がそろってきたのに、まだ減っていないときは、責めずに続ける理由を伝える
+    if(st.first.k==='c5'&&c4.ok) msg=t('comp.notYet',{v:c5.v||''});
+    else msg=t('st1.'+st.first.k+'.next');
+    if(st.first.k==='c3') extra=suggestHtml(st);
+    else btns='<button class="act-btn main" onclick="closeComp();'+compAction(st)+'">'+t('st1.'+st.first.k+'.btn')+'</button>';
+    if(['c1','c4','c5'].includes(st.first.k)) btns+='<button class="act-btn" onclick="addNextToCalendar()">'+t('comp.cal')+'</button>';
+  }
+  document.getElementById('comp-h').textContent=head;
+  document.getElementById('comp-dots').innerHTML=st.checks.map(c=>'<span class="'+(c.ok?'ok':'')+'"></span>').join('');
+  document.getElementById('comp-msg').innerHTML=esc(msg);
+  document.getElementById('comp-extra').innerHTML=extra;
+  document.getElementById('comp-btns').innerHTML=btns;
+  document.getElementById('compv').classList.add('show');
+}
+function closeComp(){ document.getElementById('compv').classList.remove('show'); }
+function compAction(st){ return {c1:'openActivity()',c2:'openActivity()',c3:'openActivity()',c4:'openActivity()',c5:"openReport('org','"+st.orgId+"')"}[st.first.k]; }
+
+// 陸側の取り組みの候補を、団体のデータから出す（固有名詞は使わず、場所の種類と担当の区分で示す）
+const SUGGEST={
+  'たばこの吸い殻':'sg.butt','ライター':'sg.butt',
+  'PETボトル':'sg.drink','ペットボトルのキャップ':'sg.drink','飲料缶':'sg.drink','ガラス瓶':'sg.drink',
+  '食品の包装・袋':'sg.food','食品容器・トレー':'sg.food','プラスチックカップ':'sg.food','ストロー':'sg.food',
+  'レジ袋':'sg.bag','花火':'sg.leisure','風船':'sg.leisure','おもちゃ':'sg.leisure',
+  'プラスチック破片':'sg.frag','発泡スチロール片':'sg.frag','フィルム片':'sg.frag',
+};
+function suggestions(st){
+  const ids=new Set((st.info.activities||[]).map(a=>a.id)), items={}, areas={};
+  (window.allRecords||[]).filter(r=>ids.has(r.activity_id)).forEach(r=>{
+    const c=countsOf(r); if(!c) return;
+    (c.item_counts||[]).forEach(x=>{ if(x.origin!=='陸由来') return; const n=canonName(x.name), k=Number(x.count)||0; items[n]=(items[n]||0)+k; const a=r.location_name||''; if(a) areas[a]=(areas[a]||0)+k; });
+  });
+  const total=Object.values(items).reduce((a,b)=>a+b,0);
+  const area=Object.entries(areas).sort((a,b)=>b[1]-a[1])[0];
+  const seen=new Set(), out=[];
+  Object.entries(items).sort((a,b)=>b[1]-a[1]).forEach(([name,n])=>{
+    const key=SUGGEST[name]; if(!key||seen.has(key)||out.length>=3) return; seen.add(key);
+    out.push({key,name,share:total?Math.round(n/total*100):0,area:area?area[0]:''});
+  });
+  return out;
+}
+function suggestHtml(st){
+  const sg=suggestions(st);
+  if(!sg.length) return '<div class="comp-sug"><button onclick="closeComp();addMeasure(\''+st.orgId+'\')">'+t('comp.ownIdea')+'</button></div>';
+  return '<div class="comp-sug">'+sg.map(x=>{
+    const title=t(x.key+'.t');
+    return '<button onclick="closeComp();addMeasure(\''+st.orgId+'\','+JSON.stringify(title).replace(/"/g,'&quot;')+')">'+esc(title)+
+      '<small>'+esc(t('sg.why',{item:itemLabel(x.name),share:x.share,area:x.area?aiText(x.area):t('sum.areaUnknown')}))+' '+esc(t(x.key+'.who'))+'</small></button>';
+  }).join('')+'<button onclick="closeComp();addMeasure(\''+st.orgId+'\')">'+t('comp.ownIdea')+'</button></div>';
+}
+// 次の活動の日をカレンダーに（スマホのカレンダーに取り込めるファイルを作る）
+function addNextToCalendar(){
+  const d=prompt(t('comp.calAsk'),(()=>{const x=new Date();x.setDate(x.getDate()+28);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');})());
+  if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d.trim())) return;
+  const ymd=d.trim().replace(/-/g,''), stamp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//moto no umi//JA','BEGIN:VEVENT','UID:'+Date.now()+'@motonoumi.jp','DTSTAMP:'+stamp,
+    'DTSTART;VALUE=DATE:'+ymd,'SUMMARY:'+t('comp.calTitle'),'DESCRIPTION:'+t('comp.calDesc'),'URL:'+location.origin+location.pathname,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  saveBlob(new Blob([ics],{type:'text/calendar'}),'motonoumi_next.ics');
+}
 
 // ── 世界のごみの今（ツアー）。内容は tour.json（差し替えるだけで最新の動向に更新）。読めなければアプリに入れた控えを使う ──
 let tourData=null, tourBack=null, tourIdx=-1, tourObs=null;
@@ -3054,6 +3358,7 @@ function startApp(){
   applyWallpaper();
   maybeShowGuide(); // 初めての人には撮り方を案内
   setTimeout(resumeBatchIfAny,1800); // 再読み込みで止まったまとめて記録があれば、続けるか聞く（記録の読み込み後）
+  setTimeout(()=>refreshCompanion(),2200); // 伴走の帯（団体で活動している人）
   updateActChip();
   consumePendingJoin(); // QRコードから開いた人は、その活動に参加 // 画面の大きさが決まってから帯の高さを合わせる
   if(preloaded&&needReload){
@@ -3632,7 +3937,7 @@ renderObSpecs();
 switchTab(authMode);
 // 画面（写真の拡大・メニュー・使い方・集計・活動・完了・確認）が開いている間は履歴を1つ積み、
 // 「戻る」でアプリから出ずに、いちばん上の画面を閉じる
-const OVERLAYS=[['tourv',()=>closeTour()],['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
+const OVERLAYS=[['compv',()=>closeComp()],['stepv',()=>closeSteps()],['tourv',()=>closeTour()],['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
   ['sumv',()=>{ if(!reportMode) closeSummary(); }],['actv',()=>closeActivity()],['donev',()=>backToMap()],
   ['confv',()=>{ if(confirm(t('cf.discard'))){ if(!batchSkip()) document.getElementById('confv').classList.remove('show'); } }]];
 const isOpen=id=>{const e=document.getElementById(id);return !!e&&e.classList.contains('show');};
