@@ -90,6 +90,13 @@ html,body{height:100%;background:var(--deep);color:var(--white);font-family:'Int
 .rep-d{font-size:12px;color:var(--foam);line-height:1.6;margin-bottom:12px}
 .rep-opt{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);color:#fff;font-family:inherit;font-size:14px;cursor:pointer}
 .rep-cancel{display:block;width:100%;padding:12px;border:none;background:transparent;color:rgba(255,255,255,.7);font-family:inherit;font-size:14px;cursor:pointer}
+.gyre-label{background:transparent!important;border:none!important;box-shadow:none!important;color:#FFE3A8!important;font-family:inherit;font-size:11px;font-weight:600;text-align:center;white-space:normal;width:110px;line-height:1.3;text-shadow:0 1px 3px rgba(0,0,0,.6);display:none}
+.gyre-label::before{display:none}
+.world-zoom .gyre-label{display:block}
+.gyre-pop{padding:12px 14px;color:#fff}
+.gyre-pop-t{font-size:14px;font-weight:600;color:#FFE3A8;margin-bottom:4px}
+.gyre-pop-d{font-size:12px;line-height:1.6;color:rgba(255,255,255,.88)}
+.gyre-pop-n{font-size:11px;line-height:1.6;color:rgba(255,255,255,.55);margin-top:8px}
 .gal-tabs{display:flex;gap:0;margin:0 -20px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
 .gal-tabs button{flex:1;padding:10px 0;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer}
 .gal-tabs button.on{color:#fff;border-bottom-color:#5FD3E6}
@@ -881,7 +888,16 @@ ja:{
   'wp.settings':'壁紙の設定','wp.choose':'壁紙の写真を選ぶ','wp.pos':'表示位置','wp.top':'上','wp.center':'中央','wp.bottom':'下','wp.reset':'元の背景に戻す',
   'wp.note':'壁紙はこの端末の中だけに保存され、ほかの人には見えません','wp.saveFail':'壁紙を保存できませんでした。別の写真をお試しください。','wp.loadFail':'この写真は読み込めませんでした。',
   'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
-  'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示',
+  'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示','gy.world':'世界のごみが集まる海域を見る',
+  'gy.npe':'北太平洋・東','gy.npw':'北太平洋・西','gy.sp':'南太平洋','gy.na':'北大西洋','gy.sa':'南大西洋','gy.io':'インド洋',
+  'gy.npe.d':'ハワイとカリフォルニアの間。「太平洋ごみベルト」と呼ばれ、世界で最も大きいとされる海域です',
+  'gy.npw.d':'日本とハワイの間。日本の陸から海に出たごみも、海流に乗ってこうした海域に集まると考えられています',
+  'gy.sp.d':'南太平洋の環流の中心。周りの陸から遠い海にも、ごみは集まります',
+  'gy.na.d':'北大西洋の環流の中心。周りの陸から出たごみが、海流で運ばれて集まります',
+  'gy.sa.d':'南大西洋の環流の中心。周りの陸から出たごみが、海流で運ばれて集まります',
+  'gy.io.d':'インド洋の環流の中心。周りの陸から出たごみが、海流で運ばれて集まります',
+  'gy.note':'範囲はおおよその目安です（NOAAなどの資料による）。ごみは島のように固まっているのではなく、細かくなって広く散らばり、季節や年で動きます。もとは陸から出たごみです',
+  'gy.hint':'オレンジの範囲は、世界でごみが集まる海域の目安です。もう一度押すと元の場所に戻ります',
   'h.purpose':'このアプリの目的','h.promise':'大切な約束',
   'axis.t':'便利は設計してきた。|次は、管理を設計する','axis.d':'海のごみは、|陸でしか|止められない。|リスクを知り、|社会全体で|陸側から|管理に|取り組むための|アプリです',
   'p1.t':'海のごみ：|リスクを知る','p1.d':'すでに|海に出た、|または|出る寸前の|ごみ。|その実態を|記録します',
@@ -1039,7 +1055,16 @@ en:{
   'wp.settings':'Wallpaper','wp.choose':'Choose a wallpaper photo','wp.pos':'Position','wp.top':'Top','wp.center':'Center','wp.bottom':'Bottom','wp.reset':'Restore default background',
   'wp.note':'The wallpaper is saved only on this device and is not visible to others','wp.saveFail':'Could not save the wallpaper. Please try another photo.','wp.loadFail':'This photo could not be loaded.',
   'me':'Me','all':'Others','nav.mine':'My records','nav.all':'Others\u2019 records','nav.prev':'previous','nav.next':'next','count':'{n}',
-  'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records',
+  'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records','gy.world':'See where litter gathers in the world\u2019s oceans',
+  'gy.npe':'North Pacific (east)','gy.npw':'North Pacific (west)','gy.sp':'South Pacific','gy.na':'North Atlantic','gy.sa':'South Atlantic','gy.io':'Indian Ocean',
+  'gy.npe.d':'Between Hawaii and California. Known as the Great Pacific Garbage Patch, considered the largest in the world',
+  'gy.npw.d':'Between Japan and Hawaii. Litter that leaves land in Japan is thought to gather in waters like these via ocean currents',
+  'gy.sp.d':'Center of the South Pacific gyre. Litter gathers even far from any land',
+  'gy.na.d':'Center of the North Atlantic gyre. Litter from surrounding land is carried here by currents',
+  'gy.sa.d':'Center of the South Atlantic gyre. Litter from surrounding land is carried here by currents',
+  'gy.io.d':'Center of the Indian Ocean gyre. Litter from surrounding land is carried here by currents',
+  'gy.note':'Ranges are approximate (based on NOAA and other sources). Litter is not a solid island; it breaks into small pieces, spreads widely, and moves with seasons and years. It originally came from land',
+  'gy.hint':'Orange areas show roughly where litter gathers in the world\u2019s oceans. Tap again to return',
   'h.purpose':'Why this app','h.promise':'Our promises',
   'axis.t':'We designed convenience. Now, design what comes after','axis.d':'Ocean litter can only be stopped on land. Know the risk, and manage it from the land side, together as a society',
   'p1.t':'At sea: know the risk','p1.d':'Litter already in the sea or about to enter it. We record what is really there',
@@ -1231,6 +1256,7 @@ function setLang(l){
   if(typeof switchTab==='function'&&document.getElementById('ob-auth-btn')) switchTab(authMode);
   if(typeof showSpec==='function'&&document.getElementById('spec-t')) showSpec(specIdx);
   if(typeof refreshMapTexts==='function') refreshMapTexts();
+  if(typeof addGyres==='function'&&lmap) addGyres();
   if(typeof updateNavInfo==='function'){updateNavInfo('mine');updateNavInfo('digest');}
   if(typeof translateMissing==='function') translateMissing();
   if(document.getElementById('sumv').classList.contains('show')) renderSummary();
@@ -1417,6 +1443,7 @@ function initMap(clat, clng, zoom){
   L.control.attribution({position:'topright'}).addTo(lmap);
   addMapTools();
   enableOneFingerZoom(lmap);
+  addGyres();
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom:19,
@@ -2319,6 +2346,52 @@ function openGuide(section){
 function closeGuide(){ document.getElementById('guidev').classList.remove('show'); try{localStorage.setItem('umi_guided','1');}catch(e){} }
 function maybeShowGuide(){ let seen=null; try{seen=localStorage.getItem('umi_guided');}catch(e){} if(!seen) openGuide(); }
 
+
+// ── 世界のごみが集まる海域（5つの大きな環流＋北太平洋の西側）。おおよその範囲を、透ける楕円で示す ──
+// 位置は NOAA などの資料による目安。ごみは島のように固まっているのではなく、広い範囲に散らばり、季節や年で動く
+const GYRES=[
+  {k:'npe', lat:32, lng:215, rl:7, rg:13},    // 北太平洋・東（ハワイとカリフォルニアの間）。日本側からひと続きに見えるよう東経で表す
+  {k:'npw', lat:33, lng:158,  rl:6, rg:13},   // 北太平洋・西（日本とハワイの間）
+  {k:'sp',  lat:-30,lng:250,  rl:8, rg:16},   // 南太平洋（同上）
+  {k:'na',  lat:30, lng:-50,  rl:7, rg:15},   // 北大西洋
+  {k:'sa',  lat:-30,lng:-15,  rl:7, rg:14},   // 南大西洋
+  {k:'io',  lat:-28,lng:80,   rl:7, rg:16},   // インド洋
+];
+let gyreLayer=null, worldBack=null;
+function gyrePoints(g){ const pts=[]; for(let i=0;i<48;i++){const a=i/48*2*Math.PI; pts.push([g.lat+g.rl*Math.sin(a), g.lng+g.rg*Math.cos(a)]);} return pts; }
+function addGyres(){
+  if(!lmap) return;
+  if(gyreLayer) lmap.removeLayer(gyreLayer);
+  gyreLayer=L.layerGroup();
+  GYRES.forEach(g=>{
+    // 外側ほど薄くなるよう、3重の楕円を重ねる（境界があいまいなことを表す）
+    [1,0.72,0.45].forEach((sc,i)=>{
+      const poly=L.polygon(gyrePoints({...g,rl:g.rl*sc,rg:g.rg*sc}),{stroke:i===0,color:'#FFAA44',weight:1,opacity:.5,dashArray:'4 6',fillColor:'#FFAA44',fillOpacity:.10,interactive:i===0,className:'gyre'});
+      if(i===0){
+        poly.bindTooltip(t('gy.'+g.k),{permanent:true,direction:'center',className:'gyre-label'});
+        poly.bindPopup('<div class="gyre-pop"><div class="gyre-pop-t">'+esc(t('gy.'+g.k))+'</div><div class="gyre-pop-d">'+esc(t('gy.'+g.k+'.d'))+'</div><div class="gyre-pop-n">'+esc(t('gy.note'))+'</div></div>',{maxWidth:280});
+      }
+      gyreLayer.addLayer(poly);
+    });
+  });
+  gyreLayer.addTo(lmap);
+  updateGyreVisibility();
+  if(!lmap._gyreZoomHooked){ lmap.on('zoomend',updateGyreVisibility); lmap._gyreZoomHooked=true; } // 1回だけ登録
+}
+// 近くを見ているとき（縮尺が大きいとき）は名前を隠す
+function updateGyreVisibility(){
+  const el=lmap&&lmap.getContainer(); if(!el) return;
+  el.classList.toggle('world-zoom',lmap.getZoom()<=5);
+}
+// 「世界を見る」：世界全体を見る縮尺へ。もう一度押すと、元の場所に戻る
+function toggleWorld(){
+  if(!lmap) return;
+  lmap.closePopup();
+  if(lmap.getZoom()>3){ worldBack={c:lmap.getCenter(),z:lmap.getZoom()}; lmap.flyTo([20,190],2,{duration:.9}); /* 日本からカリフォルニアまでの北太平洋が見える位置 */ toast(t('gy.hint')); }
+  else if(worldBack){ lmap.flyTo(worldBack.c,worldBack.z,{duration:.9}); worldBack=null; }
+  else { lmap.flyTo([35.32,139.41],12,{duration:.9}); }
+}
+
 // ── 地図操作ツール（右側：拡大・縮小・全体表示） ──
 function addMapTools(){
   const Tools=L.Control.extend({
@@ -2336,6 +2409,7 @@ function addMapTools(){
       btn('map.zoomOut',ic('<line x1="5" y1="12" x2="19" y2="12"/>'),()=>lmap.zoomOut(1));
       L.DomUtil.create('div','map-tool-sep',box);
       btn('map.fit',ic('<polyline points="4 9 4 4 9 4"/><polyline points="20 9 20 4 15 4"/><polyline points="4 15 4 20 9 20"/><polyline points="20 15 20 20 15 20"/><circle cx="12" cy="12" r="2.5"/>'),fitAll);
+      btn('gy.world',ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),toggleWorld);
       L.DomEvent.disableClickPropagation(box);
       L.DomEvent.disableScrollPropagation(box);
       return box;
