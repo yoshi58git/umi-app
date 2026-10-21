@@ -159,6 +159,60 @@ body.touring .leaflet-popup{display:none}
 .comp-sug{margin-top:10px}
 .comp-sug button{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid rgba(255,170,68,.35);background:rgba(255,170,68,.06);color:#fff;font-family:inherit;font-size:13px;line-height:1.55;cursor:pointer}
 .comp-sug small{display:block;font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+/* マイ浜 */
+.mb-hero{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.mb-hero img{width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0;background:#0B2A3C}
+.mb-area{font-size:16px;font-weight:600}
+.mb-sub{font-size:12px;color:var(--foam);margin-top:2px;line-height:1.5}
+.mb-path{margin:14px 0 4px}
+.mb-goal{display:flex;gap:10px;align-items:flex-start;padding:7px 0}
+.mb-dot{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:transparent}
+.mb-goal.ok .mb-dot{background:#2F7F60;border-color:#2F7F60;color:#fff}
+.mb-goal.next .mb-dot{border-color:#FFAA44;box-shadow:0 0 0 4px rgba(255,170,68,.15)}
+.mb-gt{font-size:13px;line-height:1.5;color:rgba(255,255,255,.75)}
+.mb-goal.ok .mb-gt{color:rgba(255,255,255,.55);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+.mb-goal.next .mb-gt{color:#fff;font-weight:600}
+.mb-gt small{display:block;font-weight:400;font-size:11px;color:rgba(255,255,255,.55);text-decoration:none}
+.mb-next{margin:10px 0;padding:14px;border-radius:14px;background:rgba(255,170,68,.1);border:1px solid rgba(255,170,68,.4)}
+.mb-next-k{font-size:11px;font-weight:700;color:#FFAA44;letter-spacing:.06em}
+.mb-next-t{font-size:15px;font-weight:600;margin:4px 0 6px;line-height:1.5}
+.mb-next-d{font-size:13px;line-height:1.65;color:rgba(255,255,255,.85)}
+.mb-diff{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.7}
+.mb-diff b{color:#FFD27A}
+.mb-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px;margin:0 -20px;padding-left:20px;scroll-snap-type:x proximity}
+.mb-strip::-webkit-scrollbar{display:none}
+.mb-tile{flex-shrink:0;width:112px;scroll-snap-align:start;border:none;padding:0;background:transparent;color:#fff;font-family:inherit;text-align:left;cursor:pointer}
+.mb-tile img{width:112px;height:112px;border-radius:12px;object-fit:cover;display:block;background:#0B2A3C}
+.mb-tile span{display:block;font-size:10px;color:rgba(255,255,255,.65);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-cel{font-size:40px;line-height:1;margin-bottom:6px;color:#FFD27A}
+#guest-chip{position:absolute;left:12px;top:calc(var(--hdr-h,96px) + 6px);z-index:27;display:none;align-items:center;padding:8px 14px;border-radius:16px;border:none;background:#FFAA44;color:#04111C;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#app.guest #guest-chip{display:flex}
+#app.guest #spec-tip,#app.guest #comp-chip{display:none!important}
+.umi-pop-cap{margin:10px 0 2px;padding:8px 12px;border-left:3px solid #FFD27A;background:rgba(255,210,122,.08);border-radius:0 10px 10px 0;font-size:13px;line-height:1.6;color:#fff}
+.umi-pop-cap-k{display:block;font-size:10px;font-weight:600;letter-spacing:.06em;color:#FFD27A;margin-bottom:2px}
+.chk-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid rgba(255,255,255,.08)}
+.chk-mk{width:22px;height:22px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.chk-mk.ok{background:#2F7F60;color:#fff}.chk-mk.ng{background:#B5473A;color:#fff}.chk-mk.warn{background:#8A5A12;color:#fff}.chk-mk.wait{background:rgba(255,255,255,.12)}
+.chk-t{font-size:13px;line-height:1.5}.chk-t small{display:block;font-size:11px;color:rgba(255,255,255,.6)}
+.chk-sum{padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.7;margin-bottom:10px}
+.chk-sum.ok{background:rgba(126,224,168,.1);border:1px solid rgba(126,224,168,.4)}.chk-sum.ng{background:rgba(255,119,102,.1);border:1px solid rgba(255,119,102,.45)}
+.vf-row{margin-top:12px;font-size:12px;color:var(--foam)}
+.vf-btns{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.vf-btns button{padding:6px 10px;border-radius:10px;border:1px solid rgba(170,221,238,.35);background:transparent;color:#fff;font-family:inherit;font-size:12px;cursor:pointer}
+.vf-btns button.on{background:#2F7F60;border-color:#2F7F60}
+#eff-box{margin:10px 16px 0}
+.eff-l{font-size:11px;color:var(--foam);margin-bottom:6px}
+.eff-chips{display:flex;gap:6px;flex-wrap:wrap}
+.eff-chips button{padding:7px 12px;border-radius:14px;border:1px solid rgba(170,221,238,.35);background:transparent;color:#fff;font-family:inherit;font-size:13px;cursor:pointer}
+.eff-chips button.on{background:var(--wave);border-color:var(--wave)}
+.eff-n{font-size:11px;color:rgba(255,255,255,.55);margin-top:6px;line-height:1.5}
+#sec-box{display:none;margin:10px 16px 0;padding:10px 12px;border-radius:12px;border:1px dashed rgba(255,210,122,.5)}
+#sec-box.show{display:block}
+#sec-name{font-size:12px;color:#FFD27A;margin-bottom:6px}
+#sec-box label{font-size:13px;display:flex;gap:8px;align-items:center}
+.sec-chip{display:inline-flex;gap:6px;align-items:center;margin:4px 6px 0 0;padding:4px 8px;border-radius:10px;border:1px solid rgba(255,210,122,.4);font-size:11px}
+.sec-chip button{border:none;background:transparent;color:#FFB4A8;font-size:13px;cursor:pointer;padding:0}
+.wp-more{display:none}.wp-more.show{display:block}
 .gal-tabs{display:flex;gap:0;margin:0 -20px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
 .gal-tabs button{flex:1;padding:10px 0;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer}
 .gal-tabs button.on{color:#fff;border-bottom-color:#5FD3E6}
@@ -729,6 +783,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     </div>
     <label id="ob-agree" style="display:none;align-items:flex-start;gap:8px;font-size:12px;line-height:1.6;color:#fff;margin:0 0 12px;text-shadow:0 1px 3px rgba(4,30,50,.6)"><input type="checkbox" id="ob-agree-cb" style="margin-top:3px;width:18px;height:18px;flex-shrink:0"><span><a href="#" onclick="openTerms();return false;" style="color:#fff;text-decoration:underline" data-i18n="terms.title">利用規約とプライバシーポリシー</a><span data-i18n="terms.agree">に同意します</span></span></label>
     <div style="text-align:center;margin:-4px 0 10px"><a href="#" onclick="openTerms();return false;" style="font-size:11px;color:rgba(255,255,255,.75)" data-i18n="terms.title">利用規約とプライバシーポリシー</a></div>
+    <button id="ob-guest-btn" type="button" onclick="enterGuest()" data-i18n="guest.btn" style="width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,.45);border-radius:var(--r);color:#fff;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:10px">まずは見てみる（登録なし）</button>
     <button id="ob-auth-btn" onclick="doAuth()" style="width:100%;padding:14px;background:var(--wave);border:none;border-radius:var(--r);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px">はじめる</button>
     <div id="ob-auth-err" style="font-size:12px;color:#FF7766;text-align:center;margin-bottom:10px;display:none"></div>
     <div id="ob-sub-link" style="text-align:center;font-size:11px;color:rgba(255,255,255,.3)">はじめて？ <a href="#" onclick="switchTab('new');return false;" style="color:rgba(170,221,238,.5)">新規登録</a></div>
@@ -748,6 +803,16 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
   <div class="seg-row sum-filter"><span class="seg-lbl" data-i18n="sum.area">場所</span>
     <div class="seg" id="sum-area"><button data-v="view" onclick="setSum('area','view')" data-i18n="sum.view">地図の表示範囲</button><button data-v="all" onclick="setSum('area','all')" data-i18n="sum.everywhere">すべて</button></div></div>
   <div id="sum-body"></div>
+</div>
+<!-- 動作チェック（更新のあと、どこまで入ったかを確かめる） -->
+<div id="chkv" class="sheet" role="dialog" aria-modal="true" style="z-index:7000">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="chk.title">動作チェック</div><button class="sheet-x" onclick="closeCheck()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div id="chk-body"></div>
+</div>
+<!-- マイ浜（ステップ1：同じ浜で、小さなゴールを積み重ねる） -->
+<div id="mybv" class="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-hdr"><div class="sheet-title" data-i18n="mb.title">マイ浜</div><button class="sheet-x" onclick="closeMyBeach()" aria-label="閉じる" data-i18n-aria="close">&times;</button></div>
+  <div id="myb-body"></div>
 </div>
 <!-- 伴走のカード（行動の直後に出る） -->
 <div id="compv" role="dialog" aria-modal="true" onclick="if(event.target===this)closeComp()">
@@ -833,28 +898,23 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <!-- 壁紙メニュー -->
     <div id="wp-menu" role="menu" onclick="event.stopPropagation()">
       <div class="wp-who"><span data-i18n="me.who">ログイン中：</span><b id="wp-who-name"></b></div>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSteps()" data-i18n="st.title">進め方</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTour()" data-i18n="tour.title">世界のごみの今</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openMyBeach()" data-i18n="mb.menu">マイ浜（ステップ1）</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGallery('mine')" data-i18n="gal.open">写真の一覧</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTour()" data-i18n="tour.title">世界のごみの今</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">撮り方</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');changePin()" data-i18n="pin.change">PINを変更</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');logout()" data-i18n="logout">ログアウト</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTerms()" data-i18n="terms.open">利用規約とプライバシー</button>
-      <button type="button" class="wp-item wp-reset" style="display:block" onclick="document.getElementById('wp-menu').classList.remove('show');deleteAccount()" data-i18n="delacc.open">アカウントを削除</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">使い方</button>
       <div class="wp-sep"></div>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-in').click()" data-i18n="wp.choose">壁紙の写真を選ぶ</button>
-      <div class="wp-pos" id="wp-pos">
-        <span data-i18n="wp.pos">表示位置</span>
-        <button type="button" data-pos="top" onclick="setWpPos('top')" data-i18n="wp.top">上</button>
-        <button type="button" data-pos="center" onclick="setWpPos('center')" data-i18n="wp.center">中央</button>
-        <button type="button" data-pos="bottom" onclick="setWpPos('bottom')" data-i18n="wp.bottom">下</button>
+      <button type="button" class="wp-item" style="color:rgba(255,255,255,.6)" onclick="document.getElementById('wp-more').classList.toggle('show')" data-i18n="menu.more">その他…</button>
+      <div class="wp-more" id="wp-more">
+        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSteps()" data-i18n="st.title">進め方</button>
+        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openCheck()" data-i18n="chk.title">動作チェック</button>
+        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTerms()" data-i18n="terms.open">利用規約とプライバシー</button>
+        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');changePin()" data-i18n="pin.change">PINを変更</button>
+        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');logout()" data-i18n="logout">ログアウト</button>
+        <button type="button" class="wp-item wp-reset" style="display:block" onclick="document.getElementById('wp-menu').classList.remove('show');deleteAccount()" data-i18n="delacc.open">アカウントを削除</button>
       </div>
-      <button type="button" class="wp-item wp-reset" id="wp-reset" onclick="clearWallpaper()" data-i18n="wp.reset">元の背景に戻す</button>
-      <div class="wp-note" data-i18n="wp.note">壁紙はこの端末の中だけに保存され、ほかの人には見えません</div>
     </div>
-    <input type="file" id="wp-in" accept="image/*" style="display:none" onchange="onWallpaperFile(this)">
     <div id="hdr-right"><div class="lang-seg" role="group" aria-label="Language / 言語"><button type="button" data-lang="ja" onclick="setLang('ja')">JA</button><button type="button" data-lang="en" onclick="setLang('en')">EN</button></div>
     <div id="hdr-counts" onclick="openSummary()" role="button" tabindex="0">
       <div class="hc" style="--a:#5FD3E6"><div class="hc-n" id="cnt-mine">0</div><div class="hc-l" data-i18n="me">自分</div></div>
@@ -869,6 +929,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     <button class="li" data-cat="GROUND" style="--c:var(--ground)" onclick="toggleCat('GROUND')" aria-pressed="true"><span class="ld"></span>GROUND<span class="li-n" id="s-ground">0</span></button>
   </div>
   <!-- アプリの仕様をさりげなく切り替え表示（タップで詳しく） -->
+  <button id="guest-chip" type="button" onclick="openSignup()"><span data-i18n="guest.chip">登録して、記録をはじめる</span></button>
   <button id="comp-chip" type="button" onclick="openSteps()"><span class="cc-step" id="cc-step"></span><span class="cc-dots" id="cc-dots"></span><span class="cc-next" id="cc-next"></span></button>
   <button id="act-chip" type="button" onclick="openActivity()"><span class="ac-dot"></span><span id="act-chip-t"></span></button>
   <button id="spec-tip" type="button" aria-live="polite" onclick="toggleSpecTip()">
@@ -929,6 +990,8 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     </div>
   </div>
   <div id="pv-warn" role="alert"></div>
+  <div id="sec-box"><div id="sec-name"></div><label><input type="checkbox" id="sec-all"> <span data-i18n="sec.all">区間のごみを全部拾った（証拠の記録）</span></label><div class="eff-n" data-i18n="sec.allNote">主催者の方へ：区間の中の見えるごみを全部拾ったときだけ押してください。月ごとの「たまった量」として比べます</div></div>
+  <div id="eff-box"><div class="eff-l" data-i18n="eff.q">今日、拾った時間</div><div class="eff-chips" id="eff-chips"></div><div class="eff-n" data-i18n="eff.note">毎回同じ区間を、同じくらいの時間で拾うと、前と後を正しく比べられます</div></div>
   <div id="conf-summary"></div>
   <button id="batch-stop" type="button" onclick="stopBatch()" data-i18n="batch.stop">まとめて記録をやめる</button>
   <div id="confbtns">
@@ -980,6 +1043,61 @@ ja:{
   'wp.note':'壁紙はこの端末の中だけに保存され、ほかの人には見えません','wp.saveFail':'壁紙を保存できませんでした。別の写真をお試しください。','wp.loadFail':'この写真は読み込めませんでした。',
   'me':'自分','all':'みんな','nav.mine':'自分の記録','nav.all':'みんなの記録','nav.prev':'前へ','nav.next':'次へ','count':'{n}件',
   'map.zoomIn':'拡大','map.zoomOut':'縮小','map.fit':'すべての記録を表示','gy.world':'世界のごみが集まる海域を見る',
+  'guest.btn':'まずは見てみる（登録なし）','guest.chip':'登録して、記録をはじめる',
+  'guest.need':'記録するには、ニックネームとPINの登録が必要です（1分ほど）。登録しますか？',
+  'share.btn':'マイ浜をシェア','share.none':'マイ浜の記録がまだありません','share.my':'マイ浜','share.land':'この浜のごみのうち、陸から来たもの',
+  'share.days':'{n}日記録 ・ 小さなゴール {g}/7','share.text':'私の浜のごみ、陸から来ていた。#motonoumi',
+  'inv.btn':'仲間を誘う','inv.text':'浜で拾ったごみを撮ると、何割が陸から来ているか分かるアプリ。一緒に、自分の浜で続けてみない？',
+  'pop.aiNote':'AIのひとこと',
+  'cap.mustFix':'ひとことに「{why}」が入っているようです。このアプリでは使わないことにしています。\n\nこの言い方に直して記録しますか？\n「{s}」\n\n（キャンセルすると、自分で書き直せます）',
+  'eff.q':'今日、拾った時間','eff.min':'{n}分','eff.note':'毎回同じ区間を、同じくらいの時間で拾うと、前と後を正しく比べられます',
+  'mb.howTo':'いつものやり方：同じ区間を、決めた時間で拾って撮る。比べるときは「15分あたり」にそろえます',
+  'mb.noMin':'拾った時間が分からない日が{n}日あります。その日は比べる数に入れていません',
+  'mb.trending':'減ってきています。あと{n}日で確かめられます',
+  'st1.my':'ステップ1は、マイ浜で小さなゴールを積み重ねて進めます（7つのうち{n}つ）','st1.team':'団体の活動で撮った記録も、それぞれの人のマイ浜に積み重なります',
+  'st.later':'その先（ステップ2〜5）','act.peopleSaved':'参加人数を記録しました',
+  'menu.more':'その他…','share.atLeast':'少なくとも',
+  'tr.perPerson15':'1人・15分あたり{n}個','tr.per15':'1人・15分あたりの陸由来：{a}個 → {b}個（{r}%）','ms.perPerson15':'{n}個/人・15分',
+  'bk.h':'データの控え（運営者）','bk.d':'記録が消えると、ステップ1の証拠を取り戻せません。月に1回、すべての表を書き出して、パソコンや共有ドライブに保管してください（写真そのものは含みません。PINの暗号やログインの情報も含みません）',
+  'bk.btn':'データの控えを書き出す','bk.cal':'毎月のお知らせをカレンダーに','bk.ask':'運営者の合言葉（ADMIN_KEY）を入力してください','bk.doing':'書き出しています...',
+  'bk.done':'書き出しました（{n}）。安全な場所に保管してください','bk.calTitle':'moto no umi データの控えを取る','bk.calDesc':'アプリの動作チェックから「データの控えを書き出す」',
+  'sec.h':'区間','sec.none':'まだありません','sec.new':'区間を作る','sec.tgt':'狙いの区間','sec.ref':'比べる区間','sec.del':'区間を消す','sec.delAsk':'この区間を消しますか？（結びついた記録は残り、区間なしになります）',
+  'sec.howTo':'地図の中心を、区間の中心にします（半径75m）。先に地図を動かして、区間にしたい場所を画面の真ん中に合わせてください。続けますか？',
+  'sec.askLabel':'区間の名前（固有名詞は使わず、場所の特徴で。例：区間A（駅からの道に近い））','sec.defLabel':'区間A（駅からの道に近い）',
+  'sec.askRole':'区間の種類を数字で：1＝狙いの区間（取り組みの影響を受ける）、2＝比べる区間（影響を受けにくい）','sec.saved':'区間を作りました',
+  'sec.here':'{l}（{r}）の記録です','sec.all':'区間のごみを全部拾った（証拠の記録）','sec.allNote':'主催者の方へ：区間の中の見えるごみを全部拾ったときだけ押してください。月ごとの「たまった量」として比べます',
+  'ms.askTarget':'この取り組みが狙うごみ（例：たばこの吸い殻、PETボトル）。比べるときは、このごみの新しいものの量を見ます',
+  'chk.title':'動作チェック','chk.running':'確かめています...','chk.app':'アプリ（この画面）','chk.ver':'版 {v}','chk.old':'古い版です（{v}）',
+  'chk.api':'サーバー（umi-api）','chk.apiNg':'つながりません。まだ新しくなっていないか、デプロイに失敗しています',
+  'chk.db':'データベース','chk.dbOk':'必要な{n}項目がそろっています','chk.dbNg':'{n}項目が足りません：{items}',
+  'chk.ai':'写真の解析（analyze-image）','chk.aiNg':'つながりません。まだ新しくなっていないか、デプロイに失敗しています','chk.aiKey':'AIの鍵（ANTHROPIC_API_KEY）が設定されていません',
+  'chk.tour':'ツアーの内容（tour.json）','chk.tourOk':'読み込めます','chk.tourNg':'読み込めません（アプリに入れた控えで動きます）',
+  'chk.login':'ログイン','chk.loginOk':'ログインできています','chk.loginNo':'まだログインしていません（ログインすると確かめられます）',
+  'chk.todoH':'次にやること','chk.allOk':'すべて ✓ です。写真を1枚記録して保存できたら、最後に「sql_update_2_finish.sql」を実行してください。',
+  'chk.doSql':'Supabase の SQL Editor で「sql_update_1_prepare.sql」を実行する',
+  'chk.doSqlFirst':'（まだなら）先に Supabase の SQL Editor で「sql_update_1_prepare.sql」を実行する','chk.dbUnknown':'サーバーを新しくすると確かめられます','chk.doApi':'Edge Functions の umi-api を「umi-api/index.ts」の中身に置き換えてデプロイする',
+  'chk.doAi':'Edge Functions の analyze-image を、もう一つの「index.ts」の中身に置き換えてデプロイする','chk.doKey':'analyze-image の設定（Secrets）に ANTHROPIC_API_KEY を入れる',
+  'chk.doTour':'GitHub に「tour.json」を index.html と同じ場所へ置く','chk.again':'もう一度確かめる',
+  'vf.q':'AIの数は合ってた？','vf.exact':'ぴったり','vf.close':'だいたい（±2個）','vf.off':'ちがう','vf.saved':'答え合わせを記録しました',
+  'vf.goal':'自分の記録10件以上で答え合わせをして、8割以上が「ぴったり」か「だいたい」','vf.now':'いま{n}件・一致 {r}%',
+  'mb.title':'マイ浜','mb.menu':'マイ浜（ステップ1）','mb.open':'マイ浜を見る','mb.here':'マイ浜',
+  'mb.setHere':'ここをマイ浜にする','mb.set':'マイ浜に決めました。ここで小さなゴールを積み重ねていきましょう',
+  'mb.heroSub':'ここで{n}日記録しました','mb.autoNote':'記録がいちばん集まっている場所をマイ浜にしています。変えるときは、自分の記録のピンから選べます',
+  'mb.startK':'はじめの一歩','mb.startT':'あなたの浜で、最初の1枚を','mb.startD':'よく行く浜で、拾ったごみを並べて撮るだけ。そこがあなたの「マイ浜」になり、小さなゴールを一緒に積み重ねていきます','mb.shoot':'撮る',
+  'mb.nextK':'次の小さなゴール','mb.allDone':'7つの小さなゴールをすべて達成しました。あなたの浜で、管理の効果を示せています。団体のレポートで、仲間や管理者と共有しましょう',
+  'mb.pathH':'小さなゴール（7つのうち{n}つ）','mb.diffH':'前回からの変化',
+  'mb.diffDown':'15分あたり 前回 {a}個 → 今回 {b}個。陸由来のごみが{n}個少なめでした（{day}）','mb.diffUp':'15分あたり 前回 {a}個 → 今回 {b}個。今回は{n}個多めでした（{day}）。天気や季節でも変わります。続けて見ていきましょう','mb.diffSame':'15分あたり、前回とほぼ同じ{b}個でした（{day}）',
+  'mb.othersH':'みんなが最近見つけたもの','mb.beyond':'その先（ステップ2〜5）','mb.beyondD':'マイ浜で「減った」を示せたら、その場所の管理者や地域へ広げていきます。全体の進め方はこちら',
+  'mb.visits':'いま{n}日','mb.days':'最初の記録から{n}日','mb.after':'気づきの後 {n}日','mb.pv':'15分あたりの陸由来 前 {b}個 → 後 {a}個','mb.seasons':'いま{n}つの季節',
+  'mb.ideaAsk':'マイ浜の陸側で、気づいたこと・やってみたことを1つ書いてください（例：駅から浜への道の吸い殻入れを、管理している人に相談した）',
+  'mb.celH':'小さなゴールに届きました',
+  'mb.g1.t':'マイ浜で、最初の記録','mb.g1.s':'最初の1枚','mb.g1.d':'よく行く浜で、拾ったごみを並べて撮りましょう','mb.g1.btn':'撮る','mb.g1.cel':'マイ浜での最初の記録です。ここから、この浜の変化を一緒に見ていきます',
+  'mb.g2.t':'同じ浜で、3日記録する','mb.g2.s':'同じ浜で3日','mb.g2.d':'同じ浜で3日記録すると、この浜のごみの「何割が陸から」が見えてきます','mb.g2.btn':'撮る','mb.g2.cel':'同じ浜で3日。この浜の陸由来の割合が見えてきました',
+  'mb.g3.t':'1か月、続ける','mb.g3.s':'1か月続ける','mb.g3.d':'最初の記録から1か月あけて、また同じ浜で記録しましょう。続けることが、いちばんの力になります','mb.g3.btn':'撮る','mb.g3.cel':'1か月続きました。続けている人だけが見られる変化があります',
+  'mb.g4.t':'陸側で、気づいたこと・やってみたことを1つ書く','mb.g4.s':'気づきを1つ書く','mb.g4.d':'多かったごみが、陸のどこから来ていそうか。気づいたことや、管理している人に相談したことなど、小さなことで大丈夫です','mb.g4.btn':'気づきを書く','mb.g4.cel':'気づきを書きました。ここからは、その前と後で、この浜がどう変わるかを見ていきます',
+  'mb.g5.t':'その後も、3日記録する','mb.g5.s':'その後も3日','mb.g5.d':'気づきを書いた後も、同じ浜で3日記録しましょう。天気や季節のばらつきをならして、前と後を比べられるようになります','mb.g5.btn':'撮る','mb.g5.cel':'前と後を比べられるようになりました',
+  'mb.g6.t':'15分あたりの陸由来ごみが、前の8割以下に減る','mb.g6.s':'減るまで続ける','mb.g6.d':'すぐに減らなくても大丈夫。天気や季節でも量は変わります。続けて測ることで、本当の変化が見えてきます','mb.g6.btn':'撮る','mb.g6.cel':'気づきの後、続けて減っています。あなたの浜で、陸側の管理の効果が見えてきています',
+  'mb.g7.t':'3つの季節を通して続ける','mb.g7.s':'季節を通して続ける','mb.g7.d':'季節が変わっても続けることで、この浜の1年の姿が見えてきます','mb.g7.btn':'撮る','mb.g7.cel':'3つの季節を通して続けました。この浜を、いちばんよく知る一人です',
   'comp.later':'あとで','comp.step1':'ステップ1','comp.next':'次',
   'comp.short.c1':'同じ浜で続けて測る','comp.short.c2':'参加人数を入れる','comp.short.c3':'陸側の取り組みを1つ決める','comp.short.c4':'取り組みの後も測る','comp.short.c5':'減るまで続ける',
   'comp.stepH':'ステップ1：5つのうち{n}つ達成','comp.progressH':'一歩進みました（5つのうち{n}つ）','comp.passedH':'ステップ1を達成しました',
@@ -1000,7 +1118,7 @@ ja:{
   'st.lead':'条件を満たすまで、次へ進みません。最初の一歩で挫折しないことが、いちばん大事です。',
   'st0.t':'道具を確かめる','st0.c':'AIの数え方を、人の答え合わせと比べて、十分に一致している',
   'st0.open':'答え合わせの表を書き出す（集計から）','st0.done':'一致を確かめた',
-  'st1.t':'1か所で証明する','st1.c':'同じ浜で、陸側の取り組みの後、1人あたりの陸由来ごみが続けて減っている',
+  'st1.t':'1か所で証明する','st1.c':'同じ浜を同じやり方で測り、陸側の取り組みの後、15分あたりの陸由来ごみが続けて減っている',
   'st2.t':'担当に組み込む','st2.c':'その場所の管理者が、担当・予算・手順として文書にしている',
   'st3.t':'ほかの場所で再現する','st3.c':'3〜5か所・団体で、同じ測り方で、同じように減っている',
   'st4.t':'地域の制度に入る','st4.c':'都道府県や市町村の計画・協議会・施策の中で、この指標が使われている',
@@ -1102,7 +1220,7 @@ ja:{
   'an.tooBig':'写真のサイズが大きすぎます。別の写真をお試しください。',
   'an.loading':'AI解析中...','an.noTrash':'ごみが見つかりませんでした。\n海岸・街中などで見つけたごみを撮影してください。','an.fail':'解析に失敗しました。もう一度お試しください。',
   'an.done':'AI解析完了','an.doneCat':'AI解析完了 — {c}','an.noGpsShort':'GPS情報なし','an.noDate':'撮影日不明',
-  'cf.cat':'カテゴリ','cf.place':'場所','cf.edit':'編集','cf.date':'撮影日','cf.items':'ごみ品目','cf.maker':'メーカー','cf.brand':'ブランド','cf.summary':'要約',
+  'cf.cat':'カテゴリ','cf.place':'場所','cf.edit':'編集','cf.date':'撮影日','cf.items':'ごみ品目','cf.maker':'メーカー','cf.brand':'ブランド','cf.summary':'AIのひとこと',
   'cf.retry':'やり直す','cf.send':'記録する','cf.askPlace':'場所名を入力してください','cf.askDate':'撮影日を入力してください（例: 2026-09-27）','cf.badDate':'日付の形式が正しくありません（例: 2026-09-27）',
   'sv.saving':'保存中...','sv.fail':'保存に失敗しました: ','dn.saved':'記録されました','dn.thanks':'あなたの記録が海を守ります','dn.back':'地図に戻る',
   'unknown':'不明','lang':'言語',
@@ -1186,6 +1304,61 @@ en:{
   'wp.note':'The wallpaper is saved only on this device and is not visible to others','wp.saveFail':'Could not save the wallpaper. Please try another photo.','wp.loadFail':'This photo could not be loaded.',
   'me':'Me','all':'Others','nav.mine':'My records','nav.all':'Others\u2019 records','nav.prev':'previous','nav.next':'next','count':'{n}',
   'map.zoomIn':'Zoom in','map.zoomOut':'Zoom out','map.fit':'Show all records','gy.world':'See where litter gathers in the world\u2019s oceans',
+  'guest.btn':'Just look around (no sign-up)','guest.chip':'Sign up to start recording',
+  'guest.need':'Recording needs a nickname and PIN (about 1 minute). Sign up now?',
+  'share.btn':'Share my beach','share.none':'No records at your beach yet','share.my':'My beach','share.land':'Of the litter on this beach, from land',
+  'share.days':'{n} days recorded \u00b7 small goals {g}/7','share.text':'The litter on my beach came from land. #motonoumi',
+  'inv.btn':'Invite friends','inv.text':'An app that shows how much beach litter comes from land, just by photographing what you picked up. Want to try it at your own beach?',
+  'pop.aiNote':'A note from AI',
+  'cap.mustFix':'Your note seems to include {why}, which this app does not use.\n\nRecord it with this wording instead?\n\u201c{s}\u201d\n\n(Cancel to rewrite it yourself)',
+  'eff.q':'Time spent picking today','eff.min':'{n} min','eff.note':'Picking the same stretch for about the same time each visit lets you compare before and after fairly',
+  'mb.howTo':'Your routine: pick the same stretch for a set time, then shoot. Comparisons are per 15 minutes',
+  'mb.noMin':'{n} days have no picking time, so they are not compared',
+  'mb.trending':'It seems to be falling. {n} more days to confirm',
+  'st1.my':'Step 1 moves forward by stacking small goals at your beach ({n} of 7)','st1.team':'Records taken at team activities also add up at each person\u2019s beach',
+  'st.later':'Beyond (steps 2\u20135)','act.peopleSaved':'Number of people recorded',
+  'menu.more':'More\u2026','share.atLeast':'at least',
+  'tr.perPerson15':'{n} per person \u00b7 15 min','tr.per15':'Land litter per person \u00b7 15 min: {a} \u2192 {b} ({r}%)','ms.perPerson15':'{n}/person \u00b7 15 min',
+  'bk.h':'Data backup (operator)','bk.d':'If records are lost, step 1 evidence cannot be recovered. Once a month, export all tables and keep the file on a computer or shared drive (photos themselves, PIN hashes and login data are not included)',
+  'bk.btn':'Export data backup','bk.cal':'Add a monthly reminder','bk.ask':'Enter the operator passphrase (ADMIN_KEY)','bk.doing':'Exporting...',
+  'bk.done':'Exported ({n}). Keep it somewhere safe','bk.calTitle':'moto no umi: take a data backup','bk.calDesc':'In the app, System check \u2192 Export data backup',
+  'sec.h':'Sections','sec.none':'none yet','sec.new':'Create a section','sec.tgt':'target section','sec.ref':'comparison section','sec.del':'Delete section','sec.delAsk':'Delete this section? (Linked records stay, without a section)',
+  'sec.howTo':'The map centre becomes the section centre (radius 75 m). Move the map so the place is in the middle first. Continue?',
+  'sec.askLabel':'Section name (no proper nouns; describe the place, e.g. Section A (near the path from the station))','sec.defLabel':'Section A (near the path from the station)',
+  'sec.askRole':'Section type as a number: 1 = target section (affected by the action), 2 = comparison section (less affected)','sec.saved':'Section created',
+  'sec.here':'Record in {l} ({r})','sec.all':'Picked up all litter in the section (evidence record)','sec.allNote':'Organizers: tick only when you picked up all visible litter in the section. It is compared as monthly accumulation',
+  'ms.askTarget':'Litter this action targets (e.g. cigarette butts, PET bottles). Comparisons look at new items of this kind',
+  'chk.title':'System check','chk.running':'Checking...','chk.app':'App (this screen)','chk.ver':'version {v}','chk.old':'Old version ({v})',
+  'chk.api':'Server (umi-api)','chk.apiNg':'Cannot connect. Not updated yet, or the deployment failed',
+  'chk.db':'Database','chk.dbOk':'All {n} required items are present','chk.dbNg':'{n} items missing: {items}',
+  'chk.ai':'Photo analysis (analyze-image)','chk.aiNg':'Cannot connect. Not updated yet, or the deployment failed','chk.aiKey':'The AI key (ANTHROPIC_API_KEY) is not set',
+  'chk.tour':'Tour content (tour.json)','chk.tourOk':'Loads fine','chk.tourNg':'Cannot load (the built-in copy is used)',
+  'chk.login':'Login','chk.loginOk':'Logged in','chk.loginNo':'Not logged in yet (log in to check)',
+  'chk.todoH':'Next steps','chk.allOk':'Everything is \u2713. After recording and saving one photo, run \u201csql_update_2_finish.sql\u201d last.',
+  'chk.doSql':'Run \u201csql_update_1_prepare.sql\u201d in the Supabase SQL Editor',
+  'chk.doSqlFirst':'(If not done yet) first run \u201csql_update_1_prepare.sql\u201d in the Supabase SQL Editor','chk.dbUnknown':'Can be checked once the server is updated','chk.doApi':'Replace umi-api in Edge Functions with \u201cumi-api/index.ts\u201d and deploy',
+  'chk.doAi':'Replace analyze-image in Edge Functions with the other \u201cindex.ts\u201d and deploy','chk.doKey':'Set ANTHROPIC_API_KEY in analyze-image\u2019s secrets',
+  'chk.doTour':'Put \u201ctour.json\u201d on GitHub next to index.html','chk.again':'Check again',
+  'vf.q':'Were the AI counts right?','vf.exact':'Exact','vf.close':'Close (\u00b12)','vf.off':'Off','vf.saved':'Answer check recorded',
+  'vf.goal':'Check 10+ of your records, with 80%+ \u201cexact\u201d or \u201cclose\u201d','vf.now':'{n} so far \u00b7 {r}% match',
+  'mb.title':'My beach','mb.menu':'My beach (step 1)','mb.open':'See my beach','mb.here':'My beach',
+  'mb.setHere':'Make this my beach','mb.set':'This is now your beach. Let\u2019s stack up small goals here',
+  'mb.heroSub':'You recorded here on {n} days','mb.autoNote':'Set to where most of your records are. To change it, choose from one of your own pins',
+  'mb.startK':'First step','mb.startT':'Your first photo at your beach','mb.startD':'At a beach you often visit, just line up the litter you picked and shoot. It becomes \u201cmy beach\u201d, and we stack up small goals together','mb.shoot':'Shoot',
+  'mb.nextK':'Next small goal','mb.allDone':'You reached all 7 small goals. Your beach shows the effect of land-side management. Share it with friends and managers in a team report',
+  'mb.pathH':'Small goals ({n} of 7)','mb.diffH':'Since last time',
+  'mb.diffDown':'Last {a} \u2192 now {b}. Land-based litter fell by {n} ({day})','mb.diffUp':'Last {a} \u2192 now {b}. {n} more this time ({day}). Weather and seasons matter too; keep watching','mb.diffSame':'Same as last time: {b} ({day})',
+  'mb.othersH':'What others found recently','mb.beyond':'Beyond (steps 2\u20135)','mb.beyondD':'Once your beach shows a decrease, we expand to the place\u2019s managers and the region. The whole approach is here',
+  'mb.visits':'{n} days so far','mb.days':'{n} days since your first record','mb.after':'{n} days after your note','mb.pv':'land litter per 15 min: before {b} \u2192 after {a}','mb.seasons':'{n} seasons so far',
+  'mb.ideaAsk':'Write one thing you noticed or tried on the land side of your beach (e.g. talked with the manager about butt bins on the path from the station)',
+  'mb.celH':'You reached a small goal',
+  'mb.g1.t':'First record at my beach','mb.g1.s':'first photo','mb.g1.d':'At a beach you often visit, line up what you picked and shoot','mb.g1.btn':'Shoot','mb.g1.cel':'Your first record at your beach. From here, we watch how it changes together',
+  'mb.g2.t':'Record on 3 days at the same beach','mb.g2.s':'3 days, same beach','mb.g2.d':'After 3 days at the same beach, you can see how much of its litter comes from land','mb.g2.btn':'Shoot','mb.g2.cel':'3 days at the same beach. Its land share is coming into view',
+  'mb.g3.t':'Keep going for a month','mb.g3.s':'keep going a month','mb.g3.d':'Record again at the same beach a month after your first. Keeping going is the strongest power','mb.g3.btn':'Shoot','mb.g3.cel':'A month of keeping going. Some changes only show to those who continue',
+  'mb.g4.t':'Write one thing you noticed or tried on land','mb.g4.s':'write one note','mb.g4.d':'Where on land might the most common litter come from? Something you noticed, or a talk with the manager\u2014small things are fine','mb.g4.btn':'Write a note','mb.g4.cel':'Note written. From here we watch how the beach changes before and after',
+  'mb.g5.t':'Record on 3 more days after that','mb.g5.s':'3 days after','mb.g5.d':'Record on 3 more days at the same beach after your note, smoothing out weather and seasons so before and after can be compared','mb.g5.btn':'Shoot','mb.g5.cel':'Before and after can now be compared',
+  'mb.g6.t':'Land litter per 15 min falls to 80% or less of before','mb.g6.s':'keep going until it falls','mb.g6.d':'It is fine if it doesn\u2019t fall right away. Weather and seasons change amounts too; keep measuring to see the real change','mb.g6.btn':'Shoot','mb.g6.cel':'It fell. The effect of land-side management is showing at your beach',
+  'mb.g7.t':'Keep going through 3 seasons','mb.g7.s':'through the seasons','mb.g7.d':'Keeping going as seasons change shows your beach\u2019s whole year','mb.g7.btn':'Shoot','mb.g7.cel':'Three seasons of keeping going. You know this beach better than almost anyone',
   'comp.later':'Later','comp.step1':'Step 1','comp.next':'Next',
   'comp.short.c1':'keep measuring the same beach','comp.short.c2':'enter participant counts','comp.short.c3':'choose one land-side action','comp.short.c4':'measure after the action','comp.short.c5':'keep going until it falls',
   'comp.stepH':'Step 1: {n} of 5 met','comp.progressH':'One step forward ({n} of 5)','comp.passedH':'Step 1 achieved',
@@ -1206,7 +1379,7 @@ en:{
   'st.lead':'We do not move on until the condition is met. Not giving up at the first step matters most.',
   'st0.t':'Verify the tool','st0.c':'AI counts agree well enough with people\u2019s answer checks',
   'st0.open':'Export the answer-check sheet (from Summary)','st0.done':'Agreement verified',
-  'st1.t':'Prove it in one place','st1.c':'At the same beach, land-based litter per person keeps falling after a land-side action',
+  'st1.t':'Prove it in one place','st1.c':'Measuring the same beach the same way, land-based litter per 15 min keeps falling after a land-side action',
   'st2.t':'Build it into responsibilities','st2.c':'The place\u2019s manager documents it as a role, budget and procedure',
   'st3.t':'Reproduce elsewhere','st3.c':'3\u20135 places or groups see the same decrease with the same method',
   'st4.t':'Into regional policy','st4.c':'The indicator is used in prefectural or municipal plans, councils or measures',
@@ -1308,7 +1481,7 @@ en:{
   'an.tooBig':'This photo is too large. Please try another one.',
   'an.loading':'AI analyzing...','an.noTrash':'No litter was found.\nPlease photograph litter you found on a beach, in town, etc.','an.fail':'Analysis failed. Please try again.',
   'an.done':'AI analysis complete','an.doneCat':'AI analysis complete — {c}','an.noGpsShort':'No GPS data','an.noDate':'Date unknown',
-  'cf.cat':'Category','cf.place':'Place','cf.edit':'Edit','cf.date':'Date taken','cf.items':'Items','cf.maker':'Maker','cf.brand':'Brand','cf.summary':'Summary',
+  'cf.cat':'Category','cf.place':'Place','cf.edit':'Edit','cf.date':'Date taken','cf.items':'Items','cf.maker':'Maker','cf.brand':'Brand','cf.summary':'A note from AI',
   'cf.retry':'Retake','cf.send':'Save record','cf.askPlace':'Enter the place name','cf.askDate':'Enter the date taken (e.g. 2026-09-27)','cf.badDate':'Invalid date format (e.g. 2026-09-27)',
   'sv.saving':'Saving...','sv.fail':'Failed to save: ','dn.saved':'Recorded','dn.thanks':'Your record helps protect the ocean','dn.back':'Back to map',
   'unknown':'Unknown','lang':'Language',
@@ -1384,7 +1557,7 @@ const VALUE_EN={
   'ニックネームを入力してください':'Please enter a nickname','PINは4桁の数字です':'PIN must be 4 digits','このニックネームはすでに使われています':'This nickname is already taken',
   'ニックネームまたはPINが違います':'Wrong nickname or PIN','コードが見つかりません':'Code not found','PINは6桁の数字です':'PIN must be 6 digits','今のPINが違います':'Your current PIN is incorrect','しばらくしてからもう一度お試しください':'Please try again later',
   '写真が大きすぎるか、空です':'The photo is too large or empty','JPEG形式の写真ではありません':'The photo is not a JPEG','写真を読み込めませんでした':'Could not read the photo','この団体のメンバーではありません':'You are not a member of this team',
-  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','記録が見つかりません':'Record not found','自分の記録は報告できません':'You cannot report your own record','本日の新規登録の上限に達しました。明日もう一度お試しください':'The sign-up limit for today has been reached. Please try again tomorrow','本日の解析の上限に達しました。明日もう一度お試しください':'You have reached today\u2019s analysis limit. Please try again tomorrow','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
+  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','区間の名前を入力してください':'Please enter a section name','区間が見つかりません':'Section not found','位置が正しくありません':'Invalid position','合言葉が違います':'Wrong passphrase','ADMIN_KEY が設定されていません':'ADMIN_KEY is not set','記録が見つかりません':'Record not found','自分の記録は報告できません':'You cannot report your own record','本日の新規登録の上限に達しました。明日もう一度お試しください':'The sign-up limit for today has been reached. Please try again tomorrow','本日の解析の上限に達しました。明日もう一度お試しください':'You have reached today\u2019s analysis limit. Please try again tomorrow','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
 };
 let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
   return (navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';})();
@@ -1434,7 +1607,8 @@ function setLang(l){
   if(document.getElementById('galv').classList.contains('show')) renderGallery();
   if(document.getElementById('termsv').classList.contains('show')) openTerms();
   if(document.getElementById('stepv').classList.contains('show')) renderSteps();
-  if(compState) refreshCompanion();
+  if(document.getElementById('mybv').classList.contains('show')) renderMyBeach();
+  refreshMyChip();
   if(document.getElementById('tourv').classList.contains('show')&&tourData){ const k=tourIdx; renderTour(); tourIdx=-1; goTourStop(Math.max(0,k)); if(tourObs){tourObs.disconnect();document.querySelectorAll('#tour-cards .tour-card').forEach(c=>tourObs.observe(c));} }
   updateActChip();
   const cv=document.getElementById('confv');
@@ -1874,7 +2048,6 @@ function renderSummary(){
     '<div class="sum-sec"><div class="sum-h">'+t('sum.top')+'</div><div class="cnt-list">'+top.map(([name,v])=>'<div class="cnt-row"><span class="cnt-dot" style="background:'+(ORIGIN_COL[v.origin]||ORIGIN_COL['判別できない'])+'"></span><span class="cnt-name">'+esc(itemLabel(name,v.en))+'</span><span class="cnt-n">×'+v.n+'</span></div>').join('')+'</div></div>'+
     '<div class="sum-note">'+
       (a.overseas?t('sum.overseas',{n:a.overseas})+'<br>':'')+
-      (a.weightKnown?t('sum.weight',{kg:(a.weight/1000).toFixed(a.weight<10000?2:1)})+'<br>':'')+
       (a.estimated?t('sum.estimated')+'<br>':'')+
       (a.noCount?t('sum.noCount',{n:a.noCount})+'<br>':'')+
       t('sum.method')+
@@ -2054,9 +2227,9 @@ function toast(msg){
 }
 
 let actMine={orgs:[],activities:[]}, actShowForm=false, actCreated=null;
-async function openActivity(){ document.getElementById('actv').classList.add('show'); renderActivity(); await refreshMine(); }
+async function openActivity(){ if(needAccount()) return; document.getElementById('actv').classList.add('show'); renderActivity(); await refreshMine(); }
 function closeActivity(){ document.getElementById('actv').classList.remove('show'); actShowForm=false; actCreated=null; }
-async function refreshMine(){ const r=await api('mine'); if(!r.error){actMine=r;renderActivity();translateMissing();} }
+async function refreshMine(){ const r=await api('mine'); if(!r.error){actMine=r;renderActivity();translateMissing();loadSections().then(()=>renderActivity());} }
 function fmtTime(iso){ if(!iso)return ''; const d=new Date(iso); return isNaN(d)?'':String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function actLine(a){ return [aiText(a.org_name||orgName(a.org_id)),aiText(a.place_name),fmtDate(a.starts_at)].filter(Boolean).map(esc).join(LANG==='en'?' · ':' ・ '); }
 function orgName(id){ const o=(actMine.orgs||[]).find(o=>o.id===id); return o?o.name:''; }
@@ -2136,7 +2309,8 @@ function renderActivity(){
      '<div class="act-sub" style="margin:6px 0 10px">'+t('ax.orgD')+'</div>';
   orgs.forEach(o=>{
     h+='<div class="act-card plain"><div class="act-name">'+esc(aiText(o.name))+'</div><div class="act-sub">'+t('act.staffCode')+' <b style="letter-spacing:.12em">'+esc(o.staff_code)+'</b>　'+t('ax.staffHint')+'</div>'+
-       '<div class="act-btns"><button class="act-btn main" onclick="openReport(\'org\',\''+o.id+'\')">'+t('act.orgReport')+'</button><button class="act-btn" onclick="addMeasure(\''+o.id+'\')">'+t('ms.add')+'</button></div></div>';
+       '<div class="act-sub" style="margin-top:6px">'+t('sec.h')+'：'+(mySections.filter(x=>x.org_id===o.id).map(x=>'<span class="sec-chip">'+esc(aiText(x.label))+' ・ '+t(x.role==='reference'?'sec.ref':'sec.tgt')+'<button onclick="deleteSection(\''+x.id+'\')" aria-label="'+esc(t('sec.del'))+'">×</button></span>').join('')||t('sec.none'))+'</div>'+
+       '<div class="act-btns"><button class="act-btn main" onclick="openReport(\'org\',\''+o.id+'\')">'+t('act.orgReport')+'</button><button class="act-btn" onclick="addMeasure(\''+o.id+'\')">'+t('ms.add')+'</button><button class="act-btn" onclick="createSection(\''+o.id+'\')">'+t('sec.new')+'</button></div></div>';
   });
   h+='<div class="act-btns"><button class="act-btn" onclick="createOrg()">'+t('act.newOrg')+'</button><button class="act-btn" onclick="joinOrg()">'+t('act.joinOrg')+'</button></div></details>';
   box.innerHTML=h;
@@ -2165,7 +2339,7 @@ async function finishActivity(id){
   const res=await api('activity_update',{id,participants:Number(v),ends_at:a.ends_at||new Date().toISOString()});
   if(res.error){alert(tv(res.error));return;}
   await refreshMine();
-  if(a.org_id){ stepOrg=a.org_id; closeActivity(); showCompanion('finish'); }
+  toast(t('act.peopleSaved'));
 }
 // ログアウト（端末をほかの人と共有するとき）。言語や壁紙は残す
 async function logout(){
@@ -2196,10 +2370,13 @@ async function addMeasure(orgId,preset){
   const title=prompt(t('ms.askTitle'),preset||''); if(!title) return;
   const d=new Date(), today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   const day=prompt(t('ms.askDate'),today); if(!day) return;
-  const res=await api('measure_create',{org_id:orgId,title,started_on:day});
+  const guess=(TARGET_GUESS.find(([re])=>re.test(title))||[])[1]||'';
+  const target=prompt(t('ms.askTarget'),guess); if(target===null) return;
+  const sec=mySections.find(x=>x.org_id===orgId&&x.role==='target');
+  const res=await api('measure_create',{org_id:orgId,title,started_on:day,target_item:canonName(target.trim()),section_id:sec?sec.id:null});
   if(res.error){alert(tv(res.error));return;}
   toast(t('ms.saved'));
-  stepOrg=orgId; closeActivity(); showCompanion('measure');
+  stepOrg=orgId;
 }
 async function createOrg(){
   const n=prompt(t('act.askOrg')); if(!n) return;
@@ -2275,12 +2452,18 @@ function trendGroups(recs){
       const d=new Date(r.photo_taken_at||r.created_at); if(isNaN(d)) return;
       key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); label=LANG==='en'?key:(d.getFullYear()+'年'+(d.getMonth()+1)+'月'); date=key+'-01';
     }
-    if(!groups.has(key)) groups.set(key,{key,label,date,people,total:0,land:0});
-    const g=groups.get(key);
+    if(!groups.has(key)) groups.set(key,{key,label,date,people,total:0,land:0,min:0});
+    const g=groups.get(key); g.min=Math.max(g.min,Number(r.effort_min)||0);
     (c.item_counts||[]).forEach(x=>{const n=Number(x.count)||0;g.total+=n;if(x.origin==='陸由来')g.land+=n;});
   });
-  return [...groups.values()].filter(g=>g.total>0).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  // 拾った時間が分かる回は、参加人数を「1人・15分」の単位に換算する（同じやり方で比べるため）
+  const list=[...groups.values()].filter(g=>g.total>0).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const allMin=list.length&&list.every(g=>g.min>0);
+  list.forEach(g=>{ if(allMin&&g.people){ g.people=g.people*g.min/15; g.norm15=true; } });
+  trendNorm15=allMin&&list.every(g=>g.norm15);
+  return list;
 }
+let trendNorm15=false;
 function trendHtml(recs){
   const gs=trendGroups(recs);
   if(gs.length<2) return '';
@@ -2295,11 +2478,11 @@ function trendHtml(recs){
   function trRow(g){
     const p=pct(g.land,g.total), per=usePeople?(g.land/g.people):null;
     return '<div class="tr-row"><div class="tr-l">'+esc(g.label)+'</div><div class="tr-bar"><span style="width:'+p+'%"></span></div>'+
-      '<div class="tr-v">'+p+'%<small>'+(per!=null?t('tr.perPerson',{n:per.toFixed(1)}):t('cnt.total',{n:g.total}))+'</small></div></div>';
+      '<div class="tr-v">'+p+'%<small>'+(per!=null?t(trendNorm15?'tr.perPerson15':'tr.perPerson',{n:per.toFixed(1)}):t('cnt.total',{n:g.total}))+'</small></div></div>';
   }
   const f=gs[0], l=gs[gs.length-1], d=pct(l.land,l.total)-pct(f.land,f.total);
   let change=t('tr.share',{a:pct(f.land,f.total),b:pct(l.land,l.total),d:(d>0?'+':'')+d});
-  if(usePeople){ const a=f.land/f.people,b=l.land/l.people; change+='<br>'+t('tr.per',{a:a.toFixed(1),b:b.toFixed(1),r:a?Math.round((b-a)/a*100):0}); }
+  if(usePeople){ const a=f.land/f.people,b=l.land/l.people; change+='<br>'+t(trendNorm15?'tr.per15':'tr.per',{a:a.toFixed(1),b:b.toFixed(1),r:a?Math.round((b-a)/a*100):0}); }
   return '<div class="sum-sec"><div class="sum-h">'+t(sumScope&&sumScope.type==='org'?'tr.titleAct':'tr.titleMonth')+'</div>'+rows+
     '<div class="tr-change">'+change+'</div><div class="sum-note" style="margin-top:6px">'+t(usePeople?'tr.notePeople':'tr.noteNoPeople')+'</div></div>';
 }
@@ -2316,7 +2499,7 @@ function measuresHtml(recs){
     const land=list.reduce((n,g)=>n+g.land,0), total=list.reduce((n,g)=>n+g.total,0), people=list.reduce((n,g)=>n+(g.people||0),0);
     return usePeople?(people?land/people:null):(total?land/total*100:null);
   };
-  const fmt=v=>usePeople?t('ms.perPerson',{n:v.toFixed(1)}):Math.round(v)+'%';
+  const fmt=v=>usePeople?t(trendNorm15?'ms.perPerson15':'ms.perPerson',{n:v.toFixed(1)}):Math.round(v)+'%';
   const rows=sumScope.measures.map(m=>{
     const d=String(m.started_on);
     const before=gs.filter(g=>String(g.date).slice(0,10)<d), after=gs.filter(g=>String(g.date).slice(0,10)>=d);
@@ -2575,6 +2758,7 @@ function toggleWorld(){
 const STAGES=['st0','st1','st2','st3','st4','st5'];
 let stepOrg=null, stepData=null;
 async function openSteps(){
+  if(needAccount()) return;
   document.getElementById('stepv').classList.add('show');
   document.getElementById('step-body').innerHTML='<div class="gal-empty">'+t('st.loading')+'</div>';
   const mine=await api('mine');
@@ -2613,32 +2797,27 @@ function renderSteps(){
   let h='<div class="st-lead"><div class="st-lead-t">'+t('way.t')+'</div><div class="st-lead-d">'+t('st.lead')+'</div></div>';
   if(orgs.length>1) h+='<div class="act-form" style="margin-bottom:10px"><label for="st-org">'+t('act.org')+'</label><select id="st-org" onchange="stepOrg=this.value;openSteps()">'+orgs.map(o=>'<option value="'+o.id+'"'+(o.id===stepOrg?' selected':'')+'>'+esc(aiText(o.name))+'</option>').join('')+'</select></div>';
   const checks=stepOrg&&stepData&&!stepData.error?step1Checks(stepData):null;
-  const s0=(()=>{try{return localStorage.getItem('mn_stage0_'+(stepOrg||'me'))==='1';}catch(e){return false;}})();
-  const s1=checks?checks.every(c=>c.ok):false;
+  const vs=verifyStats();
+  const s0=vs.done||(()=>{try{return localStorage.getItem('mn_stage0_'+(stepOrg||'me'))==='1';}catch(e){return false;}})();
+  const s1=myGoals().goals.find(x=>x.k==='g6').ok;
   const now=!s0?0:(!s1?1:2);
   STAGES.forEach((k,i)=>{
+    if(i===2) h+='<details class="act-how" style="margin-top:10px"><summary>'+t('st.later')+'</summary>';
     const cls=i<now?'done':(i===now?'now':'');
     h+='<div class="st-stage '+cls+'"><div class="st-n">'+(i<now?'✓':i)+'</div><div style="flex:1;min-width:0"><div class="st-t">'+t(k+'.t')+(i===now?'<span class="st-now-tag">'+t('st.now')+'</span>':'')+'</div><div class="st-c">'+t('st.cond')+'：'+t(k+'.c')+'</div>';
     if(i===0){
+      h+='<div class="st-check"><div class="st-item '+(vs.done?'ok':'ng')+'"><span class="mk">'+(vs.done?'✓':'・')+'</span><span>'+t('vf.goal')+'<small>'+t('vf.now',{n:vs.n,r:vs.rate})+'</small></span></div></div>';
       h+='<div class="act-btns"><button class="act-btn" onclick="closeSteps();openSummary()">'+t('st0.open')+'</button><label class="act-btn" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" '+(s0?'checked':'')+' onchange="try{localStorage.setItem(\'mn_stage0_'+(stepOrg||'me')+'\',this.checked?\'1\':\'0\')}catch(e){};renderSteps()">'+t('st0.done')+'</label></div>';
     }
     if(i===1){
-      if(!stepOrg){
-        h+='<div class="st-next">'+t('st.noOrg')+'</div><div class="act-btns"><button class="act-btn main" onclick="closeSteps();openActivity()">'+t('act.open')+'</button></div>';
-      } else if(checks){
-        h+='<div class="st-check">'+checks.map(c=>'<div class="st-item '+(c.ok?'ok':'ng')+'"><span class="mk">'+(c.ok?'✓':'・')+'</span><span>'+t('st1.'+c.k)+(c.v?'<small>'+c.v+'</small>':'')+'</span></div>').join('')+'</div>';
-        const first=checks.find(c=>!c.ok);
-        if(first){
-          const act={c1:'openActivity()',c2:'openActivity()',c3:'openActivity()',c4:'openActivity()',c5:"openReport('org','"+stepOrg+"')"}[first.k];
-          h+='<div class="st-next"><b>'+t('st.nextH')+'</b><br>'+t('st1.'+first.k+'.next')+'</div>';
-          if(first.k==='c3') h+=suggestHtml({orgId:stepOrg,info:stepData}).replace(/closeComp\(\);/g,'closeSteps();');
-          else h+='<div class="act-btns"><button class="act-btn main" onclick="closeSteps();'+act+'">'+t('st1.'+first.k+'.btn')+'</button></div>';
-        } else h+='<div class="st-next"><b>'+t('st1.passed')+'</b></div>';
-      }
+      const G=myGoals(), done=G.goals.filter(x=>x.ok).length;
+      h+='<div class="st-next">'+t('st1.my',{n:done})+(G.next?'<br><b>'+t('mb.nextK')+'</b>：'+t('mb.'+G.next.k+'.t'):'')+'</div>'+
+         '<div class="act-btns"><button class="act-btn main" onclick="closeSteps();openMyBeach()">'+t('mb.open')+'</button></div>'+
+         '<div class="st-c" style="margin-top:6px">'+t('st1.team')+'</div>';
     }
     h+='</div></div>';
   });
-  h+='<div class="sum-note" style="margin-top:10px">'+t('st.note')+'</div>';
+  h+='</details><div class="sum-note" style="margin-top:10px">'+t('st.note')+'</div>';
   box.innerHTML=h;
 }
 
@@ -2655,20 +2834,16 @@ async function compInfo(orgId,fresh){
 // 団体（いちばん最近に活動した団体）のステップ1の状態を計算し、帯を更新
 async function refreshCompanion(fresh){
   const app=document.getElementById('app');
-  if(!sessionToken){ app.classList.remove('has-comp'); return null; }
+  if(!sessionToken){ return null; }
   if(!actMine||!(actMine.orgs||[]).length){ const m=await api('mine'); if(!m.error) actMine=m; }
-  const orgs=actMine.orgs||[]; if(!orgs.length){ app.classList.remove('has-comp'); compState=null; return null; }
+  const orgs=actMine.orgs||[]; if(!orgs.length){ compState=null; return null; }
   const acts=actMine.activities||[];
   const latest=acts.filter(a=>a.org_id).sort((a,b)=>String(b.starts_at).localeCompare(String(a.starts_at)))[0];
   const orgId=(stepOrg&&orgs.some(o=>o.id===stepOrg))?stepOrg:(latest?latest.org_id:orgs[0].id);
-  const info=await compInfo(orgId,fresh); if(!info){ app.classList.remove('has-comp'); return null; }
+  const info=await compInfo(orgId,fresh); if(!info){ return null; }
   const checks=step1Checks(info), first=checks.find(c=>!c.ok);
   compState={orgId,info,checks,first,passed:!first};
-  const done=checks.filter(c=>c.ok).length;
-  app.classList.toggle('has-comp',!compState.passed);
-  document.getElementById('cc-step').textContent=t('comp.step1');
-  document.getElementById('cc-dots').innerHTML=checks.map(c=>'<span class="'+(c.ok?'ok':'')+'"></span>').join('');
-  document.getElementById('cc-next').textContent=first?t('comp.next')+'：'+t('comp.short.'+first.k):'';
+  refreshMyChip(); // 地図の上の帯は、いつも自分のマイ浜の小さなゴールを見せる（団体の進み具合は、行動直後のカードで）
   return compState;
 }
 // 行動の直後に出すカード
@@ -2738,6 +2913,335 @@ function addNextToCalendar(){
   const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//moto no umi//JA','BEGIN:VEVENT','UID:'+Date.now()+'@motonoumi.jp','DTSTAMP:'+stamp,
     'DTSTART;VALUE=DATE:'+ymd,'SUMMARY:'+t('comp.calTitle'),'DESCRIPTION:'+t('comp.calDesc'),'URL:'+location.origin+location.pathname,'END:VEVENT','END:VCALENDAR'].join('\r\n');
   saveBlob(new Blob([ics],{type:'text/calendar'}),'motonoumi_next.ics');
+}
+
+
+
+// ── 測り方をそろえる：毎回の拾った時間。比べるときは「15分あたり」にそろえる ──
+const EFFORTS=[10,15,20,30,45,60];
+let effortMin=(()=>{try{const v=Number(localStorage.getItem('mn_effort'));return EFFORTS.includes(v)?v:15;}catch(e){return 15;}})();
+function renderEffort(){
+  const box=document.getElementById('eff-chips'); if(!box) return;
+  box.innerHTML=EFFORTS.map(v=>'<button type="button" class="'+(v===effortMin?'on':'')+'" onclick="setEffort('+v+')">'+t('eff.min',{n:v})+'</button>').join('');
+}
+function setEffort(v){ effortMin=v; try{localStorage.setItem('mn_effort',String(v));}catch(e){} renderEffort(); }
+// 15分あたりの量（時間が分からない記録は比べない）
+const per15=(n,min)=>min?n/(min/15):null;
+
+
+// ── 区間（証拠の単位）：主催者が決める。記録は位置から自動で近くの区間に結びつく ──
+let mySections=[], sectionLayer=null;
+async function loadSections(){
+  if(!sessionToken) return;
+  if(!actMine||!(actMine.orgs||[]).length){ const m=await api('mine'); if(!m.error) actMine=m; }
+  const out=[];
+  for(const o of (actMine.orgs||[])){ const r=await api('org_info',{id:o.id}); if(!r.error) (r.sections||[]).forEach(x=>out.push({...x,org_id:o.id})); }
+  mySections=out; drawSections();
+}
+function drawSections(){
+  if(!lmap) return;
+  if(sectionLayer) lmap.removeLayer(sectionLayer);
+  sectionLayer=L.layerGroup();
+  mySections.forEach(x=>{
+    const c=x.role==='reference'?'#9EE7F2':'#FFD27A';
+    L.circle([x.lat,x.lng],{radius:x.radius_m||75,color:c,weight:1.5,dashArray:'4 4',fillColor:c,fillOpacity:.08,interactive:false}).addTo(sectionLayer);
+    L.marker([x.lat,x.lng],{icon:L.divIcon({className:'',html:'<div style="font-size:10px;color:'+c+';white-space:nowrap;text-shadow:0 1px 3px #000;transform:translate(-50%,-150%)">'+esc(aiText(x.label))+'</div>'}),interactive:false}).addTo(sectionLayer);
+  });
+  sectionLayer.addTo(lmap);
+}
+function sectionAt(lat,lng){
+  let best=null,bd=Infinity;
+  mySections.forEach(x=>{ const d=dist_m({lat,lng},x); if(d<=(x.radius_m||75)&&d<bd){bd=d;best=x;} });
+  return best;
+}
+// 区間を作る：地図の中心を、区間の中心にする
+async function createSection(orgId){
+  if(!lmap) return;
+  if(!confirm(t('sec.howTo'))) return;
+  const label=prompt(t('sec.askLabel'),t('sec.defLabel')); if(!label) return;
+  const kind=prompt(t('sec.askRole'),'1'); if(kind===null) return;
+  const c=lmap.getCenter();
+  const r=await api('section_create',{org_id:orgId,label,role:String(kind).trim()==='2'?'reference':'target',lat:c.lat,lng:c.lng});
+  if(r.error){ alert(tv(r.error)); return; }
+  toast(t('sec.saved')); await loadSections(); renderActivity();
+}
+async function deleteSection(id){
+  if(!confirm(t('sec.delAsk'))) return;
+  const r=await api('section_delete',{id}); if(r.error){ alert(tv(r.error)); return; }
+  await loadSections(); renderActivity();
+}
+// 取り組みの言葉から、狙うごみの標準の名前を推しはかる（候補として入れておくだけ。本人が直せる）
+const TARGET_GUESS=[[/吸い殻|たばこ|喫煙/,'たばこの吸い殻'],[/キャップ/,'ペットボトルのキャップ'],[/ペット|PET|飲み物|飲料|自販機|自動販売機/,'PETボトル'],[/缶/,'飲料缶'],[/瓶/,'ガラス瓶'],[/包装|袋菓子|お菓子/,'食品の包装・袋'],[/容器|トレー|弁当/,'食品容器・トレー'],[/レジ袋|袋/,'レジ袋'],[/花火/,'花火'],[/風船/,'風船']];
+
+// ── マイ浜：ステップ1を、一人でも続けられる形に。同じ浜で、小さなゴールを積み重ねる ──
+const MYB_KEY='mn_mybeach', IDEA_KEY='mn_my_ideas', MYB_RADIUS=1000; // マイ浜の範囲：中心から1km
+const dist_m=(a,b)=>{const R=6371000,r=Math.PI/180,dLa=(b.lat-a.lat)*r,dLo=(b.lng-a.lng)*r;const x=Math.sin(dLa/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));};
+function myRecords(){ return (window.allRecords||[]).filter(r=>r.is_mine&&typeof r.lat==='number'); }
+// マイ浜：決めていなければ、自分の記録がいちばん集まっている場所
+function myBeach(){
+  try{ const b=JSON.parse(localStorage.getItem(MYB_KEY)||'null'); if(b&&typeof b.lat==='number') return b; }catch(e){}
+  const mine=myRecords(); if(!mine.length) return null;
+  let best=null,bn=-1;
+  mine.forEach(r=>{ const n=mine.filter(x=>dist_m(r,x)<=MYB_RADIUS).length; if(n>bn){bn=n;best=r;} });
+  return best?{lat:best.lat,lng:best.lng,area:best.location_name||'',auto:true}:null;
+}
+function setMyBeach(id){
+  const r=(window.allRecords||[]).find(x=>x.id===id); if(!r) return;
+  try{ localStorage.setItem(MYB_KEY,JSON.stringify({lat:r.lat,lng:r.lng,area:r.location_name||''})); }catch(e){}
+  if(lmap) lmap.closePopup(); toast(t('mb.set')); refreshMyChip();
+}
+const dayOf=r=>{const d=new Date(r.photo_taken_at||r.created_at);return isNaN(d)?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function landOf(r){ const c=countsOf(r); let n=0; (c&&c.item_counts||[]).forEach(x=>{if(x.origin==='陸由来')n+=Number(x.count)||0;}); return n; }
+function myIdeas(){ try{ return JSON.parse(localStorage.getItem(IDEA_KEY)||'[]')||[]; }catch(e){ return []; } }
+// マイ浜での「訪れた日」ごとの陸由来ごみ
+function myVisits(b){
+  const g={};
+  myRecords().filter(r=>dist_m(b,r)<=MYB_RADIUS).forEach(r=>{ const d=dayOf(r); if(!d) return; g[d]=g[d]||{day:d,land:0,recs:[],min:0}; g[d].land+=landOf(r); g[d].recs.push(r); g[d].min=Math.max(g[d].min,Number(r.effort_min)||0); });
+  return Object.values(g).map(v=>({...v,p15:per15(v.land,v.min)})).sort((a,c)=>a.day.localeCompare(c.day));
+}
+// 小さなゴール（7つ）
+function myGoals(){
+  const b=myBeach(); const v=b?myVisits(b):[]; const ideas=myIdeas(); const idea=ideas[0];
+  const span=v.length>1?(new Date(v[v.length-1].day)-new Date(v[0].day))/864e5:0;
+  const months=new Set(v.map(x=>x.day.slice(0,7)));
+  const seasons=new Set(v.map(x=>Math.floor(((Number(x.day.slice(5,7))%12))/3)));
+  const before=idea?v.filter(x=>x.day<idea.date&&x.p15!=null):[], after=idea?v.filter(x=>x.day>=idea.date&&x.p15!=null):[];
+  const avg=a=>a.length?a.reduce((s,x)=>s+x.p15,0)/a.length:null;
+  const bAvg=avg(before), aAvg=avg(after);
+  const down=bAvg!=null&&before.length>=2&&after.length>=3&&aAvg<=bAvg*0.8&&after.filter(x=>x.p15<bAvg).length>=Math.ceil(after.length*2/3);
+  const trending=bAvg!=null&&after.length>=1&&after.length<3&&aAvg<bAvg;
+  const goals=[
+    {k:'g1',ok:v.length>=1,v:t('mb.visits',{n:v.length})},
+    {k:'g2',ok:v.length>=3,v:t('mb.visits',{n:v.length})},
+    {k:'g3',ok:span>=28,v:span?t('mb.days',{n:Math.round(span)}):''},
+    {k:'g4',ok:!!idea,v:idea?esc(idea.title):''},
+    {k:'g5',ok:after.length>=3,v:idea?t('mb.after',{n:after.length}):''},
+    {k:'g6',ok:down,v:bAvg!=null&&after.length?t('mb.pv',{b:bAvg.toFixed(1),a:after.map(x=>x.p15.toFixed(1)).join(' → ')})+(trending?' '+t('mb.trending',{n:3-after.length}):''):''},
+    {k:'g7',ok:seasons.size>=3,v:t('mb.seasons',{n:seasons.size})},
+  ];
+  return {b,v,goals,next:goals.find(x=>!x.ok),noMin:v.filter(x=>x.p15==null).length};
+}
+// いつも見える帯（個人のマイ浜）。団体の進み具合より、まず自分の小さなゴールを見せる
+function refreshMyChip(){
+  const app=document.getElementById('app'); if(!sessionToken){ app.classList.remove('has-comp'); return; }
+  const G=myGoals(); const done=G.goals.filter(x=>x.ok).length;
+  if(!G.next){ app.classList.remove('has-comp'); return; }
+  app.classList.add('has-comp');
+  const chip=document.getElementById('comp-chip'); chip.onclick=openMyBeach;
+  document.getElementById('cc-step').textContent=t('mb.title');
+  document.getElementById('cc-dots').innerHTML=G.goals.map(x=>'<span class="'+(x.ok?'ok':'')+'"></span>').join('');
+  document.getElementById('cc-next').textContent=t('comp.next')+'：'+t('mb.'+G.next.k+'.s');
+}
+function openMyBeach(){ if(needAccount()) return; renderMyBeach(); document.getElementById('mybv').classList.add('show'); document.getElementById('mybv').scrollTop=0; }
+function closeMyBeach(){ document.getElementById('mybv').classList.remove('show'); }
+function myNextAction(k){ return {g1:'closeMyBeach();openCam()',g2:'closeMyBeach();openCam()',g3:'closeMyBeach();openCam()',g4:'addIdea()',g5:'closeMyBeach();openCam()',g6:'closeMyBeach();openCam()',g7:'closeMyBeach();openCam()'}[k]; }
+function renderMyBeach(){
+  const G=myGoals(), box=document.getElementById('myb-body');
+  let h='';
+  if(!G.b){
+    h+='<div class="mb-next"><div class="mb-next-k">'+t('mb.startK')+'</div><div class="mb-next-t">'+t('mb.startT')+'</div><div class="mb-next-d">'+t('mb.startD')+'</div><div class="act-btns"><button class="act-btn main" onclick="closeMyBeach();openCam()">'+t('mb.shoot')+'</button></div></div>';
+  } else {
+    const last=G.v[G.v.length-1], photo=last&&last.recs.find(r=>r.image_url);
+    h+='<div class="mb-hero">'+(photo?'<img src="'+esc(photo.image_url)+'" alt="">':'')+'<div><div class="mb-area">'+esc(aiText(G.b.area)||t('mb.here'))+'</div><div class="mb-sub">'+t('mb.heroSub',{n:G.v.length})+(G.b.auto?'<br>'+t('mb.autoNote'):'')+'</div></div></div>'+
+      '<div class="sum-note" style="margin-top:8px">'+t('mb.howTo')+'</div>';
+    // 次の小さなゴール（1つだけ）
+    if(G.next){
+      h+='<div class="mb-next"><div class="mb-next-k">'+t('mb.nextK')+'</div><div class="mb-next-t">'+t('mb.'+G.next.k+'.t')+'</div><div class="mb-next-d">'+t('mb.'+G.next.k+'.d')+(G.next.v?'<br><small style="color:rgba(255,255,255,.6)">'+G.next.v+'</small>':'')+'</div>'+
+        '<div class="act-btns"><button class="act-btn main" onclick="'+myNextAction(G.next.k)+'">'+t('mb.'+G.next.k+'.btn')+'</button></div></div>';
+    } else h+='<div class="mb-next"><div class="mb-next-t">'+t('mb.allDone')+'</div></div>';
+    // 前回からの変化
+    const vv=G.v.filter(x=>x.p15!=null);
+    if(vv.length>=2){
+      const a=vv[vv.length-2], b=vv[vv.length-1], d=b.p15-a.p15, f=x=>x.toFixed(1);
+      h+='<div class="sum-h" style="margin-top:14px">'+t('mb.diffH')+'</div><div class="mb-diff">'+t(Math.abs(d)<0.05?'mb.diffSame':(d<0?'mb.diffDown':'mb.diffUp'),{a:f(a.p15),b:f(b.p15),n:f(Math.abs(d)),day:b.day})+'</div>';
+    }
+    if(G.noMin) h+='<div class="sum-note" style="margin-top:6px">'+t('mb.noMin',{n:G.noMin})+'</div>';
+    // 小さなゴールの道のり
+    h+='<div class="sum-h" style="margin-top:14px">'+t('mb.pathH',{n:G.goals.filter(x=>x.ok).length})+'</div><div class="mb-path">'+G.goals.map(x=>
+      '<div class="mb-goal '+(x.ok?'ok':(G.next&&x.k===G.next.k?'next':''))+'"><div class="mb-dot">'+(x.ok?'✓':'')+'</div><div class="mb-gt">'+t('mb.'+x.k+'.t')+(x.v&&!x.ok?'<small>'+x.v+'</small>':'')+'</div></div>').join('')+'</div>';
+  }
+  // みんなが最近見つけたもの（好奇心が続くように）
+  const others=(window.allRecords||[]).filter(r=>!r.is_mine&&r.image_url).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,12);
+  if(others.length){
+    h+='<div class="sum-h" style="margin-top:16px">'+t('mb.othersH')+'</div><div class="mb-strip">'+others.map(r=>{
+      const c=countsOf(r), top=c&&c.item_counts&&c.item_counts.slice().sort((a,b)=>(b.count||0)-(a.count||0))[0];
+      return '<button class="mb-tile" onclick="closeMyBeach();openGallery(\'all\');openGalPop(\''+esc(r.id)+'\')"><img src="'+esc(r.image_url)+'" alt="" loading="lazy"><span>'+esc(top?itemLabel(top.name,top.name_en):'')+(r.location_name?' ・ '+esc(aiText(r.location_name).split(' ').slice(-1)[0]):'')+'</span></button>';
+    }).join('')+'</div>';
+  }
+  if(G.b&&G.v.length) h+='<div class="act-btns" style="margin-top:14px"><button class="act-btn main" onclick="shareMyBeach()">'+t('share.btn')+'</button><button class="act-btn" onclick="inviteFriends()">'+t('inv.btn')+'</button></div>';
+  else h+='<div class="act-btns" style="margin-top:14px"><button class="act-btn" onclick="inviteFriends()">'+t('inv.btn')+'</button></div>';
+  h+='<details class="act-how"><summary>'+t('mb.beyond')+'</summary><div class="guide-d" style="margin:6px 0">'+t('mb.beyondD')+'</div><div class="act-btns"><button class="act-btn" onclick="closeMyBeach();openSteps()">'+t('st.title')+'</button></div></details>';
+  box.innerHTML=h;
+}
+// 陸側で気づいたこと・やってみたことを1つ書く（この端末に保存）
+function addIdea(){
+  const G=myGoals(); let preset='';
+  if(G.b){ const mine={info:{activities:[]}}; const items={}; G.v.forEach(x=>x.recs.forEach(r=>{(countsOf(r)?.item_counts||[]).forEach(i=>{if(i.origin==='陸由来'){const n=canonName(i.name);items[n]=(items[n]||0)+(Number(i.count)||0);}});}));
+    const top=Object.entries(items).sort((a,b)=>b[1]-a[1]).find(([n])=>SUGGEST[n]); if(top) preset=t(SUGGEST[top[0]]+'.t'); }
+  const title=prompt(t('mb.ideaAsk'),preset); if(!title) return;
+  const d=new Date(), today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const ideas=myIdeas(); ideas.unshift({title:title.trim().slice(0,100),date:today});
+  try{ localStorage.setItem(IDEA_KEY,JSON.stringify(ideas.slice(0,20))); }catch(e){}
+  renderMyBeach(); refreshMyChip(); celebrateIfNew();
+}
+// 小さなゴールに届いたら、一緒に喜ぶ（記録の保存のあとなど）
+let myGoalsDone=null;
+function celebrateIfNew(){
+  const G=myGoals(), done=G.goals.filter(x=>x.ok).map(x=>x.k);
+  const prev=myGoalsDone; myGoalsDone=done;
+  if(!prev) return;
+  const fresh=done.filter(k=>!prev.includes(k)); if(!fresh.length) return;
+  const k=fresh[fresh.length-1];
+  document.getElementById('comp-h').innerHTML='<div class="mb-cel">✦</div>'+esc(t('mb.celH'));
+  document.getElementById('comp-dots').innerHTML=G.goals.map(x=>'<span class="'+(x.ok?'ok':'')+'"></span>').join('');
+  document.getElementById('comp-msg').innerHTML=esc(t('mb.'+k+'.cel'))+(G.next?'<br><br><b style="color:#FFD27A">'+esc(t('mb.nextK'))+'</b><br>'+esc(t('mb.'+G.next.k+'.t')):'');
+  document.getElementById('comp-extra').innerHTML='';
+  document.getElementById('comp-btns').innerHTML='<button class="act-btn main" onclick="closeComp();openMyBeach()">'+t('mb.open')+'</button>';
+  document.getElementById('compv').classList.add('show');
+}
+function initMyGoals(){ myGoalsDone=myGoals().goals.filter(x=>x.ok).map(x=>x.k); refreshMyChip(); }
+
+
+// ── まずは見てみる：登録しなくても、地図・みんなの写真・ツアー・集計を見られる。記録したくなったら登録 ──
+let guestMode=false;
+function enterGuest(){
+  guestMode=true;
+  document.getElementById('app').classList.add('guest');
+  startApp();
+}
+function openSignup(){
+  document.getElementById('ob').style.display='';
+  switchTab('new');
+  const n=document.getElementById('inp-nick'); if(n) setTimeout(()=>n.focus(),100);
+}
+// 登録が必要な操作の前に呼ぶ。未登録なら登録を案内して true を返す
+function needAccount(){
+  if(sessionToken) return false;
+  if(confirm(t('guest.need'))) openSignup();
+  return true;
+}
+
+// ── 気づいてもらう：マイ浜を1枚の画像でシェア、仲間を誘う ──
+async function shareMyBeach(){
+  const G=myGoals(); if(!G.b||!G.v.length){ alert(t('share.none')); return; }
+  let land=0,total=0; G.v.forEach(v=>v.recs.forEach(r=>{const c=countsOf(r); (c&&c.item_counts||[]).forEach(x=>{const n=Number(x.count)||0; total+=n; if(x.origin==='陸由来') land+=n;});}));
+  const W=1080,H=1350,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  const bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#0B2A3C'); bg.addColorStop(1,'#04111C'); g.fillStyle=bg; g.fillRect(0,0,W,H);
+  // いちばん新しいマイ浜の写真（読み込めなければ、写真なしで作る）
+  const last=G.v[G.v.length-1], ph=last.recs.find(r=>r.image_url)||G.v.flatMap(v=>v.recs).reverse().find(r=>r.image_url);
+  let drew=false;
+  if(ph){ try{ const img=await new Promise((ok,ng)=>{const i=new Image(); i.crossOrigin='anonymous'; i.onload=()=>ok(i); i.onerror=ng; i.src=ph.image_url;});
+    const sz=Math.min(img.naturalWidth,img.naturalHeight); g.drawImage(img,(img.naturalWidth-sz)/2,(img.naturalHeight-sz)/2,sz,sz,0,0,W,760);
+    const sh=g.createLinearGradient(0,520,0,760); sh.addColorStop(0,'rgba(4,17,28,0)'); sh.addColorStop(1,'rgba(4,17,28,1)'); g.fillStyle=sh; g.fillRect(0,520,W,240);
+    drew=true;
+  }catch(e){} }
+  // 写真を読み込めなかったときは、上半分に波と名前を描く
+  if(!drew){
+    g.strokeStyle='rgba(95,211,230,.35)'; g.lineWidth=6;
+    for(let k=0;k<4;k++){ g.beginPath(); for(let x=0;x<=W;x+=20){ const y=430+k*70+Math.sin(x/90+k)*22; x?g.lineTo(x,y):g.moveTo(x,y);} g.stroke(); }
+    g.font='300 120px "Noto Sans JP","Hiragino Sans",sans-serif'; g.fillStyle='#5FD3E6'; g.textAlign='center'; g.fillText('moto no umi',W/2,300);
+    g.font='500 44px "Noto Sans JP","Hiragino Sans",sans-serif'; g.fillStyle='rgba(255,255,255,.7)'; g.fillText('元の海',W/2,370);
+  }
+  const tx=(s,x,y,size,col,w=400,al='left')=>{ g.font=w+' '+size+'px "Noto Sans JP","Hiragino Sans",sans-serif'; g.fillStyle=col; g.textAlign=al; g.fillText(s,x,y); };
+  tx(t('share.my')+' · '+(aiText(G.b.area)||''),80,840,34,'#9EE7F2',500);
+  tx(t('share.land'),80,920,36,'rgba(255,255,255,.85)',400);
+  // 判別できないものを除いた値なので、「少なくとも」を必ず添える
+  tx(t('share.atLeast'),80,1050,46,'rgba(255,255,255,.9)',400);
+  g.font='400 46px "Noto Sans JP","Hiragino Sans",sans-serif';
+  const lw=g.measureText(t('share.atLeast')).width;
+  tx((total?Math.round(land/total*100):0)+'%',80+lw+24,1050,140,'#FFAA44',700);
+  tx(t('share.days',{n:G.v.length,g:G.goals.filter(x=>x.ok).length}),80,1120,32,'rgba(255,255,255,.75)',400);
+  tx(t('axis.t'),80,1210,34,'#FFE3A8',500);
+  tx('moto no umi  ·  motonoumi.jp',80,1280,28,'#5FD3E6',400);
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+  const file=new File([blob],'motonoumi_mybeach.png',{type:'image/png'});
+  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'moto no umi',text:t('share.text')}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  await saveBlob(blob,'motonoumi_mybeach.png');
+}
+async function inviteFriends(){
+  const url=location.origin+location.pathname, text=t('inv.text');
+  try{ if(navigator.share){ await navigator.share({title:'moto no umi',text,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  copyText(text+' '+url);
+}
+
+
+// ── 動作チェック：更新のあと、アプリ・サーバー・データベースのどこまでが入ったかを確かめる ──
+const APP_VERSION='2026-10-21';
+function openCheck(){ document.getElementById('chkv').classList.add('show'); runCheck(); }
+function closeCheck(){ document.getElementById('chkv').classList.remove('show'); }
+async function runCheck(){
+  const box=document.getElementById('chk-body');
+  const rows=[], todo=[];
+  const row=(st,title,sub)=>rows.push('<div class="chk-row"><div class="chk-mk '+st+'">'+({ok:'✓',ng:'✗',warn:'!',wait:''}[st])+'</div><div class="chk-t">'+title+(sub?'<small>'+sub+'</small>':'')+'</div></div>');
+  box.innerHTML='<div class="gal-empty">'+t('chk.running')+'</div>';
+  row('ok',t('chk.app'),t('chk.ver',{v:APP_VERSION}));
+  // umi-api とデータベース
+  let h=null; try{ h=await api('health'); }catch(e){}
+  // サーバーが古いと、データベースの状態は分からない。新しいサーバーはSQLの準備が前提なので、SQLを先に案内する
+  if(!h||h.error||!h.version){ row('ng',t('chk.api'),t('chk.apiNg')); row('wait',t('chk.db'),t('chk.dbUnknown')); todo.push(t('chk.doSqlFirst')); todo.push(t('chk.doApi')); }
+  else {
+    const old=h.version<APP_VERSION;
+    row(old?'ng':'ok',t('chk.api'),old?t('chk.old',{v:h.version}):t('chk.ver',{v:h.version}));
+    if(old){ todo.push(t('chk.doSqlFirst')); todo.push(t('chk.doApi')); }
+    const miss=(h.items||[]).filter(x=>!x.ok);
+    row(miss.length?'ng':'ok',t('chk.db'),miss.length?t('chk.dbNg',{n:miss.length,items:miss.map(x=>x.key).join(', ')}):t('chk.dbOk',{n:(h.items||[]).length}));
+    if(miss.length) todo.unshift(t('chk.doSql'));
+  }
+  // 写真の解析
+  let a=null; try{ const r=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY,'apikey':SB_KEY},body:JSON.stringify({mode:'health'})}); a=r.ok?await r.json():null; }catch(e){}
+  if(!a||!a.version){ row('ng',t('chk.ai'),t('chk.aiNg')); todo.push(t('chk.doAi')); }
+  else {
+    const old=a.version<APP_VERSION;
+    row(old||!a.ai_key?'ng':'ok',t('chk.ai'),!a.ai_key?t('chk.aiKey'):(old?t('chk.old',{v:a.version}):t('chk.ver',{v:a.version})));
+    if(old) todo.push(t('chk.doAi')); if(!a.ai_key) todo.push(t('chk.doKey'));
+  }
+  // ツアーの内容
+  let tj=false; try{ const r=await fetch('tour.json?ts='+Date.now(),{cache:'no-store'}); tj=r.ok; }catch(e){}
+  row(tj?'ok':'warn',t('chk.tour'),tj?t('chk.tourOk'):t('chk.tourNg')); if(!tj) todo.push(t('chk.doTour'));
+  // ログイン
+  if(sessionToken){ const se=await api('session'); row(se.error?'ng':'ok',t('chk.login'),se.error?tv(se.error):t('chk.loginOk')); }
+  else row('wait',t('chk.login'),t('chk.loginNo'));
+  const ng=todo.length;
+  const admin='<div class="sum-sec"><div class="sum-h">'+t('bk.h')+'</div><div class="sum-note" style="margin-bottom:8px">'+t('bk.d')+'</div>'+
+    '<div class="act-btns"><button class="act-btn main" onclick="exportBackup()">'+t('bk.btn')+'</button><button class="act-btn" onclick="backupReminder()">'+t('bk.cal')+'</button></div></div>';
+  box.innerHTML='<div class="chk-sum '+(ng?'ng':'ok')+'">'+(ng?'<b>'+t('chk.todoH')+'</b><br>'+todo.map((x,i)=>(i+1)+'. '+x).join('<br>'):t('chk.allOk'))+'</div>'+rows.join('')+
+    '<div class="act-btns"><button class="act-btn" onclick="runCheck()">'+t('chk.again')+'</button></div>'+admin;
+}
+// ── データの控え（運営者だけ）：合言葉を入れて、すべての表を1つのファイルに書き出す。写真そのものは含まない ──
+async function exportBackup(){
+  const key=prompt(t('bk.ask')); if(!key) return;
+  showLoad(t('bk.doing'));
+  const r=await api('export',{admin_key:key.trim()});
+  hideLoad();
+  if(r.error){ alert(tv(r.error)); return; }
+  const n=Object.entries(r.tables||{}).map(([k,v])=>k+' '+(v||[]).length).join(' / ');
+  const d=new Date(), stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  await saveBlob(new Blob([JSON.stringify(r,null,1)],{type:'application/json'}),'motonoumi_backup_'+stamp+'.json');
+  alert(t('bk.done',{n}));
+}
+// 毎月1日に、控えを取ることを思い出すための予定（スマホのカレンダーに取り込む）
+function backupReminder(){
+  const d=new Date(); d.setMonth(d.getMonth()+1,1);
+  const ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+'01', stamp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//moto no umi//JA','BEGIN:VEVENT','UID:backup-'+Date.now()+'@motonoumi.jp','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+ymd,
+    'RRULE:FREQ=MONTHLY;BYMONTHDAY=1','SUMMARY:'+t('bk.calTitle'),'DESCRIPTION:'+t('bk.calDesc'),'URL:'+location.origin+location.pathname+'?check','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  saveBlob(new Blob([ics],{type:'text/calendar'}),'motonoumi_backup_reminder.ics');
+}
+// ?check で開いたときは、ログインの前でも動作チェックを出す
+try{ if(new URL(location.href).searchParams.has('check')) setTimeout(openCheck,800); }catch(e){}
+
+// ── 答え合わせ：AIの数は合っていたか（自分の記録）。段階0「道具を確かめる」の一致率になる ──
+async function setVerify(id,v){
+  const r=(window.allRecords||[]).find(x=>x.id===id); if(!r) return;
+  const res=await api('verify',{id,verify:v}); if(res.error){ alert(tv(res.error)); return; }
+  r.verify=v;
+  document.querySelectorAll('.vf-btns[data-id="'+CSS.escape(id)+'"] button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  toast(t('vf.saved'));
+}
+function verifyStats(){
+  const v=(window.allRecords||[]).filter(r=>r.is_mine&&r.verify);
+  const good=v.filter(r=>r.verify==='exact'||r.verify==='close').length;
+  return {n:v.length,rate:v.length?Math.round(good/v.length*100):0,done:v.length>=10&&good/v.length>=0.8};
 }
 
 // ── 世界のごみの今（ツアー）。内容は tour.json（差し替えるだけで最新の動向に更新）。読めなければアプリに入れた控えを使う ──
@@ -3104,6 +3608,8 @@ function addPin(r){
   const loc=shown(r.location_name)?esc(aiText(r.location_name)):'';
   const aj=r.analysis_json||{};
   const summary=shown(aj.summary)?esc(aiText(aj.summary,aj.summary_en)):'';
+  // AIのひとこと：活動の気持ちに沿って、そっと添える
+  const capHtml=summary?`<div class="umi-pop-cap"><span class="umi-pop-cap-k">${t('pop.aiNote')}</span>${summary}</div>`:'';
 
   // 数値情報
   const mpYears=shown(r.mp_years_est)?esc(r.mp_years_est):'—';
@@ -3150,28 +3656,15 @@ function addPin(r){
           <span class="umi-pop-loc">${loc}</span>
           <span class="umi-pop-date">${dt}</span>
         </div>
+        ${capHtml}
         <div class="umi-pop-div"></div>
         <div class="umi-pop-label">${t('pop.items')}</div>
         ${countsOf(r)?countsSummaryHtml(countsOf(r))+countsListHtml(countsOf(r),5):`<div class="umi-pop-items">${items||'—'}</div>`}
-        ${summary?`<div class="umi-pop-label">${t('pop.comment')}</div><div class="umi-pop-comment">${summary}</div>`:''}
-        <div class="umi-pop-nums">
-          <div class="umi-pop-num">
-            <div class="umi-pop-num-label">${t('pop.mp')}</div>
-            <div class="umi-pop-num-val" style="color:${rc}">${esc(tv(r.mp_risk)||'—')}</div>
-          </div>
-          <div class="umi-pop-num">
-            <div class="umi-pop-num-label">${t('pop.years')}</div>
-            <div class="umi-pop-num-val">${mpYears}</div>
-          </div>
-          <div class="umi-pop-num">
-            <div class="umi-pop-num-label">${t('pop.weight')}</div>
-            <div class="umi-pop-num-val">${weight}</div>
-          </div>
-        </div>
         ${stakeholderHtml}
         ${routeHtml}
         ${linksHtml}
-        ${r.is_mine?`<button type="button" class="umi-pop-del" onclick="deleteRecord('${esc(r.id)}')">${t('del.record')}</button>`:`<button type="button" class="umi-pop-report" onclick="openReportRecord('${esc(r.id)}')">${t('rep.open')}</button>`}
+        ${r.is_mine?`<div class="vf-row">${t('vf.q')}<div class="vf-btns" data-id="${esc(r.id)}">${['exact','close','off'].map(v=>`<button type="button" data-v="${v}" class="${r.verify===v?'on':''}" onclick="setVerify('${esc(r.id)}','${v}')">${t('vf.'+v)}</button>`).join('')}</div></div>`:''}
+        ${r.is_mine?`<button type="button" class="umi-pop-report" style="color:#FFD27A" onclick="setMyBeach('${esc(r.id)}')">${t('mb.setHere')}</button><button type="button" class="umi-pop-del" onclick="deleteRecord('${esc(r.id)}')">${t('del.record')}</button>`:`<button type="button" class="umi-pop-report" onclick="openReportRecord('${esc(r.id)}')">${t('rep.open')}</button>`}
       </div>
     </div>`,
     {maxWidth:320,closeButton:true,autoPanPaddingTopLeft:[10,50],autoPanPaddingBottomRight:[10,150]}
@@ -3347,6 +3840,7 @@ function initNav(){
 let preloaded = false;
 
 function startApp(){
+  if(sessionToken){ guestMode=false; document.getElementById('app').classList.remove('guest'); }
   document.getElementById('ob').style.display='none';
   document.getElementById('app').classList.add('show');
   if(currentNickname){
@@ -3355,10 +3849,10 @@ function startApp(){
   }
   initNav();
   startSpecTips();
-  applyWallpaper();
   maybeShowGuide(); // 初めての人には撮り方を案内
   setTimeout(resumeBatchIfAny,1800); // 再読み込みで止まったまとめて記録があれば、続けるか聞く（記録の読み込み後）
-  setTimeout(()=>refreshCompanion(),2200); // 伴走の帯（団体で活動している人）
+  setTimeout(()=>initMyGoals(),2200); // マイ浜の帯（一人でも続けられる小さなゴール）
+  setTimeout(()=>loadSections(),2600); // 団体の区間（主催者・メンバーの地図に表示）
   updateActChip();
   consumePendingJoin(); // QRコードから開いた人は、その活動に参加 // 画面の大きさが決まってから帯の高さを合わせる
   if(preloaded&&needReload){
@@ -3378,6 +3872,7 @@ function startApp(){
 // アプリ内カメラで撮った写真には位置情報が付かないため、
 // スマホのカメラアプリ（位置情報オン）で撮った写真を選んでもらう。
 function openCam(){
+  if(needAccount()) return;
   document.getElementById('filein').click();
 }
 function closeCam(){
@@ -3523,6 +4018,7 @@ function stopBatch(){
   finishBatch();
 }
 function finishBatch(){
+  setTimeout(()=>{ refreshMyChip(); celebrateIfNew(); },600);
   const b=batch; batch=null;
   batchClear();
   document.getElementById('confv').classList.remove('show');
@@ -3769,6 +4265,10 @@ function showConfirm(){
   document.getElementById('confpre').src=capturedUrl;
   document.getElementById('jtxt').textContent=(batch?t('batch.progress',{i:batch.i+1,n:batch.items.length})+' ・ ':'')+t('an.doneCat',{c:r.category||'SEA'});
   document.getElementById('btn-retry').textContent=batch?t('batch.skip'):t('cf.retry');
+  renderEffort();
+  const sec=sectionAt(userLat,userLng), sb=document.getElementById('sec-box');
+  sb.classList.toggle('show',!!sec);
+  if(sec){ document.getElementById('sec-name').textContent=t('sec.here',{l:aiText(sec.label),r:t(sec.role==='reference'?'sec.ref':'sec.tgt')}); if(!document.getElementById('confv').classList.contains('show')) document.getElementById('sec-all').checked=false; }
   const pvw=document.getElementById('pv-warn'), pv=r.privacy;
   if(pvw){ pvw.style.display=pv&&pv.any?'block':'none'; if(pv&&pv.any) pvw.textContent=t('pv.warn',{what:pvWhat(pv)}); }
   document.getElementById('batch-stop').style.display=batch?'block':'none';
@@ -3823,14 +4323,6 @@ function showConfirm(){
     <div class="cs-row">
       <div class="cs-label">${t('cf.items')}</div>
       <div class="cs-val">${countsOf(r)?countsSummaryHtml(countsOf(r))+countsListHtml(countsOf(r)):esc(r.items||t('unknown')).replace(/\n/g,'<br>')}</div>
-    </div>
-    <div class="cs-row">
-      <div class="cs-label">${t('pop.mp')}</div>
-      <div class="cs-val" style="color:${rc};font-weight:500">${esc(tv(r.mp_risk)||t('unknown'))}</div>
-    </div>
-    <div class="cs-row">
-      <div class="cs-label">${t('pop.years')}</div>
-      <div class="cs-val">${esc(r.mp_years_est||t('unknown'))}</div>
     </div>
     <div class="cs-row">
       <div class="cs-label">${t('cf.summary')}</div>
@@ -3894,7 +4386,7 @@ async function send(){
     const compBlob=await(await fetch(compressedForUpload)).blob();
     const imgUrl=await upload(compBlob);
     const r=analysisResult;
-    const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,
+    const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,effort_min:effortMin,cleared_all:!!(sectionAt(userLat,userLng)&&document.getElementById('sec-all').checked),ai_model:r.ai_model||null,ai_version:r.ai_version||null,
       activity_id:activityFor(photoTakenAt||r.photo_taken_at),
       category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
@@ -3918,6 +4410,7 @@ async function send(){
     buildNavRecs();
     if(batch){ batch.saved++; batchSaveState(); toast(t('batch.saved',{i:batch.i+1,n:batch.items.length})); batchNext(); return; }
     document.getElementById('donev').classList.add('show');
+    setTimeout(()=>{ refreshMyChip(); celebrateIfNew(); },400);
   }catch(e){
     hideLoad();console.error(e);
     // 確認画面を出し直して、解析をやり直さずに「記録する」をもう一度押せるようにする
@@ -3937,7 +4430,7 @@ renderObSpecs();
 switchTab(authMode);
 // 画面（写真の拡大・メニュー・使い方・集計・活動・完了・確認）が開いている間は履歴を1つ積み、
 // 「戻る」でアプリから出ずに、いちばん上の画面を閉じる
-const OVERLAYS=[['compv',()=>closeComp()],['stepv',()=>closeSteps()],['tourv',()=>closeTour()],['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
+const OVERLAYS=[['chkv',()=>closeCheck()],['compv',()=>closeComp()],['mybv',()=>closeMyBeach()],['stepv',()=>closeSteps()],['tourv',()=>closeTour()],['repv',()=>closeReport()],['termsv',()=>closeTerms()],['photo-viewer',()=>closePhoto()],['galpop',()=>closeGalPop()],['galv',()=>closeGallery()],['wp-menu',()=>document.getElementById('wp-menu').classList.remove('show')],['guidev',()=>closeGuide()],
   ['sumv',()=>{ if(!reportMode) closeSummary(); }],['actv',()=>closeActivity()],['donev',()=>backToMap()],
   ['confv',()=>{ if(confirm(t('cf.discard'))){ if(!batchSkip()) document.getElementById('confv').classList.remove('show'); } }]];
 const isOpen=id=>{const e=document.getElementById(id);return !!e&&e.classList.contains('show');};
