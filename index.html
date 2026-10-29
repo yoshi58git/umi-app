@@ -2,6 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<!-- 安全のための宣言：読み込んでよい相手と、通信してよい相手だけを許す（万一、悪意のあるコードが紛れ込んでも、外へ情報を送れない） -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://imqgpzgpytwvfkgscezn.supabase.co; connect-src 'self' data: blob: https://imqgpzgpytwvfkgscezn.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>moto no umi（元の海）</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -210,6 +213,18 @@ body.touring .leaflet-popup{display:none}
 #sec-box.show{display:block}
 #sec-name{font-size:12px;color:#FFD27A;margin-bottom:6px}
 #sec-box label{font-size:13px;display:flex;gap:8px;align-items:center}
+#hand-box .hc-h{font-size:12px;color:#FFD27A;margin:12px 0 6px}
+#hand-box .hc-row{justify-content:space-between;margin:6px 0}
+#hand-box .hc-row input{width:96px;padding:7px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:15px;text-align:right}
+.sr-wrap{overflow-x:auto;margin:4px 0 6px}
+.sr-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.sr-tbl th,.sr-tbl td{padding:6px;text-align:right;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
+.sr-tbl th:first-child,.sr-tbl td:first-child{text-align:left}
+.sr-tbl th{font-weight:500;color:rgba(170,221,238,.85);vertical-align:bottom;white-space:normal}
+.sr-tbl small{color:rgba(255,255,255,.55);font-weight:400}
+.sr-tbl .sr-mark td{text-align:left;color:#FFD27A;font-size:11px}
+.sr-v{margin-top:8px;font-size:13px;line-height:1.7}
+.sr-v b.ms-good,.sr-v b.ms-bad{font-weight:600}
 .sec-chip{display:inline-flex;gap:6px;align-items:center;margin:4px 6px 0 0;padding:4px 8px;border-radius:10px;border:1px solid rgba(255,210,122,.4);font-size:11px}
 .sec-chip button{border:none;background:transparent;color:#FFB4A8;font-size:13px;cursor:pointer;padding:0}
 .wp-more{display:none}.wp-more.show{display:block}
@@ -900,14 +915,14 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
       <div class="wp-who"><span data-i18n="me.who">ログイン中：</span><b id="wp-who-name"></b></div>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openMyBeach()" data-i18n="mb.menu">マイ浜（ステップ1）</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGallery('mine')" data-i18n="gal.open">写真の一覧</button>
-      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTour()" data-i18n="tour.title">世界のごみの今</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSummary()" data-i18n="sum.open">集計</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openActivity()" data-i18n="act.open">活動・団体</button>
+      <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSteps()" data-i18n="st.menu">進め方と区間の結果</button>
       <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openGuide()" data-i18n="guide.open">使い方</button>
       <div class="wp-sep"></div>
       <button type="button" class="wp-item" style="color:rgba(255,255,255,.6)" onclick="document.getElementById('wp-more').classList.toggle('show')" data-i18n="menu.more">その他…</button>
       <div class="wp-more" id="wp-more">
-        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openSteps()" data-i18n="st.title">進め方</button>
+        <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTour()" data-i18n="tour.title">世界のごみの今</button>
         <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openCheck()" data-i18n="chk.title">動作チェック</button>
         <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');openTerms()" data-i18n="terms.open">利用規約とプライバシー</button>
         <button type="button" class="wp-item" onclick="document.getElementById('wp-menu').classList.remove('show');changePin()" data-i18n="pin.change">PINを変更</button>
@@ -990,7 +1005,7 @@ body.report-mode #app,body.report-mode #ob{display:none!important}
     </div>
   </div>
   <div id="pv-warn" role="alert"></div>
-  <div id="sec-box"><div id="sec-name"></div><label><input type="checkbox" id="sec-all"> <span data-i18n="sec.all">区間のごみを全部拾った（証拠の記録）</span></label><div class="eff-n" data-i18n="sec.allNote">主催者の方へ：区間の中の見えるごみを全部拾ったときだけ押してください。月ごとの「たまった量」として比べます</div></div>
+  <div id="sec-box"><div id="sec-name"></div><label><input type="checkbox" id="sec-all" onchange="renderHandBox()"> <span data-i18n="sec.all">区間のごみを全部拾った（証拠の記録）</span></label><div class="eff-n" data-i18n="sec.allNote">主催者の方へ：区間の中の見えるごみを全部拾ったときだけ押してください。月ごとの「たまった量」として比べます</div><div id="hand-box"></div></div>
   <div id="eff-box"><div class="eff-l" data-i18n="eff.q">今日、拾った時間</div><div class="eff-chips" id="eff-chips"></div><div class="eff-n" data-i18n="eff.note">毎回同じ区間を、同じくらいの時間で拾うと、前と後を正しく比べられます</div></div>
   <div id="conf-summary"></div>
   <button id="batch-stop" type="button" onclick="stopBatch()" data-i18n="batch.stop">まとめて記録をやめる</button>
@@ -1066,7 +1081,7 @@ ja:{
   'sec.askLabel':'区間の名前（固有名詞は使わず、場所の特徴で。例：区間A（駅からの道に近い））','sec.defLabel':'区間A（駅からの道に近い）',
   'sec.askRole':'区間の種類を数字で：1＝狙いの区間（取り組みの影響を受ける）、2＝比べる区間（影響を受けにくい）','sec.saved':'区間を作りました',
   'sec.here':'{l}（{r}）の記録です','sec.all':'区間のごみを全部拾った（証拠の記録）','sec.allNote':'主催者の方へ：区間の中の見えるごみを全部拾ったときだけ押してください。月ごとの「たまった量」として比べます',
-  'ms.askTarget':'この取り組みが狙うごみ（例：たばこの吸い殻、PETボトル）。比べるときは、このごみの新しいものの量を見ます',
+  'ms.askTarget':'この取り組みが狙うごみ（例：たばこの吸い殻、PETボトル）。比べるときは、区間にたまったこのごみの量を見ます',
   'chk.title':'動作チェック','chk.running':'確かめています...','chk.app':'アプリ（この画面）','chk.ver':'版 {v}','chk.old':'古い版です（{v}）',
   'chk.api':'サーバー（umi-api）','chk.apiNg':'つながりません。まだ新しくなっていないか、デプロイに失敗しています',
   'chk.db':'データベース','chk.dbOk':'必要な{n}項目がそろっています','chk.dbNg':'{n}項目が足りません：{items}',
@@ -1118,7 +1133,31 @@ ja:{
   'st.lead':'条件を満たすまで、次へ進みません。最初の一歩で挫折しないことが、いちばん大事です。',
   'st0.t':'道具を確かめる','st0.c':'AIの数え方を、人の答え合わせと比べて、十分に一致している',
   'st0.open':'答え合わせの表を書き出す（集計から）','st0.done':'一致を確かめた',
-  'st1.t':'1か所で証明する','st1.c':'同じ浜を同じやり方で測り、陸側の取り組みの後、15分あたりの陸由来ごみが続けて減っている',
+  'hc.h':'手で数えた数（この回の区間の合計）','hc.note':'狙ったごみと比べるごみは、AIではなく人が数えます。1回の合計を1枚の記録にだけ入れてください。1つもなければ 0',
+  'hc.later':'あとからでも、記録を開いて入れられます','hc.pop':'手で数えた数','hc.edit':'手で数えた数を入れる',
+  'hc.ask':'{i}を手で数えた数（この回の区間の合計。空欄なら入れない）','hc.saved':'手で数えた数を記録しました','hc.bad':'0以上の整数で入れてください',
+  'ms.askCompare':'比べるごみ（狙ったごみと似ているが、この取り組みの影響を受けにくいもの）。例：吸い殻に対してペットボトルのキャップ',
+  'ms.askStage':'管理を始めた段階を番号で：1＝作る　2＝売る　3＝使う　4＝捨てる　5＝回収する',
+  'ms.askManager':'この管理をする人を、名前ではなく役割で（例：自社の総務、駐車場の管理者）',
+  'stage.make':'作る','stage.sell':'売る','stage.use':'使う','stage.discard':'捨てる','stage.collect':'回収する',
+  'ms.stage':'{s}段階','ms.manager':'管理する人：{m}',
+  'sr.h':'区間の結果','sr.lead':'狙ったごみ（{t}）と比べるごみ（{c}）が、区間に1か月あたりどれだけたまったか。区間を全部拾った回だけで比べます',
+  'sr.none':'区間の記録はまだありません。区間を作り、区間のごみを全部拾った回に「証拠の記録」を押して記録してください',
+  'sr.month':'月','sr.noMs':'取り組み（管理の変化）を記録すると、前と後を比べられます',
+  'sr.wait':'まだ判定できません：取り組みの前 {b}/3か月、後 {a}/4か月そろったら判定します',
+  'sr.change':'{s}の{i}：{b} → {a}（{r}）',
+  'sr.good':'狙いの区間の狙ったごみだけが、はっきり減りました。取り組みの効果の可能性が高いです',
+  'sr.unclear':'はっきりした差は見えません。測り方を変えずに続けるか、管理の中身を見直してください',
+  'sr.needCmp':'比べる区間か比べるごみの記録がないため、効果かどうかは判定できません',
+  'sr.src':'手で数えた回 {h}・AIの数の回 {a}。最初の回と、前の回から45日より空いた回は、たまった期間が分からないので比べません',
+  'sr.effort':'区間の記録にかけた時間：合計 {h}時間{m}分（{n}回）','sr.img':'報告用の1枚を作る',
+  'ag.goal':'手で数えた記録10件以上で、AIの数が8割以上一致（差が2割以内）','ag.now':'いま{n}件・一致 {r}%',
+  'ag.item':'{i}：{n}件・一致 {r}%（AIは手の数の{p}%）','ag.note':'一致しないごみは、AIではなく人が数えます。それも答え合わせの大事な結果です',
+  'rpi.title':'管理を1つ変えた結果','rpi.since':'{d}から','rpi.wait':'判定まで','rpi.waitN':'前 {b}/3・後 {a}/4か月',
+  'rpi.noMs':'取り組みはまだ記録されていません','rpi.perM':'1か月あたりにたまった数（{i}）',
+  'rpi.foot':'区間のごみを全部拾った回だけで比べています。最初の回は比べません',
+  'st.menu':'進め方と区間の結果',
+  'st1.t':'1か所で証明する','st1.c':'区間を全部拾う記録で、管理を変える前3か月・後4か月をそろえ、狙いの区間の狙ったごみだけがはっきり減っている',
   'st2.t':'担当に組み込む','st2.c':'その場所の管理者が、担当・予算・手順として文書にしている',
   'st3.t':'ほかの場所で再現する','st3.c':'3〜5か所・団体で、同じ測り方で、同じように減っている',
   'st4.t':'地域の制度に入る','st4.c':'都道府県や市町村の計画・協議会・施策の中で、この指標が使われている',
@@ -1147,7 +1186,7 @@ ja:{
   'gy.note':'範囲はおおよその目安です（NOAAなどの資料による）。ごみは島のように固まっているのではなく、細かくなって広く散らばり、季節や年で動きます。もとは陸から出たごみです',
   'gy.hint':'オレンジの範囲は、世界でごみが集まる海域の目安です。もう一度押すと元の場所に戻ります',
   'h.purpose':'このアプリの目的','h.promise':'大切な約束',
-  'axis.t':'便利は設計してきた。|次は、管理を設計する','axis.d':'海のごみは、|陸でしか|止められない。|リスクを知り、|社会全体で|陸側から|管理に|取り組むための|アプリです',
+  'axis.t':'便利は設計してきた。|次は、管理を設計する','axis.d':'海のごみは、|陸でしか|止められない。|作る、|使う、|捨てる。|それぞれに、|管理する人と|仕組みを|つくるための|アプリです',
   'p1.t':'海のごみ：|リスクを知る','p1.d':'すでに|海に出た、|または|出る寸前の|ごみ。|その実態を|記録します',
   'p2.t':'海に出る前：|陸の出どころを示す','p2.d':'川・街・自然地の|ごみ。|誰かを責めるためではなく、|陸のどこから来るかを|知り、|共有します',
   's1.t':'写真の|位置情報だけを|使います','s1.d':'スマホの現在地にはアクセスしません。位置情報オンで撮った写真を選んでください',
@@ -1327,7 +1366,7 @@ en:{
   'sec.askLabel':'Section name (no proper nouns; describe the place, e.g. Section A (near the path from the station))','sec.defLabel':'Section A (near the path from the station)',
   'sec.askRole':'Section type as a number: 1 = target section (affected by the action), 2 = comparison section (less affected)','sec.saved':'Section created',
   'sec.here':'Record in {l} ({r})','sec.all':'Picked up all litter in the section (evidence record)','sec.allNote':'Organizers: tick only when you picked up all visible litter in the section. It is compared as monthly accumulation',
-  'ms.askTarget':'Litter this action targets (e.g. cigarette butts, PET bottles). Comparisons look at new items of this kind',
+  'ms.askTarget':'Litter this action targets (e.g. cigarette butts, PET bottles). Comparisons look at how much of it builds up in the section',
   'chk.title':'System check','chk.running':'Checking...','chk.app':'App (this screen)','chk.ver':'version {v}','chk.old':'Old version ({v})',
   'chk.api':'Server (umi-api)','chk.apiNg':'Cannot connect. Not updated yet, or the deployment failed',
   'chk.db':'Database','chk.dbOk':'All {n} required items are present','chk.dbNg':'{n} items missing: {items}',
@@ -1379,7 +1418,31 @@ en:{
   'st.lead':'We do not move on until the condition is met. Not giving up at the first step matters most.',
   'st0.t':'Verify the tool','st0.c':'AI counts agree well enough with people\u2019s answer checks',
   'st0.open':'Export the answer-check sheet (from Summary)','st0.done':'Agreement verified',
-  'st1.t':'Prove it in one place','st1.c':'Measuring the same beach the same way, land-based litter per 15 min keeps falling after a land-side action',
+  'hc.h':'Hand count (total for this visit to the section)','hc.note':'Target and comparison litter are counted by people, not AI. Enter the visit total on one record only. Enter 0 if none',
+  'hc.later':'You can also add it later by opening the record','hc.pop':'Hand count','hc.edit':'Enter hand count',
+  'hc.ask':'Hand count of {i} (visit total for the section; leave blank to skip)','hc.saved':'Hand count saved','hc.bad':'Please enter a whole number of 0 or more',
+  'ms.askCompare':'Comparison litter (similar to the target but unlikely to be affected by this action), e.g. bottle caps for cigarette butts',
+  'ms.askStage':'Stage where management started, as a number: 1 = make  2 = sell  3 = use  4 = discard  5 = collect',
+  'ms.askManager':'Who manages this, by role rather than name (e.g. our general affairs team, the car park manager)',
+  'stage.make':'Make','stage.sell':'Sell','stage.use':'Use','stage.discard':'Discard','stage.collect':'Collect',
+  'ms.stage':'{s} stage','ms.manager':'Managed by: {m}',
+  'sr.h':'Section results','sr.lead':'How much target litter ({t}) and comparison litter ({c}) builds up in the section per month. Only visits where all litter in the section was picked up are compared',
+  'sr.none':'No section records yet. Create a section, and tick “evidence record” on visits where you pick up all litter in it',
+  'sr.month':'Month','sr.noMs':'Record an action (a change in management) to compare before and after',
+  'sr.wait':'Too early to judge: {b}/3 months before and {a}/4 months after the action so far',
+  'sr.change':'{i} in {s}: {b} → {a} ({r})',
+  'sr.good':'Only the target litter in the target section fell clearly. The action is likely working',
+  'sr.unclear':'No clear difference yet. Keep measuring the same way, or review what is being managed',
+  'sr.needCmp':'Without a comparison section or comparison litter, we cannot tell whether the action caused it',
+  'sr.src':'Hand-counted visits {h} · AI-counted visits {a}. The first visit, and visits more than 45 days after the previous one, are not compared because the build-up period is unknown',
+  'sr.effort':'Time spent on section records: {h} h {m} min in total ({n} visits)','sr.img':'Make a one-page report',
+  'ag.goal':'10+ hand-counted records, with AI within 20% of the hand count 80%+ of the time','ag.now':'{n} so far \u00b7 {r}% match',
+  'ag.item':'{i}: {n} records \u00b7 {r}% match (AI counted {p}% of the hand count)','ag.note':'Litter where AI does not agree is counted by people. That is also an important result',
+  'rpi.title':'What changed when we managed one thing','rpi.since':'from {d}','rpi.wait':'Until we can judge','rpi.waitN':'before {b}/3 · after {a}/4 months',
+  'rpi.noMs':'No action recorded yet','rpi.perM':'Build-up per month ({i})',
+  'rpi.foot':'Only visits where all litter in the section was picked up are compared. The first visit is not compared',
+  'st.menu':'Approach and section results',
+  'st1.t':'Prove it in one place','st1.c':'With full-pickup section records for 3 months before and 4 months after a change in management, only the target litter in the target section falls clearly',
   'st2.t':'Build it into responsibilities','st2.c':'The place\u2019s manager documents it as a role, budget and procedure',
   'st3.t':'Reproduce elsewhere','st3.c':'3\u20135 places or groups see the same decrease with the same method',
   'st4.t':'Into regional policy','st4.c':'The indicator is used in prefectural or municipal plans, councils or measures',
@@ -1408,7 +1471,7 @@ en:{
   'gy.note':'Ranges are approximate (based on NOAA and other sources). Litter is not a solid island; it breaks into small pieces, spreads widely, and moves with seasons and years. It originally came from land',
   'gy.hint':'Orange areas show roughly where litter gathers in the world\u2019s oceans. Tap again to return',
   'h.purpose':'Why this app','h.promise':'Our promises',
-  'axis.t':'We designed convenience. Now, design what comes after','axis.d':'Ocean litter can only be stopped on land. Know the risk, and manage it from the land side, together as a society',
+  'axis.t':'We designed convenience. Now, design what comes after','axis.d':'Ocean litter can only be stopped on land. Make, use, discard: this app helps give each stage someone who manages it, and a system that runs',
   'p1.t':'At sea: know the risk','p1.d':'Litter already in the sea or about to enter it. We record what is really there',
   'p2.t':'Before the sea: show land sources','p2.d':'Litter in rivers, towns and nature. Not to blame anyone, but to learn and share where on land it comes from',
   's1.t':'Only photo location is used','s1.d':'The app never accesses your phone\u2019s current location. Choose photos taken with location on',
@@ -1557,7 +1620,7 @@ const VALUE_EN={
   'ニックネームを入力してください':'Please enter a nickname','PINは4桁の数字です':'PIN must be 4 digits','このニックネームはすでに使われています':'This nickname is already taken',
   'ニックネームまたはPINが違います':'Wrong nickname or PIN','コードが見つかりません':'Code not found','PINは6桁の数字です':'PIN must be 6 digits','今のPINが違います':'Your current PIN is incorrect','しばらくしてからもう一度お試しください':'Please try again later',
   '写真が大きすぎるか、空です':'The photo is too large or empty','JPEG形式の写真ではありません':'The photo is not a JPEG','写真を読み込めませんでした':'Could not read the photo','この団体のメンバーではありません':'You are not a member of this team',
-  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','区間の名前を入力してください':'Please enter a section name','区間が見つかりません':'Section not found','位置が正しくありません':'Invalid position','合言葉が違います':'Wrong passphrase','ADMIN_KEY が設定されていません':'ADMIN_KEY is not set','記録が見つかりません':'Record not found','自分の記録は報告できません':'You cannot report your own record','本日の新規登録の上限に達しました。明日もう一度お試しください':'The sign-up limit for today has been reached. Please try again tomorrow','本日の解析の上限に達しました。明日もう一度お試しください':'You have reached today\u2019s analysis limit. Please try again tomorrow','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
+  'この活動を変更する権限がありません':'You cannot change this activity','活動名を入力してください':'Please enter an activity name','団体名を入力してください':'Please enter a team name','活動が見つかりません':'Activity not found','区間の名前を入力してください':'Please enter a section name','区間の中の記録ではありません':'This record is not inside a section','区間が見つかりません':'Section not found','位置が正しくありません':'Invalid position','合言葉が違います':'Wrong passphrase','ADMIN_KEY が設定されていません':'ADMIN_KEY is not set','記録が見つかりません':'Record not found','自分の記録は報告できません':'You cannot report your own record','本日の新規登録の上限に達しました。明日もう一度お試しください':'The sign-up limit for today has been reached. Please try again tomorrow','本日の解析の上限に達しました。明日もう一度お試しください':'You have reached today\u2019s analysis limit. Please try again tomorrow','団体が見つかりません':'Team not found','取り組みの内容を入力してください':'Please enter the action','日付の形式が正しくありません':'Invalid date format','ログインが必要です':'Please log in','サーバーでエラーが発生しました':'A server error occurred','位置情報がありません':'No location data'
 };
 let LANG=(()=>{try{const v=localStorage.getItem('umi_lang');if(v==='ja'||v==='en')return v;}catch(e){}
   return (navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';})();
@@ -2044,7 +2107,7 @@ function renderSummary(){
     '</div>'+
     '<div class="sum-sec"><div class="sum-h">'+t('sum.bySide')+'</div><div class="sum-side">'+side(t('sum.sideSea'),a.seaSide)+side(t('sum.sideLand'),a.landSide)+'</div></div>'+
     areaHtml(recs)+
-    trendHtml(recs)+measuresHtml(recs)+
+    trendHtml(recs)+measuresHtml(recs)+(sumScope&&sumScope.type==='org'?sectionResultsHtml(sumScope.sr,sumScope.measures):'')+
     '<div class="sum-sec"><div class="sum-h">'+t('sum.top')+'</div><div class="cnt-list">'+top.map(([name,v])=>'<div class="cnt-row"><span class="cnt-dot" style="background:'+(ORIGIN_COL[v.origin]||ORIGIN_COL['判別できない'])+'"></span><span class="cnt-name">'+esc(itemLabel(name,v.en))+'</span><span class="cnt-n">×'+v.n+'</span></div>').join('')+'</div></div>'+
     '<div class="sum-note">'+
       (a.overseas?t('sum.overseas',{n:a.overseas})+'<br>':'')+
@@ -2052,7 +2115,7 @@ function renderSummary(){
       (a.noCount?t('sum.noCount',{n:a.noCount})+'<br>':'')+
       t('sum.method')+
     '</div>'+
-    '<div class="sum-acts">'+(sumScope?'<button class="sum-act main" onclick="shareReportLink()">'+t('rp.shareLink')+'</button>':'')+'<button class="sum-act'+(sumScope?'':' main')+'" onclick="shareSummaryImage()">'+t('sum.shareImg')+'</button><button class="sum-act" onclick="exportCheckCsv()">'+t('sum.exportCsv')+'</button><button class="sum-act" onclick="exportIccCsv()">'+t('sum.exportIcc')+'</button></div>'+
+    '<div class="sum-acts">'+(sumScope?'<button class="sum-act main" onclick="shareReportLink()">'+t('rp.shareLink')+'</button>':'')+(sumScope&&sumScope.type==='org'&&sumScope.sr&&(sumScope.sr.rows||[]).length?'<button class="sum-act" onclick="makeReportImage(sumScope.sr,sumScope.measures,sumScope.orgName)">'+t('sr.img')+'</button>':'')+'<button class="sum-act'+(sumScope?'':' main')+'" onclick="shareSummaryImage()">'+t('sum.shareImg')+'</button><button class="sum-act" onclick="exportCheckCsv()">'+t('sum.exportCsv')+'</button><button class="sum-act" onclick="exportIccCsv()">'+t('sum.exportIcc')+'</button></div>'+
     '<div class="sum-axis">'+t('axis.t')+'</div>';
 }
 
@@ -2372,10 +2435,16 @@ async function addMeasure(orgId,preset){
   const day=prompt(t('ms.askDate'),today); if(!day) return;
   const guess=(TARGET_GUESS.find(([re])=>re.test(title))||[])[1]||'';
   const target=prompt(t('ms.askTarget'),guess); if(target===null) return;
+  const T=canonName(target.trim());
+  const cmp=prompt(t('ms.askCompare'),COMPARE_GUESS[T]||''); if(cmp===null) return;
+  const st=prompt(t('ms.askStage'),'4'); if(st===null) return;
+  const manager=prompt(t('ms.askManager'),''); if(manager===null) return;
   const sec=mySections.find(x=>x.org_id===orgId&&x.role==='target');
-  const res=await api('measure_create',{org_id:orgId,title,started_on:day,target_item:canonName(target.trim()),section_id:sec?sec.id:null});
+  const res=await api('measure_create',{org_id:orgId,title,started_on:day,target_item:T,compare_item:cmp.trim()?canonName(cmp.trim()):null,
+    stage:STAGE_KEYS[Number(String(st).replace(/[^0-9]/g,''))-1]||null,manager:manager.trim(),section_id:sec?sec.id:null});
   if(res.error){alert(tv(res.error));return;}
   toast(t('ms.saved'));
+  orgMeasures[orgId]=(orgMeasures[orgId]||[]).concat(res.measure?[res.measure]:[]);
   stepOrg=orgId;
 }
 async function createOrg(){
@@ -2395,7 +2464,8 @@ let sumScope=null;
 async function loadScope(type,id){
   if(type==='org'){
     const r=await api('org_info',{id}); if(r.error) return null;
-    return {type,id,ids:r.activities.map(a=>a.id),acts:r.activities,measures:r.measures||[],orgName:r.org.name};
+    const sr=await api('section_results',{org_id:id});
+    return {type,id,ids:r.activities.map(a=>a.id),acts:r.activities,measures:r.measures||[],orgName:r.org.name,sr:sr.error?null:sr};
   }
   const r=await api('activity_info',{ids:[id]}); if(r.error||!r.activities.length) return null;
   return {type,id,ids:[id],acts:r.activities,measures:[],orgName:r.activities[0].org_name||''};
@@ -2508,7 +2578,7 @@ function measuresHtml(recs){
     if(b==null) res=t('ms.noBefore');
     else if(a==null) res=t('ms.noAfter');
     else { const r=b?Math.round((a-b)/b*100):0; res=fmt(b)+' → '+fmt(a)+'<b class="'+(r<0?'ms-good':'ms-bad')+'">（'+(r>0?'+':'')+r+'%）</b>'; }
-    return '<div class="ms-row"><div class="ms-t">'+esc(m.title)+'</div><div class="ms-d">'+t('ms.since',{d:esc(d)})+(m.note?' ・ '+esc(m.note):'')+'</div><div class="ms-v">'+t('ms.beforeAfter')+'：'+res+'</div></div>';
+    return '<div class="ms-row"><div class="ms-t">'+esc(m.title)+'</div><div class="ms-d">'+t('ms.since',{d:esc(d)})+(msWhoText(m)?' ・ '+esc(msWhoText(m)):'')+(m.note?' ・ '+esc(m.note):'')+'</div><div class="ms-v">'+t('ms.beforeAfter')+'：'+res+'</div></div>';
   }).join('');
   return '<div class="sum-sec"><div class="sum-h">'+t('ms.title')+'</div>'+rows+'<div class="sum-note" style="margin-top:6px">'+t(usePeople?'ms.note':'ms.noteShare')+'</div></div>';
 }
@@ -2766,6 +2836,7 @@ async function openSteps(){
   const orgs=(actMine.orgs||[]);
   if(!stepOrg||!orgs.some(o=>o.id===stepOrg)) stepOrg=orgs[0]?orgs[0].id:null;
   stepData=stepOrg?await api('org_info',{id:stepOrg}):null;
+  stepSR=stepOrg?await api('section_results',{org_id:stepOrg}):null;
   renderSteps();
 }
 function closeSteps(){ document.getElementById('stepv').classList.remove('show'); }
@@ -2797,8 +2868,8 @@ function renderSteps(){
   let h='<div class="st-lead"><div class="st-lead-t">'+t('way.t')+'</div><div class="st-lead-d">'+t('st.lead')+'</div></div>';
   if(orgs.length>1) h+='<div class="act-form" style="margin-bottom:10px"><label for="st-org">'+t('act.org')+'</label><select id="st-org" onchange="stepOrg=this.value;openSteps()">'+orgs.map(o=>'<option value="'+o.id+'"'+(o.id===stepOrg?' selected':'')+'>'+esc(aiText(o.name))+'</option>').join('')+'</select></div>';
   const checks=stepOrg&&stepData&&!stepData.error?step1Checks(stepData):null;
-  const vs=verifyStats();
-  const s0=vs.done||(()=>{try{return localStorage.getItem('mn_stage0_'+(stepOrg||'me'))==='1';}catch(e){return false;}})();
+  const vs=verifyStats(), ag=handAgreement(stepSR);
+  const s0=vs.done||ag.done||(()=>{try{return localStorage.getItem('mn_stage0_'+(stepOrg||'me'))==='1';}catch(e){return false;}})();
   const s1=myGoals().goals.find(x=>x.k==='g6').ok;
   const now=!s0?0:(!s1?1:2);
   STAGES.forEach((k,i)=>{
@@ -2806,14 +2877,18 @@ function renderSteps(){
     const cls=i<now?'done':(i===now?'now':'');
     h+='<div class="st-stage '+cls+'"><div class="st-n">'+(i<now?'✓':i)+'</div><div style="flex:1;min-width:0"><div class="st-t">'+t(k+'.t')+(i===now?'<span class="st-now-tag">'+t('st.now')+'</span>':'')+'</div><div class="st-c">'+t('st.cond')+'：'+t(k+'.c')+'</div>';
     if(i===0){
-      h+='<div class="st-check"><div class="st-item '+(vs.done?'ok':'ng')+'"><span class="mk">'+(vs.done?'✓':'・')+'</span><span>'+t('vf.goal')+'<small>'+t('vf.now',{n:vs.n,r:vs.rate})+'</small></span></div></div>';
+      h+='<div class="st-check"><div class="st-item '+(vs.done?'ok':'ng')+'"><span class="mk">'+(vs.done?'✓':'・')+'</span><span>'+t('vf.goal')+'<small>'+t('vf.now',{n:vs.n,r:vs.rate})+'</small></span></div>'+
+         '<div class="st-item '+(ag.done?'ok':'ng')+'"><span class="mk">'+(ag.done?'✓':'・')+'</span><span>'+t('ag.goal')+'<small>'+t('ag.now',{n:ag.n,r:ag.rate})+
+         ag.items.map(x=>'<br>'+t('ag.item',{i:esc(itemLabel(x.k)),n:x.n,r:x.rate,p:x.ratio==null?'—':x.ratio})).join('')+(ag.n?'<br>'+t('ag.note'):'')+'</small></span></div></div>';
       h+='<div class="act-btns"><button class="act-btn" onclick="closeSteps();openSummary()">'+t('st0.open')+'</button><label class="act-btn" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" '+(s0?'checked':'')+' onchange="try{localStorage.setItem(\'mn_stage0_'+(stepOrg||'me')+'\',this.checked?\'1\':\'0\')}catch(e){};renderSteps()">'+t('st0.done')+'</label></div>';
     }
     if(i===1){
       const G=myGoals(), done=G.goals.filter(x=>x.ok).length;
       h+='<div class="st-next">'+t('st1.my',{n:done})+(G.next?'<br><b>'+t('mb.nextK')+'</b>：'+t('mb.'+G.next.k+'.t'):'')+'</div>'+
          '<div class="act-btns"><button class="act-btn main" onclick="closeSteps();openMyBeach()">'+t('mb.open')+'</button></div>'+
-         '<div class="st-c" style="margin-top:6px">'+t('st1.team')+'</div>';
+         '<div class="st-c" style="margin-top:6px">'+t('st1.team')+'</div>'+
+         (stepSR&&!stepSR.error?sectionResultsHtml(stepSR,stepData&&stepData.measures):'')+
+         (stepSR&&(stepSR.rows||[]).length?'<div class="act-btns"><button class="act-btn" onclick="makeReportImage(stepSR,stepData&&stepData.measures,stepData&&stepData.org?stepData.org.name:\'\')">'+t('sr.img')+'</button></div>':'');
     }
     h+='</div></div>';
   });
@@ -2935,7 +3010,7 @@ async function loadSections(){
   if(!sessionToken) return;
   if(!actMine||!(actMine.orgs||[]).length){ const m=await api('mine'); if(!m.error) actMine=m; }
   const out=[];
-  for(const o of (actMine.orgs||[])){ const r=await api('org_info',{id:o.id}); if(!r.error) (r.sections||[]).forEach(x=>out.push({...x,org_id:o.id})); }
+  for(const o of (actMine.orgs||[])){ const r=await api('org_info',{id:o.id}); if(!r.error){ (r.sections||[]).forEach(x=>out.push({...x,org_id:o.id})); orgMeasures[o.id]=r.measures||[]; } }
   mySections=out; drawSections();
 }
 function drawSections(){
@@ -2972,6 +3047,222 @@ async function deleteSection(id){
 }
 // 取り組みの言葉から、狙うごみの標準の名前を推しはかる（候補として入れておくだけ。本人が直せる）
 const TARGET_GUESS=[[/吸い殻|たばこ|喫煙/,'たばこの吸い殻'],[/キャップ/,'ペットボトルのキャップ'],[/ペット|PET|飲み物|飲料|自販機|自動販売機/,'PETボトル'],[/缶/,'飲料缶'],[/瓶/,'ガラス瓶'],[/包装|袋菓子|お菓子/,'食品の包装・袋'],[/容器|トレー|弁当/,'食品容器・トレー'],[/レジ袋|袋/,'レジ袋'],[/花火/,'花火'],[/風船/,'風船']];
+
+// ── 来季の計画：手で数えた数・区間の結果・答え合わせ・報告用の1枚 ──
+// 軸：作る、使う、捨てる。それぞれに、管理する人と仕組みを。
+const STAGE_KEYS=['make','sell','use','discard','collect'];
+// 比べるごみの候補：狙ったごみと似ているが、同じ取り組みの影響を受けにくいもの
+const COMPARE_GUESS={'たばこの吸い殻':'ペットボトルのキャップ','PETボトル':'飲料缶','飲料缶':'PETボトル','ペットボトルのキャップ':'たばこの吸い殻','レジ袋':'食品の包装・袋','食品の包装・袋':'レジ袋','食品容器・トレー':'食品の包装・袋','プラスチックカップ':'食品容器・トレー','ストロー':'ペットボトルのキャップ'};
+const DEF_TARGET='たばこの吸い殻';
+let orgMeasures={}, stepSR=null;
+function msWhoText(m){
+  if(!m) return '';
+  return [m.stage&&STAGE_KEYS.includes(m.stage)?t('ms.stage',{s:t('stage.'+m.stage)}):'', m.manager?t('ms.manager',{m:aiText(m.manager)}):''].filter(Boolean).join(LANG==='en'?' · ':' ・ ');
+}
+// いちばん新しい「狙うごみ」のある取り組み
+function mainMeasure(ms){
+  const l=(ms||[]).filter(m=>m&&m.target_item).sort((a,b)=>String(b.started_on).localeCompare(String(a.started_on)));
+  return l[0]||null;
+}
+function itemPair(ms){
+  const m=mainMeasure(ms), T=(m&&m.target_item)||DEF_TARGET;
+  let C=(m&&m.compare_item)||COMPARE_GUESS[T]||'ペットボトルのキャップ'; if(C===T) C=T===DEF_TARGET?'ペットボトルのキャップ':DEF_TARGET;
+  return [T,C];
+}
+// 確認画面：区間を全部拾ったときだけ、狙ったごみと比べるごみの「手で数えた数」を入れる
+function renderHandBox(){
+  const box=document.getElementById('hand-box'); if(!box) return;
+  const sec=sectionAt(userLat,userLng), on=!!sec&&document.getElementById('sec-all').checked;
+  const keep={}; box.querySelectorAll('input[data-item]').forEach(i=>{ keep[i.dataset.item]=i.value; });
+  if(!on){ box.innerHTML=''; return; }
+  const items=itemPair(orgMeasures[sec.org_id]);
+  box.innerHTML='<div class="hc-h">'+t('hc.h')+'</div>'+items.map(n=>'<label class="hc-row"><span>'+esc(itemLabel(n))+'</span><input type="number" inputmode="numeric" min="0" max="99999" step="1" data-item="'+esc(n)+'" value="'+esc(keep[n]||'')+'" placeholder="—" aria-label="'+esc(itemLabel(n))+'"></label>').join('')+
+    '<div class="eff-n">'+t('hc.note')+'<br>'+t('hc.later')+'</div>';
+}
+function readHand(){
+  const out={}; let any=false;
+  document.querySelectorAll('#hand-box input[data-item]').forEach(i=>{ const v=String(i.value).trim(); if(!/^\d+$/.test(v)) return; out[i.dataset.item]=Number(v); any=true; });
+  return any?out:null;
+}
+function clearHand(){ document.querySelectorAll('#hand-box input[data-item]').forEach(i=>{ i.value=''; }); }
+// 記録の詳細：手で数えた数を見せ、あとから入れられるようにする
+function handPopHtml(r){
+  const h=r.hand_counts&&typeof r.hand_counts==='object'?r.hand_counts:null;
+  const txt=h&&Object.keys(h).length?Object.entries(h).map(([k,v])=>esc(itemLabel(k))+' '+esc(v)).join(LANG==='en'?' · ':' ・ '):'—';
+  return '<div class="vf-row">'+t('hc.pop')+'：<b>'+txt+'</b><br><button type="button" class="umi-pop-report" style="color:#FFD27A;margin-top:4px" onclick="editHand(\''+esc(r.id)+'\')">'+t('hc.edit')+'</button></div>';
+}
+async function editHand(id){
+  const r=(window.allRecords||[]).find(x=>String(x.id)===String(id)); if(!r) return;
+  const sec=mySections.find(x=>x.id===r.section_id);
+  const items=itemPair(sec?orgMeasures[sec.org_id]:null), cur=r.hand_counts||{};
+  Object.keys(cur).forEach(k=>{ if(!items.includes(k)) items.push(k); });
+  const out={};
+  for(const n of items.slice(0,4)){
+    let v=prompt(t('hc.ask',{i:itemLabel(n)}),cur[n]!=null?String(cur[n]):''); if(v===null) return;
+    v=v.trim(); if(v==='') continue;
+    if(!/^\d+$/.test(v)){ alert(t('hc.bad')); return; }
+    out[n]=Number(v);
+  }
+  const res=await api('hand_counts_set',{id,hand_counts:out}); if(res.error){ alert(tv(res.error)); return; }
+  r.hand_counts=res.record.hand_counts; r.cleared_all=res.record.cleared_all;
+  toast(t('hc.saved'));
+}
+
+// 区間の結果：手で数えた数があればそれを、なければAIの数を使う。1回の訪問（区間×日）ごとにまとめる
+function srVisits(data,items){
+  const by=new Map();
+  (data&&data.rows||[]).forEach(r=>{ if(!r.day) return; const k=r.section_id+'|'+r.day; if(!by.has(k)) by.set(k,{sec:r.section_id,day:r.day,rows:[],min:0}); const v=by.get(k); v.rows.push(r); v.min+=Number(r.effort_min)||0; });
+  const out=[...by.values()].sort((a,b)=>a.day.localeCompare(b.day));
+  out.forEach(v=>{ v.val={}; v.src={};
+    items.forEach(n=>{
+      const hand=v.rows.filter(r=>r.hand&&r.hand[n]!=null);
+      if(hand.length){ v.val[n]=hand.reduce((s_,r)=>s_+(Number(r.hand[n])||0),0); v.src[n]='hand'; }
+      else { v.val[n]=v.rows.reduce((s_,r)=>s_+(r.ai||[]).filter(x=>canonName(x.name)===n).reduce((a,x)=>a+(Number(x.count)||0),0),0); v.src[n]='ai'; }
+    });
+  });
+  // たまる速さ：前の回からの日数で割る（区間の最初の回と、45日より空いた回は、たまった期間が分からないので使わない）
+  const last={};
+  out.forEach(v=>{ const p=last[v.sec]; v.days=p?Math.round((Date.parse(v.day)-Date.parse(p))/864e5):null; v.ok=v.days!=null&&v.days>0&&v.days<=45; last[v.sec]=v.day; });
+  return out;
+}
+function srMonths(visits,secId,item){ // 月ごとの「1か月（30日）あたりにたまった数」
+  const m=new Map();
+  visits.filter(v=>v.sec===secId&&v.ok).forEach(v=>{ const k=v.day.slice(0,7); if(!m.has(k)) m.set(k,{n:0,d:0}); const g=m.get(k); g.n+=v.val[item]; g.d+=v.days; });
+  const out={}; m.forEach((g,k)=>{ out[k]=g.d?g.n/g.d*30:null; }); return out;
+}
+function sectionAnalysis(data,measures){
+  const secs=data&&data.sections||[]; if(!secs.length||!(data.rows||[]).length) return null;
+  const m=mainMeasure(measures), [T,C]=itemPair(measures);
+  const visits=srVisits(data,[T,C]);
+  const tgt=secs.find(x=>m&&m.section_id===x.id)||secs.find(x=>x.role==='target')||secs[0];
+  const ref=secs.find(x=>x.role==='reference'&&x.id!==tgt.id)||null;
+  const series={tT:srMonths(visits,tgt.id,T),tC:srMonths(visits,tgt.id,C),rT:ref?srMonths(visits,ref.id,T):{}};
+  const months=[...new Set([...Object.keys(series.tT),...Object.keys(series.rT)])].sort();
+  const R={m,T,C,tgt,ref,visits,series,months};
+  if(m){
+    const d=String(m.started_on).slice(0,7);
+    const avg=(obj,pred)=>{ const v=Object.entries(obj).filter(([k,x])=>pred(k)&&x!=null).map(([,x])=>x); return {v:v.length?v.reduce((a,b)=>a+b,0)/v.length:null,n:v.length}; };
+    const B=k=>k<d, A=k=>k>d;  // 管理を変えた月は、前にも後にも入れない
+    R.b=avg(series.tT,B); R.a=avg(series.tT,A); R.rb=avg(series.rT,B); R.ra=avg(series.rT,A); R.cb=avg(series.tC,B); R.ca=avg(series.tC,A);
+    R.ready=R.b.n>=3&&R.a.n>=4;
+    const ch=(b,a)=>b.v!=null&&a.v!=null&&b.v>0?Math.round((a.v-b.v)/b.v*100):null;
+    R.dT=ch(R.b,R.a); R.dR=ch(R.rb,R.ra); R.dC=ch(R.cb,R.ca);
+    const others=[R.dR,R.dC].filter(x=>x!=null);
+    R.noCmp=!others.length;
+    // 「減った」と言うのは：狙いの区間の狙ったごみが2割以上減り、比べる相手より20ポイント以上大きく減ったとき
+    R.good=R.ready&&R.dT!=null&&!R.noCmp&&R.dT<=-20&&R.dT-Math.max(...others)<=-20;
+  }
+  R.handN=visits.filter(v=>v.ok&&v.src[T]==='hand').length; R.aiN=visits.filter(v=>v.ok&&v.src[T]==='ai').length;
+  R.min=visits.reduce((a,v)=>a+v.min,0); R.nVisits=visits.length;
+  return R;
+}
+const srFmt=v=>v==null?'—':(v<10?v.toFixed(1):String(Math.round(v)));
+const srPct=r=>r==null?'—':(r>0?'+':'')+r+'%';
+function sectionResultsHtml(data,measures){
+  if(!data||data.error||!(data.sections||[]).length) return '';
+  const R=sectionAnalysis(data,measures);
+  let h='<div class="sum-sec"><div class="sum-h">'+t('sr.h')+'</div>';
+  if(!R) return h+'<div class="sum-note">'+t('sr.none')+'</div></div>';
+  h+='<div class="sum-note" style="margin-bottom:6px">'+t('sr.lead',{t:esc(itemLabel(R.T)),c:esc(itemLabel(R.C))})+'</div>';
+  const cols=[[R.tgt,R.T,'tT']].concat(R.ref?[[R.ref,R.T,'rT']]:[]).concat([[R.tgt,R.C,'tC']]);
+  const d=R.m?String(R.m.started_on).slice(0,7):null;
+  let marked=false;
+  const body=R.months.map(k=>{
+    let row='';
+    if(d&&!marked&&k>=d){ marked=true; row+='<tr class="sr-mark"><td colspan="'+(cols.length+1)+'">'+t('ms.mark',{t:esc(aiText(R.m.title))})+'</td></tr>'; }
+    return row+'<tr><td>'+esc(k)+'</td>'+cols.map(c=>'<td>'+srFmt(R.series[c[2]][k])+'</td>').join('')+'</tr>';
+  }).join('');
+  h+='<div class="sr-wrap"><table class="sr-tbl"><thead><tr><th>'+t('sr.month')+'</th>'+cols.map(c=>'<th>'+esc(aiText(c[0].label))+'<br><small>'+esc(itemLabel(c[1]))+'</small></th>').join('')+'</tr></thead><tbody>'+
+     (body||'<tr><td colspan="'+(cols.length+1)+'">—</td></tr>')+'</tbody></table></div>';
+  let v='';
+  if(!R.m) v=t('sr.noMs');
+  else {
+    v='<b>'+esc(aiText(R.m.title))+'</b>'+(msWhoText(R.m)?'<br><small>'+esc(msWhoText(R.m))+' ・ '+t('ms.since',{d:esc(R.m.started_on)})+'</small>':'');
+    if(!R.ready) v+='<br>'+t('sr.wait',{b:R.b.n,a:R.a.n});
+    else {
+      const line=(sec,item,b,a,r)=>'<br>'+t('sr.change',{s:esc(aiText(sec.label)),i:esc(itemLabel(item)),b:srFmt(b.v),a:srFmt(a.v),r:'<b class="'+(r!=null&&r<0?'ms-good':'ms-bad')+'">'+srPct(r)+'</b>'});
+      v+=line(R.tgt,R.T,R.b,R.a,R.dT);
+      if(R.ref) v+=line(R.ref,R.T,R.rb,R.ra,R.dR);
+      v+=line(R.tgt,R.C,R.cb,R.ca,R.dC);
+      v+='<br><b>'+t(R.noCmp?'sr.needCmp':(R.good?'sr.good':'sr.unclear'))+'</b>';
+    }
+  }
+  h+='<div class="sr-v">'+v+'</div>';
+  h+='<div class="sum-note" style="margin-top:6px">'+t('sr.src',{h:R.handN,a:R.aiN})+(R.min?'<br>'+t('sr.effort',{h:Math.floor(R.min/60),m:R.min%60,n:R.nVisits}):'')+'</div>';
+  return h+'</div>';
+}
+// 段階0：手で数えた数と、同じ記録でAIが数えた数の一致（差が2割以内、少ないときは2個以内を一致とする）
+function handAgreement(data){
+  const pairs=[];
+  (data&&!data.error&&data.rows||[]).forEach(r=>{
+    if(!r.hand) return;
+    Object.entries(r.hand).forEach(([k,hv])=>{
+      const hn=Number(hv)||0, a=(r.ai||[]).filter(x=>canonName(x.name)===k).reduce((s_,x)=>s_+(Number(x.count)||0),0);
+      pairs.push({k,h:hn,a,ok:Math.abs(a-hn)<=Math.max(2,0.2*hn)});
+    });
+  });
+  const rate=l=>l.length?Math.round(l.filter(p=>p.ok).length/l.length*100):0;
+  const by={}; pairs.forEach(p=>{ (by[p.k]=by[p.k]||[]).push(p); });
+  return {n:pairs.length,rate:rate(pairs),done:pairs.length>=10&&rate(pairs)>=80,
+    items:Object.entries(by).map(([k,l])=>{ const hs=l.reduce((s_,p)=>s_+p.h,0), as=l.reduce((s_,p)=>s_+p.a,0); return {k,n:l.length,rate:rate(l),ratio:hs?Math.round(as/hs*100):null}; })};
+}
+// 報告用の1枚（社内と、次に会う管理者へ。同じ形で渡す）
+async function makeReportImage(data,measures,orgName){
+  const R=sectionAnalysis(data,measures);
+  if(!R){ alert(t('sr.none')); return; }
+  const W=1080,H=1350,c=document.createElement('canvas'); c.width=W; c.height=H;
+  const g=c.getContext('2d'), FONT='"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif';
+  const grad=g.createLinearGradient(0,0,0,H); grad.addColorStop(0,'#0A2233'); grad.addColorStop(1,'#04111C'); g.fillStyle=grad; g.fillRect(0,0,W,H);
+  const text=(s_,x,y,size,color,weight,align)=>{ g.font=(weight||400)+' '+size+'px '+FONT; g.fillStyle=color; g.textAlign=align||'left'; g.fillText(String(s_),x,y); };
+  const fit=(s_,size,weight,maxW)=>{ s_=String(s_||''); g.font=(weight||400)+' '+size+'px '+FONT; if(g.measureText(s_).width<=maxW) return s_; while(s_.length>1&&g.measureText(s_+'…').width>maxW) s_=s_.slice(0,-1); return s_+'…'; };
+  // 長い文を、幅に収まるように行に分ける（最大 n 行。あふれたら最後に…）
+  const wrap=(s_,size,weight,maxW,n)=>{ g.font=(weight||400)+' '+size+'px '+FONT; const out=[]; let cur='';
+    for(const ch of String(s_||'')){ if(g.measureText(cur+ch).width>maxW&&cur){ out.push(cur); cur=''; } cur+=ch; }
+    if(cur) out.push(cur); if(out.length>n){ out.length=n; out[n-1]=fit(out[n-1]+'…',size,weight,maxW); } return out; };
+  const d=new Date(), today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  text('moto no umi',90,130,40,'#5FD3E6',300); text(today,W-90,130,30,'rgba(255,255,255,.65)',400,'right');
+  text(fit(aiText(orgName||''),34,500,W-180),90,190,34,'#fff',500);
+  text(t('rpi.title'),90,275,52,'#fff',600);
+  if(R.m){
+    text(fit(aiText(R.m.title),36,500,W-180),90,345,36,'#FFE3A8',500);
+    text(fit([msWhoText(R.m),t('rpi.since',{d:R.m.started_on})].filter(Boolean).join(LANG==='en'?' · ':' ・ '),28,400,W-180),90,395,28,'rgba(255,255,255,.7)',400);
+  } else text(t('rpi.noMs'),90,345,32,'rgba(255,255,255,.7)',400);
+  // 決め手の数字
+  text(fit(itemLabel(R.T)+(LANG==='en'?' · ':' ・ ')+aiText(R.tgt.label),32,400,W-180),90,480,32,'rgba(170,221,238,.9)',400);
+  if(R.m&&R.ready&&R.dT!=null){
+    text(srPct(R.dT),90,640,170,R.dT<0?'#5FD3E6':'#FFAA44',600);
+    wrap(t(R.noCmp?'sr.needCmp':(R.good?'sr.good':'sr.unclear')),26,400,W-180,2).forEach((l,i)=>text(l,90,700+i*36,26,'rgba(255,255,255,.8)',400));
+  } else if(R.m){
+    text(t('rpi.wait'),90,560,34,'rgba(255,255,255,.75)',400);
+    text(t('rpi.waitN',{b:R.b.n,a:R.a.n}),90,650,72,'#FFD27A',600);
+  } else text('—',90,640,120,'rgba(255,255,255,.5)',600);
+  // 月ごとの棒（狙いの区間＝金、比べる区間＝水色）。直近12か月
+  const months=R.months.slice(-12), cy=800, ch=190, cx=90, cw=W-180;
+  text(t('rpi.perM',{i:itemLabel(R.T)}),cx,cy,26,'rgba(255,255,255,.7)',400);
+  if(months.length){
+    const vals=months.flatMap(k=>[R.series.tT[k],R.series.rT[k]]).filter(v=>v!=null), max=Math.max(1,...vals);
+    const slot=cw/months.length, bw=Math.min(28,slot/3), base=cy+30+ch;
+    g.fillStyle='rgba(255,255,255,.15)'; g.fillRect(cx,base,cw,2);
+    months.forEach((k,i)=>{
+      const x0=cx+i*slot+slot/2;
+      [[R.series.tT[k],'#FFD27A',-bw-2],[R.series.rT[k],'#9EE7F2',2]].forEach(([v,col,off])=>{ if(v==null) return; const hh=v/max*ch; g.fillStyle=col; g.fillRect(x0+off,base-hh,bw,hh); });
+      if(months.length<=8||i%2===0) text(k.slice(2).replace('-','/'),x0,base+34,20,'rgba(255,255,255,.55)',400,'center');
+      if(R.m&&k===String(R.m.started_on).slice(0,7)){ g.strokeStyle='#FFE3A8'; g.setLineDash([8,8]); g.lineWidth=2; g.beginPath(); g.moveTo(x0,cy+30); g.lineTo(x0,base); g.stroke(); g.setLineDash([]); }
+    });
+    let lx=cx; [[aiText(R.tgt.label),'#FFD27A']].concat(R.ref?[[aiText(R.ref.label),'#9EE7F2']]:[]).forEach(([s_,col])=>{ g.fillStyle=col; g.fillRect(lx,base+56,18,18); text(fit(s_,22,400,360),lx+28,base+73,22,'rgba(255,255,255,.75)',400); g.font='400 22px '+FONT; lx+=Math.min(360,g.measureText(s_).width)+70; });
+  }
+  // 比べる相手と、かけた時間
+  const lines=[];
+  if(R.m&&R.ready){ if(R.ref) lines.push(itemLabel(R.T)+' · '+aiText(R.ref.label)+'  '+srPct(R.dR)); lines.push(itemLabel(R.C)+' · '+aiText(R.tgt.label)+'  '+srPct(R.dC)); }
+  if(R.min) lines.push(t('sr.effort',{h:Math.floor(R.min/60),m:R.min%60,n:R.nVisits}));
+  lines.forEach((s_,i)=>text(fit(s_,24,400,W-180),90,1128+i*30,24,'rgba(255,255,255,.7)',400));
+  g.fillStyle='rgba(255,210,122,.35)'; g.fillRect(90,1215,W-180,2);
+  text(t('axis.t').replace('|',''),W/2,1270,34,'#FFE3A8',500,'center');
+  text(fit(t('rpi.foot'),20,400,W-120),W/2,1312,20,'rgba(255,255,255,.45)',400,'center');
+  const blob=await new Promise(res=>c.toBlob(res,'image/png'));
+  await saveBlob(blob,'motonoumi_report_'+today.replace(/-/g,'')+'.png');
+  return c; // テスト用
+}
 
 // ── マイ浜：ステップ1を、一人でも続けられる形に。同じ浜で、小さなゴールを積み重ねる ──
 const MYB_KEY='mn_mybeach', IDEA_KEY='mn_my_ideas', MYB_RADIUS=1000; // マイ浜の範囲：中心から1km
@@ -3166,7 +3457,7 @@ async function inviteFriends(){
 
 
 // ── 動作チェック：更新のあと、アプリ・サーバー・データベースのどこまでが入ったかを確かめる ──
-const APP_VERSION='2026-10-21';
+const APP_VERSION='2026-10-29';
 function openCheck(){ document.getElementById('chkv').classList.add('show'); runCheck(); }
 function closeCheck(){ document.getElementById('chkv').classList.remove('show'); }
 async function runCheck(){
@@ -3663,6 +3954,7 @@ function addPin(r){
         ${stakeholderHtml}
         ${routeHtml}
         ${linksHtml}
+        ${r.is_mine&&r.section_id?handPopHtml(r):''}
         ${r.is_mine?`<div class="vf-row">${t('vf.q')}<div class="vf-btns" data-id="${esc(r.id)}">${['exact','close','off'].map(v=>`<button type="button" data-v="${v}" class="${r.verify===v?'on':''}" onclick="setVerify('${esc(r.id)}','${v}')">${t('vf.'+v)}</button>`).join('')}</div></div>`:''}
         ${r.is_mine?`<button type="button" class="umi-pop-report" style="color:#FFD27A" onclick="setMyBeach('${esc(r.id)}')">${t('mb.setHere')}</button><button type="button" class="umi-pop-del" onclick="deleteRecord('${esc(r.id)}')">${t('del.record')}</button>`:`<button type="button" class="umi-pop-report" onclick="openReportRecord('${esc(r.id)}')">${t('rep.open')}</button>`}
       </div>
@@ -4269,6 +4561,7 @@ function showConfirm(){
   const sec=sectionAt(userLat,userLng), sb=document.getElementById('sec-box');
   sb.classList.toggle('show',!!sec);
   if(sec){ document.getElementById('sec-name').textContent=t('sec.here',{l:aiText(sec.label),r:t(sec.role==='reference'?'sec.ref':'sec.tgt')}); if(!document.getElementById('confv').classList.contains('show')) document.getElementById('sec-all').checked=false; }
+  renderHandBox();
   const pvw=document.getElementById('pv-warn'), pv=r.privacy;
   if(pvw){ pvw.style.display=pv&&pv.any?'block':'none'; if(pv&&pv.any) pvw.textContent=t('pv.warn',{what:pvWhat(pv)}); }
   document.getElementById('batch-stop').style.display=batch?'block':'none';
@@ -4386,7 +4679,7 @@ async function send(){
     const compBlob=await(await fetch(compressedForUpload)).blob();
     const imgUrl=await upload(compBlob);
     const r=analysisResult;
-    const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,effort_min:effortMin,cleared_all:!!(sectionAt(userLat,userLng)&&document.getElementById('sec-all').checked),ai_model:r.ai_model||null,ai_version:r.ai_version||null,
+    const rec={lat:userLat,lng:userLng,image_url:imgUrl,location_name:r.location_name,effort_min:effortMin,cleared_all:!!(sectionAt(userLat,userLng)&&document.getElementById('sec-all').checked),hand_counts:(sectionAt(userLat,userLng)&&document.getElementById('sec-all').checked)?readHand():null,ai_model:r.ai_model||null,ai_version:r.ai_version||null,
       activity_id:activityFor(photoTakenAt||r.photo_taken_at),
       category:r.category||'SEA',category_reason:r.category_reason,photo_taken_at:photoTakenAt||r.photo_taken_at||null,
       items:r.items,material_type:r.material_type,size_class:r.size_class,
@@ -4400,6 +4693,7 @@ async function send(){
     const res=await api('save',{record:rec});
     if(res.error) throw new Error(res.error);
     const savedRec={...rec,created_at:new Date().toISOString(),...res.record,is_mine:true};
+    clearHand(); // 同じ回の合計を、次の写真に重ねて入れないように
     hideLoad();
     if(!window.allRecords) window.allRecords=[];
     window.allRecords.unshift(savedRec);
